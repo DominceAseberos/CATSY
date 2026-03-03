@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import supabase
+from .database import supabase
 
 app = FastAPI(title="Catsy Coffee API Bridge")
 
@@ -26,3 +26,21 @@ def get_coffee():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+@app.get("/api/db-check")
+def check_db():
+    try:
+        response = supabase.table('products').select("*", count='exact').limit(1).execute()
+        
+        return {
+            "status": "📡 Supabase Connected!",
+            "data_preview": response.data,
+            "count": response.count
+        }
+    except Exception as e:
+        return {
+            "status": "❌ Supabase Connection Failed",
+            "error": str(e)
+        }
