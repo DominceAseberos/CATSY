@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .database import supabase
 
@@ -44,3 +44,13 @@ def check_db():
             "status": "❌ Supabase Connection Failed",
             "error": str(e)
         }
+
+@app.get("/api/products")
+def get_products():
+    try:
+        # Fetch all rows from the products table
+        response = supabase.table('products').select("*").execute()
+        return response.data
+    except Exception as e:
+        # Basic error handling for DB timeouts or connection issues
+        raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")

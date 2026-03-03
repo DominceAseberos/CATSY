@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'services/api_service.dart';
+import 'screens/main_shell.dart';
 
 void main() => runApp(const CatsyMobile());
 
@@ -11,7 +12,7 @@ class CatsyMobile extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.brown),
-      home: const StatusPage(),
+      home: const MainShell(),
     );
   }
 }
