@@ -1,0 +1,33 @@
+# --- Python (Catsy-Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+db.sqlite3
+
+# --- Node/React (Catsy-Web) ---
+node_modules/
+dist/
+dist-ssr
+*.local
+.eslintcache
+
+# --- Flutter (Catsy-Mobile) ---
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+ios/Flutter/Generated.xcconfig
+android/local.properties
+**/*.pks
+**/*.keystore
+
+# --- System & Editors ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
