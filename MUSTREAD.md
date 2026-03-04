@@ -49,7 +49,16 @@ When you are done saving files in your code editor, you need to save them in Git
 ![Push Step 1](steps-imgs/image-4.png)
 ![Push Step 2](steps-imgs/image-5.png)
 ![Push Step 3](steps-imgs/image-6.png)
+
+
+<br>
+<br>
+<br>
+
+**NOTE: EXAMPLE OF PUSHING TO THE CURRENT BRANCH WITHOUT "Comapre & Pull Request" Button**
+
 ![Push Example](steps-imgs/image-10.png)
+
 ![Push Example 2](steps-imgs/image-11.png)
 
 ### Step 5: Provide Proof of Work
