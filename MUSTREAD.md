@@ -22,7 +22,7 @@ Before you start any work, **always** make sure your code is up-to-date with the
 ## 📋 STEP-BY-STEP WORKFLOW
 
 ### Step 1: Claim an Issue
-Find an issue on the GitHub board that you want to work on and assign it to yourself.
+Go To Issues Tab and > Milestone Tab > Select Current Milestone and Find an issue on the GitHub board that you want to work on and assign it to yourself.
 ![Claim Issue](steps-imgs/image.png)
 ![Claim Issue](steps-imgs/image-assign.png)
 
