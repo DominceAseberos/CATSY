@@ -6,7 +6,7 @@ import STATIC_MENU from '../../data/menu.json';
 
 // ─── Grid limits ─────────────────────────────────────────────────────────────
 // Wide  (≥ 1024px): 3 cols × 6 rows = 18 items max
-// Mobile (< 1024px): 2 cols × 6 rows = 12 items max
+// Mobile (< 1024px): 2 cols × 6 rows = 12 items maxx
 const MAX_ROWS = 6;
 const COLS_WIDE = 3;
 const COLS_MOBILE = 2;
@@ -110,8 +110,8 @@ export default function UnifiedMenu() {
                                             setIsOpen(false);
                                         }}
                                         className={`w-full flex items-center gap-3 px-6 py-3.5 text-left transition-colors ${selectedCategory.id === cat.id
-                                                ? 'bg-neutral-900 text-white'
-                                                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                                            ? 'bg-neutral-900 text-white'
+                                            : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                                             }`}
                                     >
                                         <Coffee size={14} className="opacity-40 shrink-0" />
