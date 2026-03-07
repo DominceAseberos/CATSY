@@ -183,7 +183,7 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
             {/* Main Content Container */}
             {/* During splash, this centering logic applies to the fixed overlay if we used one, but here we toggle classes */}
             <div className={`
-                flex flex-col items-center justify-center 
+                flex flex-col items-center justify-center
                 ${!isSplashComplete ? 'fixed inset-0 z-50' : 'flex-grow z-10 w-full max-w-[320px]'}
             `}>
 

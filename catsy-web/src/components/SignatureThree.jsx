@@ -55,11 +55,11 @@ export default function SignatureThree() {
 
     return (
         <section ref={containerRef} className="py-24 bg-neutral-900 overflow-hidden">
-            <div className="container mx-auto px-6">
+            <div className="w-full px-6">
                 {/* Carousel Container */}
-                <div className="flex flex-row gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-12 px-4 -mx-4">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12 flex flex-row lg:flex-none overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory scrollbar-hide pb-12 px-4 -mx-4 lg:mx-0 lg:px-0">
                     {bestSellers.map((item) => (
-                        <div key={item.id} className="spotlight-card flex flex-col items-center group w-[85vw] md:w-[400px] snap-center shrink-0">
+                        <div key={item.id} className="spotlight-card flex flex-col items-center group w-[85vw] lg:w-full snap-center shrink-0">
                             {/* Product Info - Now Above Image */}
                             <div className="text-center space-y-4 mb-8">
                                 <span className="product-badge inline-block px-3 py-1 bg-brand-accent/20 border border-brand-accent/30 rounded-full text-[10px] font-bold text-brand-accent uppercase tracking-widest leading-none transition-colors group-hover:bg-brand-accent group-hover:text-white group-hover:border-transparent duration-500">

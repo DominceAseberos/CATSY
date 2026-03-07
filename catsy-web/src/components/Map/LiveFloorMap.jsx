@@ -64,7 +64,7 @@ export default function LiveFloorMap({ tablesData, onNavigate }) {
             )}
 
             {/* Sidebar Overlay Card */}
-            <div className="container mx-auto px-6 h-full flex items-center justify-end relative pointer-events-none">
+            <div className="w-full px-6 h-full flex items-center justify-end relative pointer-events-none">
                 <div className="map-overlay pointer-events-auto w-full max-w-md bg-neutral-900/95 backdrop-blur-3xl border border-white/10 p-8 rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] space-y-6 relative overflow-hidden">
 
                     {/* Enhanced Close Button */}

@@ -82,6 +82,14 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === 'phone') {
+            // Keep only numbers and limit to 11 digits
+            const cleanValue = value.replace(/\D/g, '').slice(0, 11);
+            setFormData(prev => ({ ...prev, [name]: cleanValue }));
+            return;
+        }
+
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -355,7 +363,9 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
                                                 onChange={handleChange}
                                                 readOnly={isLoggedIn}
                                                 className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : 'border-neutral-200 text-neutral-900'}`}
-                                                placeholder="e.g. +63 900 000 0000"
+                                                placeholder="e.g. 09123456789"
+                                                maxLength={11}
+                                                pattern="[0-9]{11}"
                                                 required
                                             />
                                         </div>

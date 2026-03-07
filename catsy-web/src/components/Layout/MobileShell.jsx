@@ -86,12 +86,12 @@ export default function MobileShell({ children, activePage, setActivePage }) {
     }, []);
 
     return (
-        <div ref={containerRef} className="min-h-screen bg-brand-primary text-brand-secondary font-body overflow-x-hidden relative flex flex-col items-center">
+        <div ref={containerRef} className="min-h-screen bg-brand-primary text-brand-secondary font-body overflow-x-hidden relative flex flex-col">
             {/* Full Width Navbar */}
             <Navbar activePage={activePage} onNavigate={setActivePage} />
 
             {/* Content Area - Conditional Padding for Landing Page */}
-            <main className={`w-full max-w-7xl mx-auto min-h-screen ${activePage === 'home' ? '' : 'pt-24 px-6 pb-24'}`}>
+            <main className={`w-full min-h-screen ${activePage === 'home' ? '' : 'pt-24 px-6 pb-24'}`}>
                 {children}
             </main>
 
