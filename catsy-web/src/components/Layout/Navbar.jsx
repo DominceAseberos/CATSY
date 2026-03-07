@@ -34,7 +34,7 @@ const Navbar = ({ activePage, onNavigate }) => {
 
     return (
         <nav className="fixed top-0 w-full bg-white shadow-md z-[1000] font-sans">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="w-full px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 items-center">
                     {/* Logo Section */}
                     <div
@@ -91,8 +91,8 @@ const Navbar = ({ activePage, onNavigate }) => {
                                 key={link.id}
                                 onClick={() => handleLinkClick(link.id)}
                                 className={`flex items-center w-full px-4 py-4 text-xl font-bold rounded-lg transition-colors ${activePage === link.id
-                                        ? 'bg-neutral-900 text-white'
-                                        : 'text-neutral-700 hover:bg-neutral-50'
+                                    ? 'bg-neutral-900 text-white'
+                                    : 'text-neutral-700 hover:bg-neutral-50'
                                     }`}
                             >
                                 <link.icon className="mr-4" size={24} />

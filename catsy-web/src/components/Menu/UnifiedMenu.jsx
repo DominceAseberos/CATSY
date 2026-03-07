@@ -76,7 +76,7 @@ export default function UnifiedMenu() {
             id="beverage-library"
             className="py-24 bg-white overflow-hidden relative"
         >
-            <div className="container mx-auto px-6 max-w-5xl">
+            <div className="w-full px-6">
 
                 {/* ── Header ── */}
                 <div className="bev-header mb-12 text-center relative z-10">

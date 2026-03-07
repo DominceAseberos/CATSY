@@ -73,7 +73,7 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
         <div className="flex flex-col items-center justify-center min-h-screen px-6 bg-brand-primary">
             <div className="w-full max-w-sm animate-fade-in">
                 <div className="text-center mb-10">
-                    <h1 className="text-4xl font-sans font-bold text-neutral-900 tracking-tighter mb-2">
+                    <h1 className="text-4xl font-sans font-bold text-white tracking-tighter mb-2">
                         {isLogin ? "Welcome Back." : "Join Catsy."}
                     </h1>
                     <p className="text-neutral-500">
