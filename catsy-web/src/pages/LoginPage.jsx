@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MagneticButton from '../components/UI/MagneticButton';
 import CustomerToast from '../components/UI/CustomerToast';
-import { User, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, ArrowRight, Eye, EyeOff, Phone, UserCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
@@ -17,6 +17,17 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
         passwordStrength,
         isPasswordStrong
     } = useAuth((user) => {
+        // Handle mock signup success
+        if (user.isMockSignupSuccess) {
+            setModal({
+                isOpen: true,
+                type: 'success',
+                title: 'Account Created',
+                message: user.message // "Account created! Please log in."
+            });
+            return;
+        }
+
         // Block staff/admin accounts — they must use the staff portal
         if (user.role === 'admin' || user.role === 'staff') {
             setModal({
@@ -108,6 +119,38 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                         onChange={handleChange}
                                         className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
                                         placeholder="Doe"
+                                        required={!isLogin}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* New Signup Fields: Username & Phone */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider ml-4">Username</label>
+                                <div className="flex items-center bg-white p-4 rounded-full border border-neutral-100 focus-within:ring-2 focus-within:ring-brand-accent transition-shadow">
+                                    <UserCircle size={20} className="text-neutral-400 mr-2 shrink-0" />
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                        placeholder="jane_doe"
+                                        required={!isLogin}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider ml-4">Phone</label>
+                                <div className="flex items-center bg-white p-4 rounded-full border border-neutral-100 focus-within:ring-2 focus-within:ring-brand-accent transition-shadow">
+                                    <Phone size={20} className="text-neutral-400 mr-2 shrink-0" />
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                        placeholder="0912-345-6789"
                                         required={!isLogin}
                                     />
                                 </div>
@@ -217,21 +260,24 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                     </MagneticButton>
                 </form>
 
-                <div className="mt-12 text-center space-y-4">
-                    <p className="text-sm text-neutral-400">
+                <div className="mt-12 text-center flex flex-col items-center gap-3">
+                    <div className="text-sm text-neutral-500 transition-colors">
                         {isLogin ? "Don't have an account?" : "Already have an account?"}
                         <button
                             onClick={() => { setIsLogin(!isLogin); setModal(prev => ({ ...prev, isOpen: false })); }}
-                            className="ml-2 font-bold text-neutral-900 underline hover:text-brand-accent transition-colors"
+                            className="ml-2 font-bold text-neutral-200 underline hover:text-brand-accent transition-colors cursor-pointer"
                         >
                             {isLogin ? "Sign Up" : "Login"}
                         </button>
-                    </p>
+                    </div>
 
                     {isLogin && (
-                        <p className="text-xs text-neutral-400">
-                            <a href="#" className="hover:text-neutral-900 transition-colors">Forgot Password?</a>
-                        </p>
+                        <a
+                            href="#"
+                            className="text-xs text-neutral-500 hover:text-white hover:underline transition-all tracking-wide"
+                        >
+                            Forgot Password?
+                        </a>
                     )}
                 </div>
             </div>
