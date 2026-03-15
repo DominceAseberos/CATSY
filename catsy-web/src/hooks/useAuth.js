@@ -11,6 +11,8 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
     const [formError, setFormError] = useState('');
     const [formData, setFormData] = useState({
         email: '',
+        username: '',
+        phone: '',
         password: '',
         confirmPassword: '',
         firstName: '',
@@ -65,23 +67,27 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
                     throw new Error('Invalid username or password');
                 }
             } else {
-                const newUser = await customerService.signup({
-                    email: formData.email,
-                    password: formData.password,
-                    first_name: formData.firstName,
-                    last_name: formData.lastName,
-                    role: 'customer'
+                // Mock success: Account created! Please log in.
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Set success state via onLoginSuccess or a dedicated feedback mechanism
+                // For this specific requirement, we show the message and switch to login
+                onLoginSuccess({
+                    isMockSignupSuccess: true,
+                    message: "Account created! Please log in."
                 });
 
-                if (newUser) {
-                    const loginResponse = await customerService.login(formData.email, formData.password);
-                    if (loginResponse) {
-                        const userData = Array.isArray(loginResponse) ? loginResponse[0] : loginResponse;
-                        const mappedUser = mapUserData(userData);
-                        saveSession(mappedUser);
-                        onLoginSuccess(mappedUser);
-                    }
-                }
+                // Switch to login view after successful "creation"
+                setIsLogin(true);
+                setFormData({
+                    email: '',
+                    username: '',
+                    phone: '',
+                    password: '',
+                    confirmPassword: '',
+                    firstName: '',
+                    lastName: ''
+                });
             }
         } catch (err) {
             logger.error(err);

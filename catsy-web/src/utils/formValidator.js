@@ -52,6 +52,12 @@ export const validateFormData = (formData, isLogin, passwordStrength) => {
         if (!formData.firstName.trim() || !formData.lastName.trim()) {
             return "Please enter your first and last name.";
         }
+        if (!formData.username || !formData.username.trim()) {
+            return "Please choose a username.";
+        }
+        if (!formData.phone || !formData.phone.trim()) {
+            return "Please enter your phone number.";
+        }
 
         const nameRegex = /^[a-zA-Z\s]+$/;
         if (!nameRegex.test(formData.firstName) || !nameRegex.test(formData.lastName)) {
