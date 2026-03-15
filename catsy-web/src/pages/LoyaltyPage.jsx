@@ -148,13 +148,15 @@ export default function LoyaltyPage() {
                             key={i}
                             className={`stamp w-full aspect-square rounded-full flex items-center justify-center transition-colors duration-500 overflow-hidden ${i < unspentCount
                                 ? 'bg-brand-accent shadow-[0_0_12px_rgba(var(--brand-accent-rgb),0.5)]'
-                                : 'bg-white/10'
+                                : 'bg-white/5 border border-white/10'
                                 }`}
                         >
-                            {/* White circle dims when stamp is not yet earned */}
-                            <div className={`w-[80%] h-[80%] rounded-full bg-white flex items-center justify-center overflow-hidden transition-opacity duration-500 ${i < unspentCount ? 'opacity-100' : 'opacity-5'}`}>
-                                <img src="/catsy_logo.svg" alt="Catsy" className="w-[80%] h-[80%] object-contain" />
-                            </div>
+                            {/* Show logo ONLY for earned stamps; otherwise keep circle empty */}
+                            {i < unspentCount && (
+                                <div className="w-[80%] h-[80%] rounded-full bg-white flex items-center justify-center overflow-hidden animate-scale-in">
+                                    <img src="/catsy_logo.svg" alt="Catsy" className="w-[80%] h-[80%] object-contain" />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
