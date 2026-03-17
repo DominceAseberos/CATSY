@@ -1,0 +1,96 @@
+name: catsy_pos
+description: "CATSY POS — Staff Mobile POS System for Cutsy Café"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # --- State Management ---
+  flutter_riverpod: ^3.2.1
+  # riverpod_annotation — skipped (v4 requires analyzer ^9 which conflicts with flutter_test)
+  # Using manual Riverpod providers instead of codegen
+
+  # --- Local Database (Drift / SQLite) ---
+  drift: ^2.31.0
+  sqlite3_flutter_libs: ^0.5.41
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # --- Secure Storage ---
+  flutter_secure_storage: ^10.0.0
+
+  # --- Networking & Connectivity ---
+  connectivity_plus: ^7.0.0
+  http: ^1.2.0
+
+  # --- Routing ---
+  go_router: ^17.1.0
+
+  # --- QR Code ---
+  mobile_scanner: ^7.1.4
+  qr_flutter: ^4.1.0
+
+  # --- Receipt / Printing ---
+  pdf: ^3.11.1
+  printing: ^5.13.3
+  # esc_pos_utils / esc_pos_bluetooth — skipped (incompatible with Dart 3.x)
+  sunmi_printer_plus: ^4.1.1
+
+  # --- UI Utilities ---
+  flutter_svg: ^2.2.3
+  cached_network_image: ^3.4.1
+  google_fonts: ^8.0.1
+  shimmer: ^3.0.0
+  flutter_slidable: ^4.0.3
+  fl_chart: ^1.1.1
+  intl: ^0.20.2
+  uuid: ^4.5.2
+  equatable: ^2.0.8
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+  # --- Notifications (local) ---
+  flutter_local_notifications: ^18.0.1
+  audioplayers: ^6.1.0
+
+  # --- Misc ---
+  logger: ^2.6.2
+  dartz: ^0.10.1
+  shared_preferences: ^2.5.4
+  permission_handler: ^11.4.0
+  confetti: ^0.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+  # --- Code Generation ---
+  build_runner: ^2.4.0
+  drift_dev: ^2.27.0
+  # riverpod_generator — skipped (same analyzer conflict as riverpod_annotation)
+  freezed: ^3.0.6
+  json_serializable: ^6.9.4
+  mockito: ^5.4.6
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
