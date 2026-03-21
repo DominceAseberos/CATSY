@@ -5,7 +5,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../data/local/database/app_database.dart';
 
 class HeldOrdersSection extends ConsumerWidget {
-  const HeldOrdersSection({Key? key}) : super(key: key);
+  const HeldOrdersSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -90,8 +90,7 @@ class HeldOrdersSection extends ConsumerWidget {
 class _HeldOrderCard extends StatelessWidget {
   final OrdersTableData order;
   final int index;
-  const _HeldOrderCard({Key? key, required this.order, required this.index})
-    : super(key: key);
+  const _HeldOrderCard({required this.order, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +101,7 @@ class _HeldOrderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

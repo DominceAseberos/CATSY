@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../domain/entities/inventory_item.dart';
@@ -56,7 +56,7 @@ class StockOverviewScreen extends ConsumerWidget {
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: items.length,
-              separatorBuilder: (_, __) => const Divider(),
+              separatorBuilder: (_, _) => const Divider(),
               itemBuilder: (context, index) {
                 final item = items[index];
                 return AnimatedListItem(
@@ -70,7 +70,7 @@ class StockOverviewScreen extends ConsumerWidget {
         loading: () => ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: 8,
-          separatorBuilder: (_, __) => const Divider(),
+          separatorBuilder: (_, _) => const Divider(),
           itemBuilder: (context, index) => const ShimmerListTile(),
         ),
         error: (err, stack) => Center(child: Text('Error: $err')),

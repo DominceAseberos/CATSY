@@ -7,7 +7,7 @@ import '../../../config/routes/route_names.dart';
 import '../../../domain/enums/table_status.dart';
 
 class TablesSection extends ConsumerWidget {
-  const TablesSection({Key? key}) : super(key: key);
+  const TablesSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

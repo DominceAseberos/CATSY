@@ -4,7 +4,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/routes/route_names.dart';
 
 class DashboardBottomBar extends StatelessWidget {
-  const DashboardBottomBar({Key? key}) : super(key: key);
+  const DashboardBottomBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class DashboardBottomBar extends StatelessWidget {
         color: AppColors.dashboardCard,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),

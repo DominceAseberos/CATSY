@@ -4,7 +4,7 @@ import '../providers/dashboard_data_provider.dart';
 import '../../../config/theme/app_colors.dart';
 
 class StampsSection extends ConsumerWidget {
-  const StampsSection({Key? key}) : super(key: key);
+  const StampsSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,11 +71,10 @@ class _StampCard extends StatelessWidget {
   final Color color;
 
   const _StampCard({
-    Key? key,
     required this.title,
     required this.count,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,7 @@ class _StampCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
