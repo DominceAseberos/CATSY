@@ -1,4 +1,5 @@
 import { logger } from '../utils/logger';
+import { getAccessToken, clearSession } from '../utils/sessionManager';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -17,8 +18,12 @@ class ApiError extends Error {
 export const apiClient = {
     async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
+        
+        // Auto-inject JWT token if available
+        const token = getAccessToken();
         const headers = {
             'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             ...(options.headers || {}),
         };
 
@@ -38,6 +43,19 @@ export const apiClient = {
 
             if (!response.ok) {
                 logger.error(`API Error [${response.status}] at ${endpoint}`, data);
+                
+                // Fast-fail and trigger redirect for expired/invalid tokens
+                if (response.status === 401 && !options.skipAuthError) {
+                    clearSession();
+                    window.dispatchEvent(new CustomEvent('auth-error', {
+                        detail: {
+                            title: 'Session Expired',
+                            message: 'Your session has expired or is invalid. Please sign in again.',
+                            status: 401,
+                        }
+                    }));
+                }
+
                 throw new ApiError(data?.detail || response.statusText, response.status, data);
             }
 

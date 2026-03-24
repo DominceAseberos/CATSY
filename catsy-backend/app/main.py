@@ -48,20 +48,37 @@ def check_db():
         }
 
 from fastapi import Query
+from typing import List
 from app.repositories.supabase_repo import SupabaseRepository
+from app.schemas import ProductResponse, CategoryResponse
+from app.auth import get_current_user
+from fastapi import Depends
 
-@app.get("/products")
+@app.get("/products", response_model=List[ProductResponse])
 def get_products(limit: int = Query(100, ge=1, le=1000), offset: int = Query(0, ge=0)):
     try:
         return SupabaseRepository.get_products(limit=limit, offset=offset)
     except Exception as e:
-        # Basic error handling for DB timeouts or connection issues
         raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
 
-@app.get("/categories")
+@app.get("/categories", response_model=List[CategoryResponse])
 def get_categories():
     try:
         return SupabaseRepository.get_categories()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
+
+@app.get("/api/staff/reservations")
+def get_reservations(
+    limit: int = Query(50, ge=1, le=1000), 
+    offset: int = Query(0, ge=0), 
+    user=Depends(get_current_user)
+):
+    """
+    Staff-only endpoint. Requires a valid JWT Bearer token supplied by the frontend.
+    """
+    try:
+        return SupabaseRepository.get_reservations(limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
 
