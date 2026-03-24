@@ -1,61 +1,36 @@
-import { apiClient } from './api';
+import { apiClient } from './apiClient';
 
 export const adminService = {
     login: async (email, password) => {
-        return apiClient('/admin/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-            skipAuthError: true
-        });
+        return apiClient.post('/admin/login', { email, password });
     },
 
-    getUsers: () => apiClient('/admin/users', { method: 'GET' }),
+    getUsers: () => apiClient.get('/admin/users'),
 
-    createUser: (userData) => apiClient('/admin/users', {
-        method: 'POST',
-        body: JSON.stringify(userData)
-    }),
+    createUser: (userData) => apiClient.post('/admin/users', userData),
 
-    changePassword: (userId, password) => apiClient(`/admin/users/${userId}/password`, {
-        method: 'PATCH',
-        body: JSON.stringify({ password })
-    }),
+    changePassword: (userId, password) => apiClient.patch(`/admin/users/${userId}/password`, { password }),
 
-    deleteUser: (userId) => apiClient(`/admin/users/${userId}`, { method: 'DELETE' }),
+    deleteUser: (userId) => apiClient.delete(`/admin/users/${userId}`),
 
-    getProducts: () => apiClient('/admin/products', { method: 'GET' }),
+    getProducts: () => apiClient.get('/admin/products'),
 
-    createProduct: (productData) => apiClient('/admin/products', {
-        method: 'POST',
-        body: JSON.stringify(productData)
-    }),
+    createProduct: (productData) => apiClient.post('/admin/products', productData),
 
-    updateProduct: (productId, productData) => apiClient(`/admin/products/${productId}`, {
-        method: 'PUT',
-        body: JSON.stringify(productData)
-    }),
+    updateProduct: (productId, productData) => apiClient.put(`/admin/products/${productId}`, productData),
 
-    deleteProduct: (productId) => apiClient(`/admin/products/${productId}`, { method: 'DELETE' }),
+    deleteProduct: (productId) => apiClient.delete(`/admin/products/${productId}`),
 
-    getCategories: () => apiClient('/admin/categories', { method: 'GET' }),
+    getCategories: () => apiClient.get('/admin/categories'),
 
-    createCategory: (categoryData) => apiClient('/admin/categories', {
-        method: 'POST',
-        body: JSON.stringify(categoryData)
-    }),
+    createCategory: (categoryData) => apiClient.post('/admin/categories', categoryData),
 
-    updateCategory: (categoryId, categoryData) => apiClient(`/admin/categories/${categoryId}`, {
-        method: 'PUT',
-        body: JSON.stringify(categoryData)
-    }),
+    updateCategory: (categoryId, categoryData) => apiClient.put(`/admin/categories/${categoryId}`, categoryData),
 
-    deleteCategory: (categoryId) => apiClient(`/admin/categories/${categoryId}`, { method: 'DELETE' }),
+    deleteCategory: (categoryId) => apiClient.delete(`/admin/categories/${categoryId}`),
 
     // Reservations
-    getReservations: () => apiClient('/api/staff/reservations', { method: 'GET' }),
+    getReservations: () => apiClient.get('/api/staff/reservations'),
 
-    updateReservationStatus: (reservationId, status) => apiClient(`/api/staff/reservations/${reservationId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status })
-    })
+    updateReservationStatus: (reservationId, status) => apiClient.patch(`/api/staff/reservations/${reservationId}`, { status })
 };

@@ -73,7 +73,9 @@ function AppContent() {
                 </>
             } />
 
-            <Route path="/admin/*" element={
+            <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
+            
+            <Route path="/admin/:tab" element={
                 (!isLoggedIn || !isAdmin) ? (
                     <Navigate to="/admin/login" replace />
                 ) : (

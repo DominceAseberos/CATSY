@@ -3,32 +3,23 @@
  * Handles all API calls for raw_materials_inventory and product_recipe.
  * Follows the same pattern as adminService.js.
  */
-import { apiClient } from './api';
+import { apiClient } from './apiClient';
 
 export const materialsService = {
     // --- Raw Materials CRUD ---
-    getAll: () => apiClient('/admin/materials', { method: 'GET' }),
+    getAll: () => apiClient.get('/admin/materials'),
 
-    create: (data) => apiClient('/admin/materials', {
-        method: 'POST',
-        body: JSON.stringify(data),
-    }),
+    create: (data) => apiClient.post('/admin/materials', data),
 
-    update: (id, data) => apiClient(`/admin/materials/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-    }),
+    update: (id, data) => apiClient.put(`/admin/materials/${id}`, data),
 
-    delete: (id) => apiClient(`/admin/materials/${id}`, { method: 'DELETE' }),
+    delete: (id) => apiClient.delete(`/admin/materials/${id}`),
 
     /** Unit-change guard: returns { in_use: boolean } */
-    checkInUse: (id) => apiClient(`/admin/materials/${id}/in-use`, { method: 'GET' }),
+    checkInUse: (id) => apiClient.get(`/admin/materials/${id}/in-use`),
 
     // --- Product Recipes ---
-    getRecipe: (productId) => apiClient(`/admin/products/${productId}/recipe`, { method: 'GET' }),
+    getRecipe: (productId) => apiClient.get(`/admin/products/${productId}/recipe`),
 
-    upsertRecipe: (productId, ingredients) => apiClient(`/admin/products/${productId}/recipe`, {
-        method: 'PUT',
-        body: JSON.stringify({ ingredients }),
-    }),
+    upsertRecipe: (productId, ingredients) => apiClient.put(`/admin/products/${productId}/recipe`, { ingredients }),
 };

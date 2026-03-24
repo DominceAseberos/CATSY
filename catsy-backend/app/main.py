@@ -47,22 +47,13 @@ def check_db():
             "error": str(e)
         }
 
+from fastapi import Query
+from app.repositories.supabase_repo import SupabaseRepository
+
 @app.get("/products")
-def get_products():
+def get_products(limit: int = Query(100, ge=1, le=1000), offset: int = Query(0, ge=0)):
     try:
-        # Fetch all fields from products and join with categories
-        response = supabase.table('products').select(
-            "*, categories!products_category_id_fkey(name)"
-        ).execute()
-        
-        # Transform the data: preserve all required fields for the UI, but add the resolved 'category' name
-        formatted_products = []
-        for item in response.data:
-            category_data = item.get("categories")
-            item["category"] = category_data.get("name") if category_data else "Uncategorized"
-            formatted_products.append(item)
-            
-        return formatted_products
+        return SupabaseRepository.get_products(limit=limit, offset=offset)
     except Exception as e:
         # Basic error handling for DB timeouts or connection issues
         raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
@@ -70,8 +61,7 @@ def get_products():
 @app.get("/categories")
 def get_categories():
     try:
-        response = supabase.table('categories').select("*").execute()
-        return response.data
+        return SupabaseRepository.get_categories()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
 

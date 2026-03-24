@@ -1,31 +1,15 @@
-import { apiClient } from './api';
+import { apiClient } from './apiClient';
 
 export const productService = {
     // Products
-    getAllProducts: () => apiClient('/products'),
-    createProduct: (product) => apiClient('/products', {
-        method: 'POST',
-        body: JSON.stringify(product)
-    }),
-    updateProduct: (id, product) => apiClient(`/products/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(product)
-    }),
-    deleteProduct: (id) => apiClient(`/products/${id}`, {
-        method: 'DELETE'
-    }),
+    getAllProducts: () => apiClient.get('/products'),
+    createProduct: (product) => apiClient.post('/products', product),
+    updateProduct: (id, product) => apiClient.put(`/products/${id}`, product),
+    deleteProduct: (id) => apiClient.delete(`/products/${id}`),
 
     // Categories
-    getAllCategories: () => apiClient('/categories'),
-    createCategory: (category) => apiClient('/categories', {
-        method: 'POST',
-        body: JSON.stringify(category)
-    }),
-    updateCategory: (id, category) => apiClient(`/categories/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(category)
-    }),
-    deleteCategory: (id) => apiClient(`/categories/${id}`, {
-        method: 'DELETE'
-    })
+    getAllCategories: () => apiClient.get('/categories'),
+    createCategory: (category) => apiClient.post('/categories', category),
+    updateCategory: (id, category) => apiClient.put(`/categories/${id}`, category),
+    deleteCategory: (id) => apiClient.delete(`/categories/${id}`)
 };

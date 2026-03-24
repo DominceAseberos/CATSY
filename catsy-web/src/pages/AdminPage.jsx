@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import DebugConsole from '../components/Admin/DebugConsole';
 import StatusModal from '../components/UI/StatusModal';
 import { useAdminTabs } from '../hooks/useAdminTabs';
@@ -22,19 +22,23 @@ import AdminProfile from './admin/components/AdminProfile';
 
 export default function AdminPage() {
     const navigate = useNavigate();
+    const { tab } = useParams();
+    const activeTab = tab || 'products';
+    
+    // Redirect unknown tabs safely
+    const validTabs = ['products', 'categories', 'materials', 'accounts', 'reservations', 'loyalty', 'profile'];
+    
     const { isLoggedIn, userInfo, login } = useUser();
 
     // Data & Logic Hooks
     const { products, categories, users, materials, reservations, isLoading, hasLowStock, refreshData, performSave: hookSave, performDelete: hookDelete, updateReservationState } = useAdminData(isLoggedIn);
 
-    // Tab & Filtering Hooks
+    // Filter Hooks (removed tab swapping logic, just filters now)
     const {
-        activeTab,
         selectedCategoryId,
         sortBy,
         sortOrder,
         sortedAndFilteredProducts,
-        setActiveTab,
         setSelectedCategoryId,
         toggleSort
     } = useAdminTabs(products, categories);
@@ -174,11 +178,13 @@ export default function AdminPage() {
         );
     }
 
+    if (!validTabs.includes(activeTab)) {
+        return <Navigate to="/admin/products" replace />;
+    }
+
     return (
         <div className="min-h-screen bg-neutral-900 text-white p-10 pb-40">
             <AdminHeader
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
                 setIsEditing={setIsEditing}
                 setSelectedUser={setSelectedUser}
                 hasLowStock={hasLowStock}
@@ -247,7 +253,7 @@ export default function AdminPage() {
                             toggleSort={toggleSort}
                             openCreate={openCreate}
                             openEdit={(item) => {
-                                setActiveTab('products');
+                                navigate('/admin/products');
                                 openEdit(item);
                             }}
                             handleDelete={(id) => hookDelete('products', id).then(refreshData)}
