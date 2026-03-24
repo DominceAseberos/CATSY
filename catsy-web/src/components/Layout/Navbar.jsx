@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, User, CreditCard, Calendar, Home } from 'lucide-react';
-import { mockAuth } from '../../data/mockAuth';
+import { useUser } from '../../context/UserContext';
 
 const Navbar = () => {
     const location = useLocation();
@@ -9,7 +9,7 @@ const Navbar = () => {
     const activePage = location.pathname === '/' ? 'home' : location.pathname.substring(1);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { isLoggedIn, user } = mockAuth;
+    const { isLoggedIn, userInfo: user, logout } = useUser();
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -28,9 +28,8 @@ const Navbar = () => {
 
     const handleLinkClick = (id) => {
         if (id === 'logout') {
-            // Handle mock logout or just navigate to home
-            console.log('Mock Logout Clicked');
-            navigate('/');
+            logout();
+            navigate('/login');
         } else {
             navigate(id === 'home' ? '/' : `/${id}`);
         }

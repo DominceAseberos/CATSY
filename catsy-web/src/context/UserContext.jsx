@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getSession, clearSession } from '../utils/sessionManager';
+import { loadSession, clearSession } from '../utils/sessionManager';
 
 const UserContext = createContext();
 
@@ -9,7 +9,7 @@ export function UserProvider({ children }) {
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        const session = getSession();
+        const session = loadSession();
         if (session) {
             setUserInfo(session);
             setIsLoggedIn(true);

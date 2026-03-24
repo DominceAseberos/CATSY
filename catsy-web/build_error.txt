@@ -1,0 +1,28 @@
+
+> catsy-coffee@0.0.0 build
+> vite build
+
+vite v7.3.1 building client environment for production...
+transforming...
+✓ 2231 modules transformed.
+✗ Build failed in 10.46s
+error during build:
+src/context/UserContext.jsx (2:9): "getSession" is not exported by "src/utils/sessionManager.js", imported by "src/context/UserContext.jsx".
+file: /mnt/datadrive/Project/Catsy-Final/catsy-web/src/context/UserContext.jsx:2:9
+
+1: import React, { createContext, useContext, useState, useEffect } from 'react';
+2: import { getSession, clearSession } from '../utils/sessionManager';
+            ^
+3: 
+4: const UserContext = createContext();
+
+    at getRollupError (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+    at error (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/parseAst.js:398:42)
+    at Module.error (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:17040:16)
+    at Module.traceVariable (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:17452:29)
+    at ModuleScope.findVariable (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:15070:39)
+    at FunctionScope.findVariable (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at FunctionBodyScope.findVariable (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at ReturnValueScope.findVariable (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at FunctionBodyScope.findVariable (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:5673:38)
+    at Identifier.bind (file:///mnt/datadrive/Project/Catsy-Final/catsy-web/node_modules/rollup/dist/es/shared/node-entry.js:5447:40)
