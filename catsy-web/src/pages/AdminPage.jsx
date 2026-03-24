@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DebugConsole from '../components/Admin/DebugConsole';
 import StatusModal from '../components/UI/StatusModal';
 import { useAdminTabs } from '../hooks/useAdminTabs';
@@ -20,6 +21,7 @@ import ReservationManager from './admin/components/ReservationManager';
 import AdminProfile from './admin/components/AdminProfile';
 
 export default function AdminPage() {
+    const navigate = useNavigate();
     const { isLoggedIn, userInfo, login } = useUser();
 
     // Data & Logic Hooks
@@ -165,7 +167,7 @@ export default function AdminPage() {
             <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center p-10">
                 <div className="max-w-md w-full text-center space-y-6">
                     <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
-                        <StatusModal isOpen={true} type="error" title="Access Denied" message="You do not have permission to access the Backstage Admin. Only Staff and Administrators can enter." onClose={() => window.location.href = '/admin'} />
+                        <StatusModal isOpen={true} type="error" title="Access Denied" message="You do not have permission to access the Backstage Admin. Only Staff and Administrators can enter." onClose={() => navigate('/admin/login')} />
                     </div>
                 </div>
             </div>

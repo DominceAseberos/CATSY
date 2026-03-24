@@ -8,8 +8,10 @@ import { reservationService } from '../services/reservationService';
 import { settingsService } from '../services/settingsService';
 import CustomerToast from '../components/UI/CustomerToast';
 import { useSSE } from '../hooks/useSSE';
+import { useNavigate } from 'react-router-dom';
 
-export default function ReservationPage({ onLoginReq, tablesData }) {
+export default function ReservationPage({ tablesData }) {
+    const navigate = useNavigate();
     const { isLoggedIn, userInfo } = useUser();
     const { settings: restaurantSettings, isLoading: settingsLoading } = useSettings();
     // Mock User Data - REPLACED with userInfo prop
@@ -190,7 +192,7 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
                                 <h3 className="text-2xl font-bold text-neutral-900">Reservation Details</h3>
                                 {!isLoggedIn && (
                                     <button
-                                        onClick={onLoginReq}
+                                        onClick={() => navigate('/login')}
                                         className="text-sm font-bold text-brand-accent hover:text-brand-accent/80 underline"
                                     >
                                         Log in for auto-fill

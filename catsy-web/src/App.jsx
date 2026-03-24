@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import MobileShell from './components/Layout/MobileShell';
 import HomePage from './pages/HomePage';
 import LoyaltyPage from './pages/LoyaltyPage';
@@ -23,19 +24,12 @@ import AdminWarningBanner from './components/UI/AdminWarningBanner';
 gsap.registerPlugin(ScrollTrigger);
 
 function AppContent() {
-    const getInitialPage = () => {
-        const path = window.location.pathname.replace('/', '');
-        const validPages = ['home', 'loyalty', 'profile', 'reservation', 'login', 'signup', 'admin', 'admin/login'];
-        if (path === 'admin/login') return 'admin/login';
-        return validPages.includes(path) ? path : 'home';
-    };
-
     const { isLoggedIn, userInfo, setUserInfo, login, isDeactivated, confirmDeactivation, authError, isInitialized } = useUser();
     const { isAdmin } = useRoleGuard();
-    const [activePage, setActivePage] = useState(getInitialPage);
     const dynamicData = useTableAvailability(initialTablesData);
+    const navigate = useNavigate();
 
-    logger.log('App Rendered. Active Page:', activePage);
+    logger.log('App Rendered.');
 
     if (!isInitialized) return null;
 
@@ -66,57 +60,74 @@ function AppContent() {
         />
     );
 
-    // ── Admin Login ──
-    if (activePage === 'admin/login') {
-        return (
-            <>
-                <AdminLogin onLoginSuccess={(user) => {
-                    login(user);
-                    window.location.href = '/admin';
-                }} />
-                {adminAuthErrorModal}
-            </>
-        );
-    }
-
-    // ── Admin Dashboard ──
-    if (activePage === 'admin') {
-        if (!isLoggedIn || !isAdmin) {
-            window.location.href = '/admin/login';
-            return null;
-        }
-        return (
-            <>
-                <AdminPage />
-                {adminAuthErrorModal}
-            </>
-        );
-    }
-
-
-    // ── Customer Routes ──
-    const renderPage = () => {
-        logger.log('Rendering page for:', activePage);
-        switch (activePage) {
-            case 'home': return <HomePage isLoggedIn={isLoggedIn} onNavigate={setActivePage} tablesData={dynamicData} />;
-            case 'loyalty': return <LoyaltyPage />;
-            case 'profile': return <ProfilePage userInfo={userInfo || {}} setUserInfo={setUserInfo} />;
-            case 'reservation': return <ReservationPage isLoggedIn={isLoggedIn} userInfo={userInfo} onLoginReq={() => setActivePage('login')} tablesData={dynamicData} />;
-            case 'login': return isAdmin
-                ? (window.location.href = '/admin') || null
-                : <LoginPage onLoginSuccess={(user) => { login(user); setActivePage('profile'); }} />;
-            case 'signup': return <LoginPage initialIsLogin={false} onLoginSuccess={(user) => { login(user); setActivePage('profile'); }} />;
-            default: return <HomePage onNavigate={setActivePage} tablesData={dynamicData} />;
-        }
-    };
-
     return (
-        <MobileShell activePage={activePage} setActivePage={setActivePage}>
-            {isAdmin && <AdminWarningBanner />}
-            <GlobalCustomerLoading />
-            {renderPage()}
-            {customerAuthErrorModal}
-        </MobileShell>
+        <Routes>
+            {/* ── Admin Routes ── */}
+            <Route path="/admin/login" element={
+                <>
+                    <AdminLogin onLoginSuccess={(user) => {
+                        login(user);
+                        navigate('/admin');
+                    }} />
+                    {adminAuthErrorModal}
+                </>
+            } />
+
+            <Route path="/admin/*" element={
+                (!isLoggedIn || !isAdmin) ? (
+                    <Navigate to="/admin/login" replace />
+                ) : (
+                    <>
+                        <AdminPage />
+                        {adminAuthErrorModal}
+                    </>
+                )
+            } />
+
+            {/* ── Customer Routes wrapped in MobileShell ── */}
+            <Route path="/*" element={
+                <MobileShell>
+                    {isAdmin && <AdminWarningBanner />}
+                    <GlobalCustomerLoading />
+                    <Routes>
+                        <Route path="/" element={<HomePage tablesData={dynamicData} />} />
+                        <Route path="/loyalty" element={<LoyaltyPage />} />
+                        <Route path="/profile" element={
+                            isLoggedIn ? (
+                                <ProfilePage userInfo={userInfo || {}} setUserInfo={setUserInfo} />
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        } />
+                        <Route path="/reservation" element={<ReservationPage tablesData={dynamicData} />} />
+                        
+                        <Route path="/login" element={
+                            isAdmin ? (
+                                <Navigate to="/admin" replace />
+                            ) : isLoggedIn ? (
+                                <Navigate to="/profile" replace />
+                            ) : (
+                                <LoginPage onLoginSuccess={(user) => { login(user); navigate('/profile'); }} />
+                            )
+                        } />
+                        
+                        <Route path="/signup" element={
+                            isAdmin ? (
+                                <Navigate to="/admin" replace />
+                            ) : isLoggedIn ? (
+                                <Navigate to="/profile" replace />
+                            ) : (
+                                <LoginPage initialIsLogin={false} onLoginSuccess={(user) => { login(user); navigate('/profile'); }} />
+                            )
+                        } />
+
+                        {/* Fallback component */}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                    {customerAuthErrorModal}
+                </MobileShell>
+            } />
+        </Routes>
     );
 }
 

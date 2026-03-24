@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../../services/adminService';
 import { logger } from '../../../utils/logger';
 import { saveSession } from '../../../utils/sessionManager';
@@ -12,6 +13,8 @@ export default function AdminLogin({ onLoginSuccess }) {
     const [error, setError] = useState('');
 
     const [success, setSuccess] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -146,7 +149,7 @@ export default function AdminLogin({ onLoginSuccess }) {
                 {/* Footer Link */}
                 <div className="mt-8 text-center">
                     <button
-                        onClick={() => window.location.href = '/'}
+                        onClick={() => navigate('/')}
                         className="text-neutral-600 hover:text-neutral-400 font-bold text-sm transition-colors flex items-center justify-center gap-2 mx-auto"
                     >
                         <span>&larr;</span> Back to Main Store

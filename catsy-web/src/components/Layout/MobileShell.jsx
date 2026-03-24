@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Menu, X } from 'lucide-react';
@@ -6,7 +7,11 @@ import { useUser } from '../../context/UserContext';
 import CustomerToast from '../UI/CustomerToast';
 import Navbar from './Navbar';
 
-export default function MobileShell({ children, activePage, setActivePage }) {
+export default function MobileShell({ children }) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const activePage = location.pathname === '/' ? 'home' : location.pathname.substring(1);
+    
     const { isLoggedIn, logout } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'info', title: '', message: '', onConfirm: null });
@@ -39,7 +44,7 @@ export default function MobileShell({ children, activePage, setActivePage }) {
 
         setTimeout(() => {
             logout();
-            setActivePage('home');
+            navigate('/');
             toggleMenu();
             setStatusModal(prev => ({ ...prev, isOpen: false }));
         }, 1000); // 1 second delay for success UI
@@ -88,7 +93,7 @@ export default function MobileShell({ children, activePage, setActivePage }) {
     return (
         <div ref={containerRef} className="min-h-screen bg-brand-primary text-brand-secondary font-body overflow-x-hidden relative flex flex-col">
             {/* Full Width Navbar */}
-            <Navbar activePage={activePage} onNavigate={setActivePage} />
+            <Navbar />
 
             {/* Content Area - Conditional Padding for Landing Page */}
             <main className={`w-full min-h-screen ${activePage === 'home' ? '' : 'pt-24 px-6 pb-24'}`}>

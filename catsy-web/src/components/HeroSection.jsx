@@ -8,9 +8,12 @@ import { useCallback } from 'react';
 import { mockSettings } from '../data/mockSettings';
 
 
+import { useNavigate } from 'react-router-dom';
+
 gsap.registerPlugin(Flip);
 
-export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn }) {
+export default function HeroSection({ onLogin, onSignup, isLoggedIn }) {
+    const navigate = useNavigate();
     const container = useRef(null);
     const logoRef = useRef(null);
     const textContainerRef = useRef(null);
@@ -235,7 +238,7 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
                     {/* Primary Button: Reserve a Table */}
                     <button
                         ref={btnRef}
-                        onClick={() => onNavigate('reservation')}
+                        onClick={() => navigate('/reservation')}
                         className={`compact-btn w-full bg-neutral-900 text-white py-4 rounded-full font-bold text-lg shadow-xl hover:scale-105 duration-500 active:scale-95 transition-all ${animClass}`}
                     >
                         Reserve a Table
@@ -243,7 +246,7 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
 
                     {/* Secondary Button: Login / Profile */}
                     <button
-                        onClick={isLoggedIn ? () => onNavigate('profile') : onLogin}
+                        onClick={isLoggedIn ? () => navigate('/profile') : () => navigate('/login')}
                         className={`compact-btn w-full bg-transparent border-2 border-neutral-900 text-neutral-900 py-4 rounded-full font-bold text-lg hover:bg-neutral-50 transition-colors duration-300 ${animClass}`}
                     >
                         {isLoggedIn ? "Profile" : heroData.primaryButton}

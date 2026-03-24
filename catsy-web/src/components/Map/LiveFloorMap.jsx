@@ -1,10 +1,12 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { MapPin, ArrowUpRight, X, LocateFixed } from 'lucide-react';
 import locationData from '../../data/location.json';
 
-export default function LiveFloorMap({ tablesData, onNavigate }) {
+export default function LiveFloorMap({ tablesData }) {
+    const navigate = useNavigate();
     const containerRef = useRef(null);
     const [isVisible, setIsVisible] = useState(true);
     // dynamicData state removed, using props.tablesData
@@ -137,7 +139,7 @@ export default function LiveFloorMap({ tablesData, onNavigate }) {
                     <div className="space-y-3">
                         {/* Primary Action: Reservation */}
                         <button
-                            onClick={() => onNavigate('reservation')}
+                            onClick={() => navigate('/reservation')}
                             className="group flex items-center justify-center w-full text-center bg-white text-neutral-900 px-6 py-4 rounded-full font-bold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-xl shadow-white/10"
                         >
                             <span className="tracking-tight uppercase text-center">REserve TAble</span>

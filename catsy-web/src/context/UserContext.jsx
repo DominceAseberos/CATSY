@@ -31,7 +31,6 @@ export function UserProvider({ children }) {
 
     const confirmDeactivation = () => {
         logout();
-        window.location.href = '/';
     };
 
     return (
