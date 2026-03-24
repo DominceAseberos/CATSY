@@ -13,13 +13,13 @@ import CustomerToast from './components/UI/CustomerToast';
 import GlobalCustomerLoading from './components/UI/GlobalCustomerLoading';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import initialTablesData from './data/tables.json';
 import { useTableAvailability } from './hooks/useTableAvailability';
 import { logger } from './utils/logger';
 import { UserProvider, useUser } from './context/UserContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { useRoleGuard } from './hooks/useRoleGuard';
 import AdminWarningBanner from './components/UI/AdminWarningBanner';
+import ErrorBoundary from './components/UI/ErrorBoundary';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -135,10 +135,12 @@ function AppContent() {
 
 export default function App() {
     return (
-        <UserProvider>
-            <SettingsProvider>
-                <AppContent />
-            </SettingsProvider>
-        </UserProvider>
+        <ErrorBoundary>
+            <UserProvider>
+                <SettingsProvider>
+                    <AppContent />
+                </SettingsProvider>
+            </UserProvider>
+        </ErrorBoundary>
     );
 }

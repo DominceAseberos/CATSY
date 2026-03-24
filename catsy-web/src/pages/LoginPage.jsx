@@ -9,13 +9,13 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
     const {
         isLogin,
         setIsLogin,
-        formData,
-        handleChange,
+        register,
         handleSubmit,
         loading,
         formError,
         passwordStrength,
-        isPasswordStrong
+        isPasswordStrong,
+        errors
     } = useAuth((user) => {
         // Handle mock signup success
         if (user.isMockSignupSuccess) {
@@ -100,28 +100,24 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                 <div className="flex items-center bg-white p-4 rounded-full border border-neutral-100 focus-within:ring-2 focus-within:ring-brand-accent transition-shadow">
                                     <input
                                         type="text"
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                        {...register('firstName')}
+                                        className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.firstName ? 'text-red-500' : ''}`}
                                         placeholder="Jane"
-                                        required={!isLogin}
                                     />
                                 </div>
+                                {errors.firstName && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.firstName.message}</p>}
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider ml-4">Last Name</label>
                                 <div className="flex items-center bg-white p-4 rounded-full border border-neutral-100 focus-within:ring-2 focus-within:ring-brand-accent transition-shadow">
                                     <input
                                         type="text"
-                                        name="lastName"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                        {...register('lastName')}
+                                        className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.lastName ? 'text-red-500' : ''}`}
                                         placeholder="Doe"
-                                        required={!isLogin}
                                     />
                                 </div>
+                                {errors.lastName && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.lastName.message}</p>}
                             </div>
 
                             {/* New Signup Fields: Username & Phone */}
@@ -131,14 +127,12 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                     <UserCircle size={20} className="text-neutral-400 mr-2 shrink-0" />
                                     <input
                                         type="text"
-                                        name="username"
-                                        value={formData.username}
-                                        onChange={handleChange}
-                                        className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                        {...register('username')}
+                                        className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.username ? 'text-red-500' : ''}`}
                                         placeholder="jane_doe"
-                                        required={!isLogin}
                                     />
                                 </div>
+                                {errors.username && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.username.message}</p>}
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase text-neutral-400 tracking-wider ml-4">Phone</label>
@@ -146,14 +140,12 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                     <Phone size={20} className="text-neutral-400 mr-2 shrink-0" />
                                     <input
                                         type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                        {...register('phone')}
+                                        className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.phone ? 'text-red-500' : ''}`}
                                         placeholder="0912-345-6789"
-                                        required={!isLogin}
                                     />
                                 </div>
+                                {errors.phone && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.phone.message}</p>}
                             </div>
                         </div>
                     )}
@@ -164,14 +156,12 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                             <User size={20} className="text-neutral-400 mr-3 shrink-0" />
                             <input
                                 type="text"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                {...register('email')}
+                                className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.email ? 'text-red-500' : ''}`}
                                 placeholder="name@example.com"
-                                required
                             />
                         </div>
+                        {errors.email && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.email.message}</p>}
                     </div>
 
                     <div className="space-y-2">
@@ -180,12 +170,9 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                             <Lock size={20} className="text-neutral-400 mr-3 shrink-0" />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                {...register('password')}
+                                className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.password ? 'text-red-500' : ''}`}
                                 placeholder="• • • • • •"
-                                required
                             />
                             <button
                                 type="button"
@@ -195,9 +182,11 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
+                        {errors.password && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.password.message}</p>}
+                    </div>
 
-                        {/* Password Strength Indicator (Sign-up only) */}
-                        {!isLogin && formData.password && (
+                    {/* Password Strength Indicator (Sign-up only) */}
+                    {!isLogin && watch('password') && (
                             <div className="px-4 pt-1 space-y-3">
                                 {/* Strength Bar */}
                                 <div className="h-1 w-full bg-neutral-100 rounded-full overflow-hidden">
@@ -226,7 +215,6 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                 </div>
                             </div>
                         )}
-                    </div>
 
                     {!isLogin && (
                         <div className="space-y-2">
@@ -235,14 +223,12 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                                 <Lock size={20} className="text-neutral-400 mr-3 shrink-0" />
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    className="w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal"
+                                    {...register('confirmPassword')}
+                                    className={`w-full bg-transparent outline-none font-bold text-neutral-900 placeholder:font-normal ${errors.confirmPassword ? 'text-red-500' : ''}`}
                                     placeholder="Confirm password"
-                                    required={!isLogin}
                                 />
                             </div>
+                            {errors.confirmPassword && <p className="text-red-500 text-[10px] ml-4 font-bold">{errors.confirmPassword.message}</p>}
                         </div>
                     )}
 
