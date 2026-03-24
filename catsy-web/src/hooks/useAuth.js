@@ -1,3 +1,12 @@
+/**
+ * useAuth — Thin auth coordinator (SRP-compliant after Fix #3).
+ *
+ * Responsibilities:
+ *   • Drive react-hook-form with Zod validation
+ *   • Delegate password strength → usePasswordStrength
+ *   • Delegate API calls → customerService
+ *   • Delegate session persistence → sessionManager
+ */
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,6 +15,7 @@ import { mapAuthError } from '../utils/errorHandler';
 import { logger } from '../utils/logger';
 import { saveSession } from '../utils/sessionManager';
 import { authLoginSchema, authSignupSchema } from '../utils/validationSchemas';
+import { usePasswordStrength } from './usePasswordStrength';
 
 export function useAuth(onLoginSuccess, initialIsLogin = true) {
     const [isLogin, setIsLogin] = useState(initialIsLogin);
@@ -34,7 +44,7 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
         }
     });
 
-    // Reset form when switching between Login and Signup
+    // Reset form when switching Login ↔ Signup
     useEffect(() => {
         reset();
         setFormError('');
@@ -42,73 +52,36 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
 
     const watchedPassword = watch('password');
 
-    useEffect(() => {
-        if (isLogin || !watchedPassword) {
-            setPasswordStrength({ score: 0, label: 'Weak', color: 'bg-red-500', feedback: [] });
-            return;
-        }
-
-        // Logic moved to a utility or kept local for UI feedback
-        const p = watchedPassword;
-        const requirements = [
-            { id: 'length', text: 'Min 8 characters', met: p.length >= 8 },
-            { id: 'upper', text: 'Uppercase letter', met: /[A-Z]/.test(p) },
-            { id: 'lower', text: 'Lowercase letter', met: /[a-z]/.test(p) },
-            { id: 'number', text: 'Number', met: /\d/.test(p) },
-            { id: 'special', text: 'Special character', met: /[!@#$%^&*(),.?":{}|<>]/.test(p) }
-        ];
-
-        const metCount = requirements.filter(r => r.met).length;
-        let score = metCount;
-        let label = 'Weak';
-        let color = 'bg-red-500';
-
-        if (score > 4) {
-            label = 'Strong';
-            color = 'bg-green-500';
-        } else if (score > 2) {
-            label = 'Moderate';
-            color = 'bg-yellow-500';
-        }
-
-        setPasswordStrength( { score, label, color, feedback: requirements } );
-    }, [watchedPassword, isLogin]);
+    // Delegated to usePasswordStrength (SRP)
+    const passwordStrength = usePasswordStrength(watchedPassword, !isLogin);
 
     const onSubmit = async (data) => {
         setLoading(true);
         setFormError('');
-
         try {
             if (isLogin) {
-                // Use the provided 'username' as email for login service
                 const response = await customerService.login(data.email, data.password);
-                
-                // Map the response to our user object structure
                 const user = mapUserData({
                     ...response.user,
                     access_token: response.access_token,
                     refresh_token: response.refresh_token
                 });
-
                 if (user) {
                     saveSession(user);
                     onLoginSuccess(user);
                 }
             } else {
-                // Signup
-                const response = await customerService.signup({
+                await customerService.signup({
                     email: data.email,
                     password: data.password,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     phone: data.phone
                 });
-
                 onLoginSuccess({
                     isSignupSuccess: true,
-                    message: "Account created! Please check your email for confirmation."
+                    message: 'Account created! Please check your email for confirmation.'
                 });
-
                 setIsLogin(true);
             }
         } catch (err) {
@@ -120,32 +93,32 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
         }
     };
 
-    const handleSubmit = hookHandleSubmit(onSubmit);
-
     return {
         isLogin,
         setIsLogin,
         register,
         watch,
         errors,
-        handleSubmit,
+        handleSubmit: hookHandleSubmit(onSubmit),
         loading,
         formError,
         passwordStrength,
-        isPasswordStrong: isLogin || (passwordStrength.score >= 5 && isValid)
+        isPasswordStrong: isLogin || (passwordStrength.score >= 5 && isValid),
     };
 }
 
+// ── Data mapping (pure function — no side effects) ───────────────────────────
 const mapUserData = (userData) => ({
     id: userData.id,
     email: userData.email,
     firstName: userData.first_name || userData.firstName,
     lastName: userData.last_name || userData.lastName,
     phone: userData.contact || userData.phone,
-    accountId: (userData.account_id || userData.accountId) ? String(userData.account_id || userData.accountId) : null,
+    accountId: (userData.account_id || userData.accountId)
+        ? String(userData.account_id || userData.accountId) : null,
     role: userData.role || 'customer',
     access_token: userData.access_token,
     refresh_token: userData.refresh_token,
     favoriteItem: userData.favoriteItem || null,
-    history: userData.history || []
+    history: userData.history || [],
 });

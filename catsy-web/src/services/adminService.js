@@ -1,36 +1,20 @@
+/**
+ * adminService.js — Admin-specific operations (login + reservations only).
+ * User management → userService.js
+ * Product management → productService.js
+ * Category management → productService.js (categories)
+ */
 import { apiClient } from './apiClient';
 
 export const adminService = {
-    login: async (email, password) => {
-        return apiClient.post('/admin/login', { email, password });
-    },
-
-    getUsers: () => apiClient.get('/admin/users'),
-
-    createUser: (userData) => apiClient.post('/admin/users', userData),
-
-    changePassword: (userId, password) => apiClient.patch(`/admin/users/${userId}/password`, { password }),
-
-    deleteUser: (userId) => apiClient.delete(`/admin/users/${userId}`),
-
-    getProducts: () => apiClient.get('/admin/products'),
-
-    createProduct: (productData) => apiClient.post('/admin/products', productData),
-
-    updateProduct: (productId, productData) => apiClient.put(`/admin/products/${productId}`, productData),
-
-    deleteProduct: (productId) => apiClient.delete(`/admin/products/${productId}`),
-
-    getCategories: () => apiClient.get('/admin/categories'),
-
-    createCategory: (categoryData) => apiClient.post('/admin/categories', categoryData),
-
-    updateCategory: (categoryId, categoryData) => apiClient.put(`/admin/categories/${categoryId}`, categoryData),
-
-    deleteCategory: (categoryId) => apiClient.delete(`/admin/categories/${categoryId}`),
+    login: (email, password) => apiClient.post('/admin/login', { email, password }),
 
     // Reservations
     getReservations: () => apiClient.get('/api/staff/reservations'),
+    updateReservationStatus: (reservationId, status) =>
+        apiClient.patch(`/api/staff/reservations/${reservationId}`, { status }),
 
-    updateReservationStatus: (reservationId, status) => apiClient.patch(`/api/staff/reservations/${reservationId}`, { status })
+    // Audit logs
+    getAuditLogs: (limit = 100, offset = 0) =>
+        apiClient.get(`/admin/audit-logs?limit=${limit}&offset=${offset}`),
 };

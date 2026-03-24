@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import MobileShell from './components/Layout/MobileShell';
+import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoyaltyPage from './pages/LoyaltyPage';
 import ProfilePage from './pages/ProfilePage';
@@ -23,6 +24,8 @@ import ErrorBoundary from './components/UI/ErrorBoundary';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const initialTablesData = { available: 0, total: 0, shopStatus: 'Loading...' };
+
 function AppContent() {
     const { isLoggedIn, userInfo, setUserInfo, login, isDeactivated, confirmDeactivation, authError, isInitialized } = useUser();
     const { isAdmin } = useRoleGuard();
@@ -34,17 +37,16 @@ function AppContent() {
     if (!isInitialized) return null;
 
     /**
-     * Global Session-Expired Modal (SRP / DIP)
-     * Defined once here and included in ALL routing branches so it always renders
-     * regardless of whether the user is on the admin panel or a customer page.
+     * Auth error modals — rendered in all routing branches so they always surface
+     * regardless of which section the user is in.
      */
     const adminAuthErrorModal = (
         <StatusModal
             isOpen={isDeactivated}
             onClose={confirmDeactivation}
             type="error"
-            title={authError?.title || "Session Expired"}
-            message={authError?.message || "Your session has expired. Please sign in again."}
+            title={authError?.title || 'Session Expired'}
+            message={authError?.message || 'Your session has expired. Please sign in again.'}
             closeLabel="Sign Out"
         />
     );
@@ -54,8 +56,8 @@ function AppContent() {
             isOpen={isDeactivated}
             onClose={confirmDeactivation}
             type="error"
-            title={authError?.title || "Session Expired"}
-            message={authError?.message || "Your session has expired. Please sign in again."}
+            title={authError?.title || 'Session Expired'}
+            message={authError?.message || 'Your session has expired. Please sign in again.'}
             closeLabel="Sign Out"
         />
     );
@@ -65,25 +67,20 @@ function AppContent() {
             {/* ── Admin Routes ── */}
             <Route path="/admin/login" element={
                 <>
-                    <AdminLogin onLoginSuccess={(user) => {
-                        login(user);
-                        navigate('/admin');
-                    }} />
+                    <AdminLogin onLoginSuccess={(user) => { login(user); navigate('/admin'); }} />
                     {adminAuthErrorModal}
                 </>
             } />
 
             <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
-            
+
             <Route path="/admin/:tab" element={
-                (!isLoggedIn || !isAdmin) ? (
-                    <Navigate to="/admin/login" replace />
-                ) : (
+                <ProtectedRoute isAllowed={isLoggedIn && isAdmin} redirectTo="/admin/login">
                     <>
                         <AdminPage />
                         {adminAuthErrorModal}
                     </>
-                )
+                </ProtectedRoute>
             } />
 
             {/* ── Customer Routes wrapped in MobileShell ── */}
@@ -95,35 +92,24 @@ function AppContent() {
                         <Route path="/" element={<HomePage tablesData={dynamicData} />} />
                         <Route path="/loyalty" element={<LoyaltyPage />} />
                         <Route path="/profile" element={
-                            isLoggedIn ? (
+                            <ProtectedRoute isAllowed={isLoggedIn} redirectTo="/login">
                                 <ProfilePage userInfo={userInfo || {}} setUserInfo={setUserInfo} />
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
+                            </ProtectedRoute>
                         } />
                         <Route path="/reservation" element={<ReservationPage tablesData={dynamicData} />} />
-                        
+
                         <Route path="/login" element={
-                            isAdmin ? (
-                                <Navigate to="/admin" replace />
-                            ) : isLoggedIn ? (
-                                <Navigate to="/profile" replace />
-                            ) : (
-                                <LoginPage onLoginSuccess={(user) => { login(user); navigate('/profile'); }} />
-                            )
-                        } />
-                        
-                        <Route path="/signup" element={
-                            isAdmin ? (
-                                <Navigate to="/admin" replace />
-                            ) : isLoggedIn ? (
-                                <Navigate to="/profile" replace />
-                            ) : (
-                                <LoginPage initialIsLogin={false} onLoginSuccess={(user) => { login(user); navigate('/profile'); }} />
-                            )
+                            isAdmin ? <Navigate to="/admin" replace /> :
+                            isLoggedIn ? <Navigate to="/profile" replace /> :
+                            <LoginPage onLoginSuccess={(user) => { login(user); navigate('/profile'); }} />
                         } />
 
-                        {/* Fallback component */}
+                        <Route path="/signup" element={
+                            isAdmin ? <Navigate to="/admin" replace /> :
+                            isLoggedIn ? <Navigate to="/profile" replace /> :
+                            <LoginPage initialIsLogin={false} onLoginSuccess={(user) => { login(user); navigate('/profile'); }} />
+                        } />
+
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                     {customerAuthErrorModal}
