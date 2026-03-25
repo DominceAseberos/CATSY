@@ -1,4 +1,4 @@
-import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Flip } from 'gsap/Flip';
@@ -173,14 +173,14 @@ export default function HeroSection({ onLogin, onSignup, isLoggedIn }) {
             <div className={`absolute inset-0 pointer-events-none overflow-hidden z-10 ${!isSplashComplete ? 'hidden' : 'block'}`}>
                 <img
                     ref={leftCupRef}
-                    src={assets.leftCup}
+                    src={heroContent.assets.leftCup}
                     className={`absolute top-[100px] -left-[80px] w-[200px] cup-atmospheric`}
                     alt="Decorative Coffee"
                     style={{ transform: 'rotate(35deg)', opacity: 0 }}
                 />
                 <img
                     ref={rightCupRef}
-                    src={assets.rightCup}
+                    src={heroContent.assets.rightCup}
                     className={`absolute top-[230px] -right-[80px] w-[200px] cup-atmospheric`}
                     alt="Decorative Coffee"
                     style={{ transform: 'rotate(-50deg)', opacity: 0 }}

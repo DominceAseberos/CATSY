@@ -74,6 +74,7 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
                 await customerService.signup({
                     email: data.email,
                     password: data.password,
+                    username: data.username,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     phone: data.phone
@@ -111,6 +112,7 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
 const mapUserData = (userData) => ({
     id: userData.id,
     email: userData.email,
+    username: userData.username || userData.user_name || null,
     firstName: userData.first_name || userData.firstName,
     lastName: userData.last_name || userData.lastName,
     phone: userData.contact || userData.phone,

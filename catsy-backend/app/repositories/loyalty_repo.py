@@ -4,19 +4,19 @@ from app.database import get_db
 
 class LoyaltyRepository(IRepository):
     def get_all(self, limit: int = 100, offset: int = 0) -> List[Any]:
-        pass
+        return []
 
     def get_by_id(self, id: str) -> Optional[Any]:
-        pass
+        return None
 
     def create(self, dict_data: dict, user_id: Optional[str] = None) -> Any:
-        pass
+        return None
 
     def update(self, id: str, dict_data: dict, user_id: Optional[str] = None) -> Any:
-        pass
+        return None
 
     def delete(self, id: str, user_id: Optional[str] = None) -> Any:
-        pass
+        return None
 
     def get_loyalty_status(self, user_id: str):
         db = get_db()

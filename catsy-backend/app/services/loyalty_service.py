@@ -15,7 +15,7 @@ class LoyaltyService:
         if len(unspent_stamps) < 9:
             raise ValueError("Insufficient stamps (need 9)")
 
-        coupon_code = str(uuid.uuid4())[:8].upper()
+        coupon_code = uuid.uuid4().hex[:8].upper()
         reward_data = {
             "user_id": user_id,
             "coupon_code": coupon_code,

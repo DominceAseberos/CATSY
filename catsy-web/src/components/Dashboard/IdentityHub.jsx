@@ -11,9 +11,9 @@ export default function IdentityHub({ user }) {
     // Guard Clause if user data is not loaded
     if (!user || !user.id) return null; // Or return a Skeleton/Loading state
 
-    // Compute formatted ID (handling camelCase or snake_case, string or number)
-    const rawId = user.accountId || user.account_id;
-    const formattedId = rawId ? String(rawId).match(/.{1,4}/g)?.join(' ') : '---- ----';
+    // Compute formatted ID from native Supabase UUID
+    const rawId = user.id || user.accountId || user.account_id;
+    const formattedId = rawId ? rawId.split('-')[0].toUpperCase() + ' ' + (rawId.split('-')[1] || '').toUpperCase() : '---- ----';
 
     useGSAP(() => {
         // Glassmorphism shimmer effect or float
@@ -49,8 +49,8 @@ export default function IdentityHub({ user }) {
 
                 <div className="flex justify-between items-start z-10 relative">
                     <div>
-                        <p className="text-sm opacity-70 mb-1">Catsy Cafe Account</p>
-                        <h3 className="text-xl font-bold">{user.firstName} {user.lastName}</h3>
+                        <p className="text-sm text-brand-secondary font-bold mb-1 tracking-wide">Catsy Cafe Account</p>
+                        <h3 className="text-xl font-bold text-white">{user.firstName || user.first_name || 'Guest'} {user.lastName || user.last_name || ''}</h3>
                     </div>
 
                     {/* Clickable Small QR Code */}
@@ -90,7 +90,7 @@ export default function IdentityHub({ user }) {
                             <X size={24} />
                         </button>
                         <div className="text-center">
-                            <h3 className="text-2xl font-bold text-neutral-900 mb-1">{user.firstName} {user.lastName}</h3>
+                            <h3 className="text-2xl font-bold text-neutral-900 mb-1">{user.firstName || user.first_name || 'Guest'} {user.lastName || user.last_name || ''}</h3>
                             <p className="text-neutral-500 text-sm">Scan to verify profile</p>
                         </div>
 

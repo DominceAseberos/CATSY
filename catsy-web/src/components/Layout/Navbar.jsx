@@ -9,6 +9,7 @@ const Navbar = () => {
     const activePage = location.pathname === '/' ? 'home' : location.pathname.substring(1);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { isLoggedIn, userInfo: user, logout } = useUser();
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -16,6 +17,7 @@ const Navbar = () => {
     const navLinks = isLoggedIn
         ? [
             { id: 'home', label: 'Home', icon: Home },
+            { id: 'reservation', label: 'Reservation', icon: Calendar },
             { id: 'profile', label: 'Profile', icon: User },
             { id: 'loyalty', label: 'Loyalty Card', icon: CreditCard },
             { id: 'logout', label: 'Logout', icon: LogOut },
@@ -28,12 +30,17 @@ const Navbar = () => {
 
     const handleLinkClick = (id) => {
         if (id === 'logout') {
-            logout();
-            navigate('/login');
+            setShowLogoutModal(true);
         } else {
             navigate(id === 'home' ? '/' : `/${id}`);
         }
         setIsMenuOpen(false);
+    };
+
+    const confirmLogout = () => {
+        logout();
+        setShowLogoutModal(false);
+        navigate('/login');
     };
 
     return (
@@ -103,6 +110,34 @@ const Navbar = () => {
                                 {link.label}
                             </button>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Logout Confirmation Modal */}
+            {showLogoutModal && (
+                <div className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
+                    <div className="bg-neutral-900 border border-white/10 w-full sm:max-w-sm rounded-3xl p-6 shadow-2xl animate-slide-up-fade text-center">
+                        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <LogOut size={28} className="text-red-500" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Sign Out</h3>
+                        <p className="text-neutral-400 mb-8">Are you sure you want to end your active session and log out?</p>
+                        
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowLogoutModal(false)}
+                                className="flex-1 py-3 px-4 bg-neutral-800 text-white rounded-xl font-bold hover:bg-neutral-700 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmLogout}
+                                className="flex-1 py-3 px-4 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition"
+                            >
+                                Yes, Logout
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

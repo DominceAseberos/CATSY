@@ -32,9 +32,16 @@ export default function ReservationPage({ tablesData }) {
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', title: '', message: '' });
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
 
-    // Today's date in YYYY-MM-DD, used as min for the date input
-    const todayStr = new Date().toISOString().split('T')[0];
-    const selectedDateStr = formData.date ? new Date(formData.date).toISOString().split('T')[0] : todayStr;
+    // Zero-dependency local date formatting to prevent locale timezone bleed
+    const getLocalYYYYMMDD = (dateObj) => {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const todayStr = getLocalYYYYMMDD(new Date());
+    const selectedDateStr = formData.date ? formData.date : todayStr;
 
     const { 
         availableTables, 
@@ -95,8 +102,11 @@ export default function ReservationPage({ tablesData }) {
         if (!formData.date || !formData.guests) return;
 
         // Block TODAY if restaurant is manually toggled closed
-        const selectedDate = new Date(formData.date).toISOString().split('T')[0];
-        if (restaurantSettings && !restaurantSettings.is_open && selectedDate === todayStr) {
+        const formDateObj = formData.date ? new Date(formData.date) : new Date();
+        const targetDate = formDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+        const currentDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+
+        if (restaurantSettings && !restaurantSettings.is_open && targetDate === currentDate) {
             setStatusModal({
                 isOpen: true,
                 type: 'error',

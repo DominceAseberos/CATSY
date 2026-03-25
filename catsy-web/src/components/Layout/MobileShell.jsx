@@ -15,7 +15,6 @@ export default function MobileShell({ children }) {
     const { isLoggedIn, logout } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'info', title: '', message: '', onConfirm: null });
-    const menuRef = useRef(null);
     const containerRef = useRef(null);
 
     // Morphing Hamburger Logic
@@ -60,23 +59,6 @@ export default function MobileShell({ children }) {
         // Force scroll to top
         window.scrollTo(0, 0);
     }, [activePage]);
-
-    useGSAP(() => {
-        if (isMenuOpen) {
-            gsap.to(menuRef.current, {
-                x: 0,
-                duration: 0.5,
-                ease: 'power4.out',
-            });
-        } else {
-            // Using pixels instead of % to ensure it translates exactly 430px (or the container width) out of frame.
-            gsap.to(menuRef.current, {
-                x: '150%',
-                duration: 0.5,
-                ease: 'power4.in',
-            });
-        }
-    }, [isMenuOpen]);
 
 
 

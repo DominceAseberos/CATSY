@@ -1,4 +1,10 @@
-"""Reservations router — staff management of bookings."""
+"""
+Reservations Router — Staff management of bookings & public availability.
+[SOLID: SRP] This file ONLY handles HTTP Request/Response mapping and payload validation.
+[SOLID: DIP] All database logic is injected via `Depends(get_reservation_repository)`.
+[SOLID: OCP] To add new reservation features (e.g., SMS alerts), do NOT modify this file.
+Create a new `ReservationService` and inject it alongside the repository.
+"""
 from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -9,10 +15,13 @@ from pydantic import BaseModel
 from typing import Optional
 
 class ReservationCreate(BaseModel):
-    customer_name: str
-    contact_info: Optional[str] = None
+    first_name: str
+    last_name: str
+    email: Optional[str] = None
+    phone: str
     guest_count: int
     reservation_time: str
+    special_requests: Optional[str] = None
 
 from app.auth import get_current_user
 
@@ -46,7 +55,6 @@ def create_reservation(
     try:
         data = reservation.dict()
         data["status"] = "pending"
-        data["created_by_staff"] = True
         return repo.create(data, user_id=str(user.id))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -63,3 +71,41 @@ def update_reservation_status(
     return repo.update(
         reservation_id, {"status": status_update.status}, user_id=str(user.id)
     )
+
+# --- Customer Endpoints ---
+customer_router = APIRouter(prefix="/api/customer", tags=["Customer Reservations"])
+
+@customer_router.get("/reservations")
+@limiter.limit("100/minute")
+def get_public_reservations(
+    request: Request,
+    repo: ReservationRepository = Depends(get_reservation_repository)
+):
+    """
+    Public endpoint for frontend capacity calculation.
+    [OCP] Returns lightweight payload. If more complex filtering is needed later, 
+    add a query string parameter without breaking the native fetch behavior.
+    """
+    try:
+        # Customers need to see pending/confirmed to know table limits
+        return repo.get_all(limit=1000)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@customer_router.post("/reservations")
+@limiter.limit("5/minute")
+def register_customer_reservation(
+    request: Request,
+    reservation: ReservationCreate,
+    repo: ReservationRepository = Depends(get_reservation_repository)
+):
+    """
+    Guest and Customer reservation ingestion endpoint.
+    [SRP] Validates the Pydantic model natively via FastAPI type hints.
+    """
+    try:
+        data = reservation.model_dump() if hasattr(reservation, 'model_dump') else reservation.dict()
+        data["status"] = "pending"
+        return repo.create(data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

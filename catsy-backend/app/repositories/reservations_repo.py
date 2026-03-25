@@ -17,15 +17,15 @@ class ReservationRepository(IRepository):
         db = get_db()
         response = db.table('reservations').insert(data).execute()
         if response.data:
-            AuditLogger.log_action("CREATE", "reservation", response.data[0].get('id'), user_id, data)
-        return response.data
+            AuditLogger.log_action("CREATE", "reservation", user_id=user_id, entity_id=response.data[0].get('id'), details=data)
+        return response.data[0] if response.data else None
 
     def update(self, id: str, data: dict, user_id: Optional[str] = None) -> Any:
         db = get_db()
         response = db.table('reservations').update(data).eq('id', id).execute()
         if response.data:
-            AuditLogger.log_action("UPDATE", "reservation", id, user_id, data)
-        return response.data
+            AuditLogger.log_action("UPDATE", "reservation", user_id=user_id, entity_id=id, details=data)
+        return response.data[0] if response.data else None
 
     def delete(self, id: str, user_id: Optional[str] = None) -> Any:
         db = get_db()
