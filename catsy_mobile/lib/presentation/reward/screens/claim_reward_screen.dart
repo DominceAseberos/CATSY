@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../config/theme/app_colors.dart';
 import '../../../../domain/models/reward_result.dart';
 import '../../../../data/local/providers.dart';
+import '../../auth/providers/auth_provider.dart';
 
 // ── State machine ─────────────────────────────────────────────────────────────
 
@@ -54,9 +55,6 @@ class _ClaimRewardScreenState extends ConsumerState<ClaimRewardScreen>
   _ClaimScreenState _claimState = _ClaimScreenState.initial();
   bool _scannerActive = true;
 
-  // TODO (Phase 12): Replace with real staff ID from auth session.
-  static const String _staffId = 'staff-001';
-
   @override
   void initState() {
     super.initState();
@@ -88,9 +86,13 @@ class _ClaimRewardScreenState extends ConsumerState<ClaimRewardScreen>
 
     setState(() => _claimState = _ClaimScreenState.loading());
 
+    // Retrieve staff ID from auth session
+    final authState = ref.read(authNotifierProvider);
+    final staffId = authState.staff?.id ?? 'unknown-staff';
+
     final result = await ref
         .read(rewardRepositoryProvider)
-        .validateAndClaimReward(trimmed, _staffId);
+        .validateAndClaimReward(trimmed, staffId);
 
     if (!mounted) return;
 

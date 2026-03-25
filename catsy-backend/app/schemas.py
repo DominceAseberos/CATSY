@@ -71,3 +71,23 @@ class ProductUpdate(BaseModel):
 
 class ReservationStatusUpdate(BaseModel):
     status: str
+# ── Orders ───────────────────────────────────────────────────────────────────
+
+from typing import List
+
+class OrderItemCreate(BaseModel):
+    product_id: int
+    quantity: int
+    price: float
+
+class OrderCreate(BaseModel):
+    order_type: str  # 'dine-in' or 'take-out'
+    payment_status: str  # 'paid' or 'pending'
+    items: List[OrderItemCreate]
+
+class OrderUpdate(BaseModel):
+    order_type: Optional[str] = None
+    items: Optional[List[OrderItemCreate]] = None
+
+class OrderPaymentStatusUpdate(BaseModel):
+    payment_status: str # 'paid', 'voided', 'refunded'

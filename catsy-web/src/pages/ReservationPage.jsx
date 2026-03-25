@@ -8,6 +8,7 @@ import { reservationService } from '../services/reservationService';
 import { settingsService } from '../services/settingsService';
 import CustomerToast from '../components/UI/CustomerToast';
 import { useSSE } from '../hooks/useSSE';
+import { useReservations } from '../hooks/useReservations';
 import { useNavigate } from 'react-router-dom';
 
 export default function ReservationPage({ tablesData }) {
@@ -30,26 +31,18 @@ export default function ReservationPage({ tablesData }) {
     const [isLoading, setIsLoading] = useState(false);
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', title: '', message: '' });
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
-    const [submittedReservation, setSubmittedReservation] = useState(null);
 
     // Today's date in YYYY-MM-DD, used as min for the date input
     const todayStr = new Date().toISOString().split('T')[0];
+    const selectedDateStr = formData.date ? new Date(formData.date).toISOString().split('T')[0] : todayStr;
 
-    // Fetch active reservation if logged in
-    const fetchActiveReservation = useCallback(async () => {
-        if (isLoggedIn) {
-            try {
-                const reservations = await reservationService.getMyReservations();
-                // Show ONLY active reservations (pending, confirmed).
-                // If it's cancelled, rejected, or completed, it goes to history,
-                // and the user sees the booking form again.
-                const active = reservations.find(r => ['pending', 'confirmed'].includes(r.status));
-                setSubmittedReservation(active || null);
-            } catch (error) {
-                logger.error("Failed to fetch user reservations", error);
-            }
-        }
-    }, [isLoggedIn]);
+    const { 
+        availableTables, 
+        TOTAL_TABLES, 
+        submittedReservation, 
+        fetchActiveReservation, 
+        setSubmittedReservation 
+    } = useReservations(selectedDateStr);
 
     useEffect(() => {
         fetchActiveReservation();
@@ -173,11 +166,22 @@ export default function ReservationPage({ tablesData }) {
                 </p>
 
                 {/* Availability Badge */}
-                <div className="inline-flex items-center gap-3 bg-neutral-800/50 border border-white/5 px-5 py-2 rounded-full backdrop-blur-md">
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                    <span className="text-sm font-bold text-white tracking-wide uppercase">
-                        5 Tables Currently Available
-                    </span>
+                <div className="inline-flex items-center gap-3 bg-neutral-800/50 border border-white/5 px-5 py-2 rounded-full backdrop-blur-md transition-all">
+                    {availableTables > 0 ? (
+                        <>
+                            <span className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse" />
+                            <span className="text-sm font-bold text-white tracking-wide uppercase">
+                                {availableTables} Tables Available on {selectedDateStr === todayStr ? 'Today' : new Date(selectedDateStr).toLocaleDateString()}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                            <span className="text-sm font-bold text-white tracking-wide uppercase">
+                                Fully Booked {selectedDateStr === todayStr ? 'Today' : 'on ' + new Date(selectedDateStr).toLocaleDateString()}
+                            </span>
+                        </>
+                    )}
                 </div>
             </div>
 
