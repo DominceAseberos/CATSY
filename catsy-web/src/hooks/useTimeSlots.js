@@ -1,3 +1,13 @@
+/**
+ * @module useTimeSlots
+ * @description Custom hook for the Time Slots management domain.
+ *
+ * Single Responsibility: Manages loading state, the slots list, and
+ * CRUD operations for `/api/admin/time-slots`. No UI logic.
+ *
+ * Open/Closed: New time-slot features (e.g. bulk import, capacity edit)
+ * add a new function here without modifying existing ones.
+ */
 import { useState, useCallback } from 'react';
 import { apiClient } from '../services/apiClient';
 

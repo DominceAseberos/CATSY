@@ -17,8 +17,13 @@ import AdminForm from './admin/components/AdminForm';
 import RedeemPanel from './admin/components/RedeemPanel';
 import ReservationManager from './admin/components/ReservationManager';
 
-// Auth handled by parent
-import AdminProfile from './admin/components/AdminProfile';
+// Phase 3 pages
+import DashboardPage from './admin/components/DashboardPage';
+import SeatOverviewPage from './admin/components/SeatOverviewPage';
+import TimeSlotsPage from './admin/components/TimeSlotsPage';
+import ReportsPage from './admin/components/ReportsPage';
+import CmsPage from './admin/components/CmsPage';
+import ApkDownloadPage from './admin/components/ApkDownloadPage';
 
 export default function AdminPage() {
     const navigate = useNavigate();
@@ -26,7 +31,7 @@ export default function AdminPage() {
     const activeTab = tab || 'products';
     
     // Redirect unknown tabs safely
-    const validTabs = ['products', 'categories', 'materials', 'accounts', 'reservations', 'loyalty', 'profile'];
+    const validTabs = ['products', 'categories', 'materials', 'accounts', 'reservations', 'loyalty', 'profile', 'dashboard', 'seats', 'time-slots', 'reports', 'cms', 'apk'];
     
     const { isLoggedIn, userInfo, login } = useUser();
 
@@ -298,6 +303,14 @@ export default function AdminPage() {
                     setProcessingMessage={setProcessingMessage}
                 />
             )}
+
+            {/* ===== PHASE 3 TABS ===== */}
+            {activeTab === 'dashboard' && <DashboardPage />}
+            {activeTab === 'seats' && <SeatOverviewPage />}
+            {activeTab === 'time-slots' && <TimeSlotsPage />}
+            {activeTab === 'reports' && <ReportsPage />}
+            {activeTab === 'cms' && <CmsPage />}
+            {activeTab === 'apk' && <ApkDownloadPage />}
 
             <DebugConsole />
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Coffee, LayoutGrid, Users, LogOut, FlaskConical, Gift, BookOpen } from 'lucide-react';
+import { Coffee, LayoutGrid, Users, LogOut, FlaskConical, Gift, BookOpen, LayoutDashboard, Armchair, Clock, BarChart3, Megaphone, Download } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
 import StatusModal from '../../../components/UI/StatusModal';
 
@@ -91,6 +91,52 @@ export default function AdminHeader({ setIsEditing, setSelectedUser, hasLowStock
                             className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <Gift size={20} /> Loyalty
+                        </NavLink>
+                    </div>
+
+                    {/* Phase 3 Nav Group */}
+                    <div className="flex gap-2 bg-neutral-800/50 p-1.5 rounded-xl border border-neutral-700/50 mt-2">
+                        <NavLink
+                            to="/admin/dashboard"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <LayoutDashboard size={18} /> Dashboard
+                        </NavLink>
+                        <NavLink
+                            to="/admin/seats"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Armchair size={18} /> Seats
+                        </NavLink>
+                        <NavLink
+                            to="/admin/time-slots"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Clock size={18} /> Time Slots
+                        </NavLink>
+                        <NavLink
+                            to="/admin/reports"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <BarChart3 size={18} /> Reports
+                        </NavLink>
+                        <NavLink
+                            to="/admin/cms"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Megaphone size={18} /> CMS
+                        </NavLink>
+                        <NavLink
+                            to="/admin/apk"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Download size={18} /> APK
                         </NavLink>
                     </div>
 

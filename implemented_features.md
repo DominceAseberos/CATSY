@@ -7,10 +7,11 @@ This document outlines all the features, architectures, and systems that have be
 ## 🏗️ 1. Core Architecture & Foundation
 *   **Tech Stack:** React + Vite (Frontend), FastAPI (Backend), Supabase (Database & Auth).
 *   **SOLID Backend Refactor:** The backend has been completely reconstructed to follow standard SOLID guidelines:
-    *   **Repository Pattern:** Isolated data fetching into pure models (`ReservationRepository`, `OrderRepository`, `LoyaltyRepository`, etc.).
-    *   **Service Layer (Dependency Injection):** Business logic is decoupled from routing. FastAPI utilizes `Depends()` to inject services asynchronously.
-    *   **Strict Typing:** Deep integration of `Pydantic` models for request validation and secure type coercion.
-*   **Database Schema:** Fully scaled PostgreSQL schema including `user_profiles`, `products`, `categories`, `reservations`, `settings`, `orders`, and `audit_logs`.
+    *   **Repository Pattern:** Isolated data fetching into domain-specific repositories (`ReservationRepository`, `OrderRepository`, `LoyaltyRepository`, `TimeSlotsRepository`, `CmsRepository`, `ReportsRepository`, `SeatsRepository`).
+    *   **Service Layer (Dependency Injection):** Business logic is decoupled from routing. FastAPI utilizes `Depends()` factory functions to inject repositories, making the architecture testable and modular.
+    *   **Pure Logic Separation:** Complex aggregations (e.g., Sales Reporting, Seat Map merging) are implemented as pure, side-effect-free functions within repositories.
+    *   **Strict Typing:** Centralized Pydantic models in `schemas.py` for all request/response validation.
+*   **Database Schema:** Fully scaled PostgreSQL schema including `user_profiles`, `products`, `categories`, `reservations`, `settings`, `orders`, `audit_logs`, `time_slots`, `cms_content`, and `user_feedback`.
 
 ## 🔒 2. Authentication & Security
 *   **Supabase JWT Auth:** Secure, stateless login/signup flows using Supabase email schemas.
@@ -32,11 +33,23 @@ This document outlines all the features, architectures, and systems that have be
     *   Supports both Logged-In Members and Walk-in Guests (via `Optional` email schemas).
 
 ## 🛠️ 4. Admin / Staff Web Panel
-*   **Store Settings Configuration:** Admins can dynamically toggle the global `is_open` switch and update `opening_time` / `closing_time` to immediately reflect on the public site.
-*   **Reservation Management Dashboard:** 
-    *   Centralized UI for staff to review incoming bookings.
-    *   Fetches un-filtered, chronological lists of all reservations (spanning both guests and accounts).
-*   **Order Tracking:** POS endpoints available to sync in-house transaction ledgers.
+*   **Store Settings & Dashboard:** 
+    *   Admins can toggle the global `is_open` switch and update operating hours.
+    *   Live Dashboard with Stat Cards (Sales, Orders, Stock Alerts) and Recent Activity.
+*   **Inventory & Product Management:**
+    *   Full CRUD for Products with Category mapping and Stamp Eligibility toggles.
+    *   Real-time Inventory tracking with Low-Stock highlighting and Adjustment logs.
+    *   Reward Product Picker: Admins link rewards to existing products for automated inventory deduction.
+*   **CMS (Content Management System):** Full control over Banners, Announcements, and Promos displayed on the Customer Portal.
+*   **Reports & Analytics:**
+    *   Comprehensive Sales Reports with Date-Range filtering and Payment Method (Cash, GCash, Maya) breakdowns.
+    *   Customer Feedback monitoring and sentiment tracking.
+*   **Reservation & Table Management:**
+    *   Visual Seat Overview grid with reservation tooltips.
+    *   Operating Hours / Time Slot CRUD with first-run default initialization.
+*   **Security & Deployment:**
+    *   Protected APK Download portal for Staff Handheld distribution (Admin-only access).
+    *   Global Toast Notification system for consistent server-side error feedback.
 
 ---
 

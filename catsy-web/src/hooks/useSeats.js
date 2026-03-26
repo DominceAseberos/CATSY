@@ -1,3 +1,13 @@
+/**
+ * @module useSeats
+ * @description Custom hook for the Seat Overview domain.
+ *
+ * Single Responsibility: Fetches the live seat map from `/api/seats`
+ * and exposes loading state. Zero UI rendering logic.
+ *
+ * Open/Closed: Extend with `filterByStatus(status)` or `fetchByZone(zone)`
+ * without modifying the existing `fetchSeats` function.
+ */
 import { useState, useCallback } from 'react';
 import { apiClient } from '../services/apiClient';
 

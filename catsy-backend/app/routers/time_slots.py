@@ -1,44 +1,51 @@
-"""Time Slots router for Reservation Management (Phase 3)."""
+"""
+Time Slots Router (Phase 3).
+
+Responsibility: HTTP request/response handling for `/api/admin/time-slots`.
+  - Route declarations and rate limiting
+  - Auth enforcement via `get_current_user`
+  - Translating request data to repository calls
+  - Shaping repository results into HTTP responses
+
+What this file does NOT do (Open/Closed):
+  - No Supabase queries — those live in `time_slots_repo.py`
+  - No business schemas — those live in `schemas.py`
+  - Adding a new time-slot feature means adding a route here and
+    a method in `time_slots_repo.py` — this file never shrinks or locks.
+"""
 from fastapi import APIRouter, HTTPException, Request, Depends
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from pydantic import BaseModel
-from app.database import supabase
 from app.auth import get_current_user
+from app.schemas import TimeSlotCreate
+from app.repositories.time_slots_repo import TimeSlotsRepository
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/api/admin/time-slots", tags=["Time Slots"])
 
 
-class TimeSlotCreate(BaseModel):
-    time: str
+def get_repo() -> TimeSlotsRepository:
+    """Dependency factory — returns the repository instance.
+    
+    Using a factory function (rather than a global instance) follows the
+    Dependency Inversion Principle and makes the repo swappable in tests.
+    """
+    return TimeSlotsRepository()
 
 
 @router.get("")
 @limiter.limit("60/minute")
 def get_time_slots(
     request: Request,
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: TimeSlotsRepository = Depends(get_repo),
 ):
-    """Admin: Get all time slots with pending reservation count (Phase 3)."""
+    """Admin: List all active time slots enriched with pending reservation counts."""
     try:
-        # Fetch active slots
-        res = supabase.table("time_slots").select("*").eq("is_active", True).order("created_at").execute()
-        slots = res.data or []
-        
-        # Count pending reservations per slot
-        # Ideally an RPC or aggregate, but doing Python-side for simplicity given low volume
-        reserve_res = supabase.table("reservations").select("reservation_time").eq("status", "pending").execute()
-        reservations = reserve_res.data or []
-        
-        pending_counts = {}
-        for r in reservations:
-            t = r.get("reservation_time")
-            pending_counts[t] = pending_counts.get(t, 0) + 1
-            
+        slots = repo.get_active_slots()
+        pending_counts = repo.get_pending_counts()
         for slot in slots:
             slot["pending_count"] = pending_counts.get(slot["time"], 0)
-            
         return {"data": slots}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -49,22 +56,19 @@ def get_time_slots(
 def create_time_slot(
     request: Request,
     data: TimeSlotCreate,
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: TimeSlotsRepository = Depends(get_repo),
 ):
-    """Admin: Create or re-activate a time slot."""
+    """Admin: Create a new time slot, or re-activate a previously removed one."""
     try:
-        # We do an upsert or check existing
-        existing = supabase.table("time_slots").select("*").eq("time", data.time).execute()
-        if existing.data:
-            rec = existing.data[0]
-            if not rec.get("is_active"):
-                res = supabase.table("time_slots").update({"is_active": True}).eq("id", rec["id"]).execute()
-                return {"data": res.data[0]}
-            else:
-                raise HTTPException(status_code=400, detail="Time slot already exists.")
-        
-        res = supabase.table("time_slots").insert({"time": data.time}).execute()
-        return {"data": res.data[0]}
+        existing = repo.get_by_time(data.time)
+        if existing:
+            if not existing.get("is_active"):
+                updated = repo.set_active(existing["id"], True)
+                return {"data": updated}
+            raise HTTPException(status_code=400, detail="Time slot already exists.")
+        created = repo.create(data.time)
+        return {"data": created}
     except HTTPException:
         raise
     except Exception as e:
@@ -76,14 +80,15 @@ def create_time_slot(
 def delete_time_slot(
     request: Request,
     slot_id: str,
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: TimeSlotsRepository = Depends(get_repo),
 ):
-    """Admin: Remove a time slot."""
+    """Admin: Soft-delete a time slot (sets is_active=False)."""
     try:
-        res = supabase.table("time_slots").update({"is_active": False}).eq("id", slot_id).execute()
-        if not res.data:
+        updated = repo.set_active(slot_id, False)
+        if not updated:
             raise HTTPException(status_code=404, detail="Time slot not found.")
-        return {"data": res.data[0]}
+        return {"data": updated}
     except HTTPException:
         raise
     except Exception as e:

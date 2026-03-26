@@ -1,3 +1,13 @@
+/**
+ * @module useCms
+ * @description Custom hook for the CMS (Content Management) domain.
+ *
+ * Single Responsibility: Manages loading state, the CMS items list, and
+ * CRUD operations for `/api/admin/cms` and `/api/cms/active`. No UI logic.
+ *
+ * Open/Closed: New CMS features (e.g. scheduling, image upload, type filter)
+ * add a new function here without modifying existing ones.
+ */
 import { useState, useCallback } from 'react';
 import { apiClient } from '../services/apiClient';
 

@@ -128,3 +128,29 @@ class CustomerOrderResponse(BaseModel):
 class RewardRedeemRequest(BaseModel):
     """Staff payload for POST /loyalty/staff/redeem — validates a coupon code."""
     coupon_code: str
+
+
+# ── Phase 3: Time Slots ───────────────────────────────────────────────────────
+
+class TimeSlotCreate(BaseModel):
+    """Admin payload for POST /api/admin/time-slots."""
+    time: str
+
+
+# ── Phase 3: CMS ──────────────────────────────────────────────────────────────
+
+class CMSCreate(BaseModel):
+    """Admin payload for POST /api/admin/cms."""
+    type: str  # 'banner' | 'announcement' | 'promo'
+    title: str
+    body: Optional[str] = None
+    image_url: Optional[str] = None
+    is_active: bool = True
+
+
+class CMSUpdate(BaseModel):
+    """Admin payload for PUT /api/admin/cms/:id — all fields optional (partial update)."""
+    title: Optional[str] = None
+    body: Optional[str] = None
+    image_url: Optional[str] = None
+    is_active: Optional[bool] = None

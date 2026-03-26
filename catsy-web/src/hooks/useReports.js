@@ -1,3 +1,16 @@
+/**
+ * @module useReports
+ * @description Custom hook for the Reports & Analytics domain.
+ *
+ * Single Responsibility: This hook ONLY manages state and side-effects
+ * for report data (sales aggregation, feedback). It does NOT:
+ *   - Render any UI elements
+ *   - Handle route navigation or toast notifications
+ *
+ * Open/Closed: To add a new report type (e.g. inventory or staff reports),
+ * add a new `fetchX` function and matching state — existing functions
+ * are never modified.
+ */
 import { useState, useCallback } from 'react';
 import { apiClient } from '../services/apiClient';
 
