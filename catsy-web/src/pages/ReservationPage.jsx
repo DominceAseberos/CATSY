@@ -34,6 +34,8 @@ export default function ReservationPage({ tablesData }) {
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', title: '', message: '' });
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
     const [cancelModal, setCancelModal] = useState({ isOpen: false });
+    const [errors, setErrors] = useState({});
+    const [loadingDots, setLoadingDots] = useState('');
 
     // Zero-dependency local date formatting to prevent locale timezone bleed
     const getLocalYYYYMMDD = (dateObj) => {
@@ -62,6 +64,15 @@ export default function ReservationPage({ tablesData }) {
     useSSE({
         'reservation.updated': fetchActiveReservation,
     });
+
+    // Animate loading dots
+    useEffect(() => {
+        if (!isLoading) return;
+        const interval = setInterval(() => {
+            setLoadingDots(prev => prev.length >= 3 ? '' : prev + '.');
+        }, 400);
+        return () => clearInterval(interval);
+    }, [isLoading]);
 
     // Auto-fill logic
     useEffect(() => {
@@ -96,13 +107,43 @@ export default function ReservationPage({ tablesData }) {
         }
 
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error when user types
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+        if (!isLoggedIn) {
+            if (!formData.email.trim()) newErrors.email = 'Email is required';
+            else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
+        }
+        if (!formData.phone.trim()) newErrors.phone = 'Contact number is required';
+        else if (formData.phone.length < 11) newErrors.phone = 'Should be 11 digits';
+        
+        if (!formData.date) newErrors.date = 'Date and time are required';
+        if (!formData.guests) newErrors.guests = 'Guest count is required';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validation check
-        if (!formData.date || !formData.guests) return;
+        // TC_CST_001 FIX: Manual validation check with labels
+        if (!validateForm()) {
+            // Scroll to first error
+            const firstError = Object.keys(errors)[0];
+            if (firstError) {
+                const el = document.getElementsByName(firstError)[0];
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
 
         // Block TODAY if restaurant is manually toggled closed
         const formDateObj = formData.date ? new Date(formData.date) : new Date();
@@ -345,8 +386,10 @@ export default function ReservationPage({ tablesData }) {
                                     <div className="absolute inset-0 border-4 border-brand-accent rounded-full border-t-transparent animate-spin"></div>
                                     <Calendar size={24} className="text-brand-accent animate-pulse" />
                                 </div>
-                                <p className="mt-6 text-xl font-bold text-neutral-900 animate-pulse">Securing your table...</p>
-                                <p className="mt-2 text-sm text-neutral-500">Please do not refresh the page.</p>
+                                <p className="mt-6 text-xl font-bold text-neutral-900 animate-pulse text-center px-6">
+                                    Securing your table{loadingDots}
+                                </p>
+                                <p className="mt-2 text-sm text-neutral-500 text-center px-6">Please do not refresh the page.</p>
                             </div>
                         )}
 
@@ -380,10 +423,11 @@ export default function ReservationPage({ tablesData }) {
                                                 value={formData.firstName}
                                                 onChange={handleChange}
                                                 readOnly={isLoggedIn}
-                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : 'border-neutral-200 text-neutral-900'}`}
+                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : errors.firstName ? 'border-red-500' : 'border-neutral-200 text-neutral-900'}`}
                                                 placeholder="e.g. John"
                                                 required
                                             />
+                                            {errors.firstName && <p className="text-xs text-red-500 font-bold ml-1 animate-fade-in">{errors.firstName}</p>}
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-sm font-bold text-neutral-900 ml-1">Last Name</label>
@@ -393,10 +437,11 @@ export default function ReservationPage({ tablesData }) {
                                                 value={formData.lastName}
                                                 onChange={handleChange}
                                                 readOnly={isLoggedIn}
-                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : 'border-neutral-200 text-neutral-900'}`}
+                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : errors.lastName ? 'border-red-500' : 'border-neutral-200 text-neutral-900'}`}
                                                 placeholder="e.g. Doe"
                                                 required
                                             />
+                                            {errors.lastName && <p className="text-xs text-red-500 font-bold ml-1 animate-fade-in">{errors.lastName}</p>}
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -408,10 +453,11 @@ export default function ReservationPage({ tablesData }) {
                                                 value={formData.email}
                                                 onChange={handleChange}
                                                 readOnly={isLoggedIn}
-                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : 'border-neutral-200 text-neutral-900'}`}
+                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : errors.email ? 'border-red-500' : 'border-neutral-200 text-neutral-900'}`}
                                                 placeholder="e.g. coffee@catsy.com"
                                                 required={!isLoggedIn}
                                             />
+                                            {errors.email && <p className="text-xs text-red-500 font-bold ml-1 animate-fade-in">{errors.email}</p>}
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-sm font-bold text-neutral-900 ml-1">Contact Number</label>
@@ -421,12 +467,13 @@ export default function ReservationPage({ tablesData }) {
                                                 value={formData.phone}
                                                 onChange={handleChange}
                                                 readOnly={isLoggedIn}
-                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : 'border-neutral-200 text-neutral-900'}`}
+                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-medium outline-none border focus:border-brand-accent transition-all ${isLoggedIn ? 'text-neutral-500 cursor-not-allowed border-transparent' : errors.phone ? 'border-red-500' : 'border-neutral-200 text-neutral-900'}`}
                                                 placeholder="e.g. 09123456789"
                                                 maxLength={11}
                                                 pattern="[0-9]{11}"
                                                 required
                                             />
+                                            {errors.phone && <p className="text-xs text-red-500 font-bold ml-1 animate-fade-in">{errors.phone}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -453,9 +500,10 @@ export default function ReservationPage({ tablesData }) {
                                                 onChange={handleChange}
                                                 min={`${todayStr}T${restaurantSettings?.opening_time?.slice(0, 5) ?? '00:00'}`}
                                                 max={restaurantSettings ? undefined : undefined}
-                                                className="w-full p-4 bg-neutral-50 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-brand-accent text-neutral-900"
+                                                className={`w-full p-4 bg-neutral-50 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-brand-accent text-neutral-900 border ${errors.date ? 'border-red-500' : 'border-transparent'}`}
                                                 required
                                             />
+                                            {errors.date && <p className="text-xs text-red-500 font-bold ml-1 animate-fade-in">{errors.date}</p>}
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-sm font-bold text-neutral-900 ml-1">Guests</label>
@@ -490,7 +538,7 @@ export default function ReservationPage({ tablesData }) {
                                         disabled={isLoading}
                                         className={`w-full text-white py-5 rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 px-8 ${isLoading ? 'bg-neutral-500 cursor-wait' : 'bg-neutral-900 group'}`}
                                     >
-                                        <span>{isLoading ? 'Processing...' : 'Confirm Reservation'}</span>
+                                        <span>{isLoading ? `Processing${loadingDots}` : 'Confirm Reservation'}</span>
                                         {!isLoading && (
                                             <div className="bg-white/10 p-1 rounded-full group-hover:bg-brand-accent group-hover:text-black transition-colors flex items-center justify-center">
                                                 <Check size={20} className="transition-transform" />

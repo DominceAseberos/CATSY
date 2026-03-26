@@ -8,7 +8,19 @@ description: AI orchestration workflow — read the codebase, align with MD spec
 
 ---
 
-## STEP 0 — Pull Latest Code First
+## 🚫 AI HARD RULES — Read Before Every Session
+
+These rules are **absolute**. No exceptions. No overrides.
+
+| Rule | Detail |
+|---|---|
+| **NEVER mark a test `pass` or `fail`** | `test_cases.md` Status column is **human-only**. If you applied a fix, you may write `[Fix Applied] <what changed>` in the Actual Outcome column. The Status **must stay `pending`** until the human manually tests and explicitly updates it. |
+| **NEVER edit spec files** | `catsy.md`, `catsy_development_phases.md`, `phase3.md` are read-only references. |
+| **NEVER modify `FROZEN.md`** | Unless the user explicitly asks for an audit. |
+| **ALWAYS log your session** | Add an entry to `DEVELOPMENT_LOG.md` after any coding session. |
+
+---
+
 
 Before anything else, always sync with the remote repository.
 

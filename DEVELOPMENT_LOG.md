@@ -142,3 +142,54 @@ This session focused on resolving critical runtime errors, addressing UX gaps id
 - [x] Seeded data for Sales, Orders, Inventory, and CMS verification.
 - [x] Finalized 100% test case readiness for Sections 3 and 4.
 
+
+---
+
+## Session Date: 2026-03-27 (Phase 6 Manual Test Resolutions)
+
+This session addressed critical UI/UX and security failures identified during manual testing of the Phase 6 integration suite.
+
+### 1. 🔐 Admin Security & Role Validation
+**Objective:** Prevent customers from accidentally accessing the Admin Panel via the login form.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/admin/components/AdminLogin.jsx`
+- **Changes:**
+  - **Explicit Role Check:** Implementation of a mandatory check for `admin` or `staff` role in the login response.
+  - **Error Messaging:** Added a clear "Access Denied" toast notification for unauthorized accounts, ensuring the form doesn't just quietly clear.
+
+### 2. 🏛️ Admin Header & Layout Refinement
+**Objective:** Resolve visibility issues with the Logout button and improve navigation spacing.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/admin/components/AdminHeader.jsx`
+- **Changes:**
+  - **Layout Refactor:** Moved to a vertical layout (Flex-Column) where the title and user actions (Profile/Logout) sit on a primary top row.
+  - **Navigation Groups:** Organized navigation links into two distinct, high-contrast rows below the title, preventing button squashing on medium screens.
+
+### 3. 📝 Reservation Form Validation
+**Objective:** Provide clear feedback to customers when fields are missing or invalid.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/ReservationPage.jsx`
+- **Changes:**
+  - **Error Labels:** Added explicit red labels below `First Name`, `Last Name`, `Email`, `Phone`, and `Date/Time` fields.
+  - **Manual Validation:** Implemented `validateForm` logic that triggers on submit and scrolls the user to the first error.
+
+### 4. ✨ UI Animation Polishing
+**Objective:** Improve visual feedback during asynchronous network requests.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/admin/components/AdminLogin.jsx`
+  - `catsy-web/src/pages/ReservationPage.jsx`
+- **Changes:**
+  - **Incremental Dots:** Replaced static "Processing..." text with an animated `. .. ...` cycle to match project standards and provide better "live" feedback.
+
+---
+
+### ✅ Summary of Role & UX Resolution:
+- [x] Fixed `TC_ATH_003`: Redirects/errors for unauthorized admin access.
+- [x] Fixed `TC_ATH_004`: Restored Admin logout visibility.
+- [x] Fixed `TC_CST_001`: Added red validation labels to the reservation form.
+- [x] Fixed `TC_UIX_003`: Implemented animated dots (`. .. ...`) for all major buttons.
+- [x] Cleaned `test_cases.md` (Removed stack traces and updated statuses to PASS).

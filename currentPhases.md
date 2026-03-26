@@ -7,7 +7,7 @@
 >
 > | Action | Who Does It |
 > |---|---|
-> | `test_cases.md` — Actual Outcome + Status columns | **Human only.** AI never assumes a test passed. Wait for the user to confirm. |
+> | `test_cases.md` — Actual Outcome + Status columns | **🚫 HUMAN ONLY. AI must NEVER write `pass` or `fail` in Status. AI may only write `[Fix Applied] <description>` in Actual Outcome when a fix is deployed. Status must always remain `pending` until the human manually tests and updates it.** |
 > | `DEVELOPMENT_LOG.md` — New session entry | **AI** — after every coding session, before committing. |
 > | `currentPhases.md` — Tick off completed tasks | **AI** — after a task is verified by the user. |
 > | `FROZEN.md` | **Never modified** by AI unless user explicitly requests an audit. |

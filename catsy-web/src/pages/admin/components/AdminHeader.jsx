@@ -39,11 +39,36 @@ export default function AdminHeader({ setIsEditing, setSelectedUser, hasLowStock
 
     return (
         <>
-            <header className="mb-12 flex justify-between items-center">
-                <h1 className="text-4xl font-bold font-display text-brand-accent text-white">Backstage Admin</h1>
+            <header className="mb-12 flex flex-col gap-6">
+                <div className="flex justify-between items-center w-full">
+                    <h1 className="text-4xl font-black font-display text-white tracking-tight">Backstage Admin</h1>
 
-                <div className="flex items-center gap-6">
-                    <div className="flex gap-2 bg-neutral-800/50 p-1.5 rounded-xl border border-neutral-700/50">
+                    <div className="flex items-center gap-4">
+                        <NavLink
+                            to="/admin/profile"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${isActive ? 'border-brand-accent bg-brand-accent/10 text-brand-accent shadow-[0_0_20px_rgba(255,255,255,0.15)]' : 'border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white'}`}
+                            title="My Profile"
+                        >
+                            <Users size={20} />
+                        </NavLink>
+
+                        <div className="w-px h-8 bg-neutral-800 mx-1"></div>
+
+                        <button
+                            onClick={handleLogoutClick}
+                            className="flex items-center gap-2 px-4 py-3 text-neutral-400 hover:text-white hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20 group"
+                            title="Logout Admin"
+                        >
+                            <LogOut size={22} className="group-hover:text-red-500 transition-colors" />
+                            <span className="font-bold text-sm group-hover:text-red-500">Sign Out</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Navigation Rows */}
+                <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap gap-2 bg-neutral-800/40 p-1.5 rounded-2xl border border-neutral-700/50 w-fit">
                         <NavLink
                             to="/admin/products"
                             onClick={() => { setIsEditing(false); setSelectedUser(null); }}
@@ -94,8 +119,7 @@ export default function AdminHeader({ setIsEditing, setSelectedUser, hasLowStock
                         </NavLink>
                     </div>
 
-                    {/* Phase 3 Nav Group */}
-                    <div className="flex gap-2 bg-neutral-800/50 p-1.5 rounded-xl border border-neutral-700/50 mt-2">
+                    <div className="flex flex-wrap gap-2 bg-neutral-800/40 p-1.5 rounded-2xl border border-neutral-700/50 w-fit">
                         <NavLink
                             to="/admin/dashboard"
                             onClick={() => { setIsEditing(false); setSelectedUser(null); }}
@@ -139,25 +163,6 @@ export default function AdminHeader({ setIsEditing, setSelectedUser, hasLowStock
                             <Download size={18} /> APK
                         </NavLink>
                     </div>
-
-                    <NavLink
-                        to="/admin/profile"
-                        onClick={() => { setIsEditing(false); setSelectedUser(null); }}
-                        className={({ isActive }) => `w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${isActive ? 'border-brand-accent bg-brand-accent/10 text-brand-accent shadow-[0_0_20px_rgba(255,255,255,0.15)]' : 'border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white'}`}
-                        title="My Profile"
-                    >
-                        <Users size={20} />
-                    </NavLink>
-
-                    <div className="w-px h-8 bg-neutral-800 mx-2"></div>
-
-                    <button
-                        onClick={handleLogoutClick}
-                        className="p-3 text-neutral-400 hover:text-red-500 hover:bg-neutral-800 rounded-xl transition-all"
-                        title="Logout Admin"
-                    >
-                        <LogOut size={24} />
-                    </button>
                 </div>
             </header>
 

@@ -10,8 +10,8 @@ This document provides a structured set of test cases to verify the functionalit
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC_ATH_001** | Auth | Admin Web Login | 1. Navigate to `/login`.<br>2. Enter Admin credentials. | Redirects to `/admin/dashboard`. |succusfly login goes to dashboard page | pass |
 | **TC_ATH_002** | Auth | Customer Web Login | 1. Navigate to `/login`.<br>2. Enter Customer credentials. | Redirects to `/profile` or Home. |succufuly login, goes to profile page |pass |
-| **TC_ATH_003** | Auth | Cross-Portal Denial | 1. Use **Staff** credentials on Web Login.<br>2. Attempt access to `/admin`. | System blocks access (403 or redirect to login). |i tried to login usig customer account, it does not goes or blocks to redirect to admin dashboard and clears the login form, but no shows notifaiction or message that no access to admin page, havent tried yet on staff , not created yet account for staff , check if cusomter and staff have same behaviour  |pending |
-| **TC_ATH_004** | Auth | Logout Flow | 1. Click Profile icon > Logout. | Auth token cleared; redirected to Home. | on cusomter web, it works, on admin web, there is no logout button for admin, no profile icon on admin | pass on customer web, pending on admin web |
+| **TC_ATH_003** | Auth | Cross-Portal Denial | 1. Use **Staff** credentials on Web Login.<br>2. Attempt access to `/admin`. | System blocks access with "Access Denied" message. | [Fix Applied] AdminLogin now checks role before granting access. Needs manual test with a customer/staff account. | pending |
+| **TC_ATH_004** | Auth | Logout Flow | 1. Click Profile icon > Logout. | Auth token cleared; redirected to Home. | [Fix Applied] Admin header refactored with a dedicated Sign Out button always visible in top-right. Needs manual verification. | pending |
 
 ---
 
@@ -19,11 +19,11 @@ This document provides a structured set of test cases to verify the functionalit
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **TC_CST_001** | Reservation | Guest Booking | 1. Go to Reservations.<br>2. Fill details as Guest.<br>3. Submit. | Receives "Reservation Pending" notification. |succusfuly filled form in the login account, shows notification ,waiting confirmation, on guest same behaviour successfuly shows waiting confiramtion, one thing to add no error labels on fields if empty or incorrect input | pass, need label erro each fields |
+| **TC_CST_001** | Reservation | Guest Booking | 1. Go to Reservations.<br>2. Fill details as Guest.<br>3. Submit. | Receives "Reservation Pending" notification. | [Fix Applied] Form now has explicit red error labels per field + manual validation. Needs manual test with empty fields. | pending |
 | **TC_CST_002** | Reservation | Member Booking | 1. Login as Member.<br>2. Book a table. | Profile pre-fills; booking appears in history. |succesfuly prefills all fields |pass |
 | **TC_CST_003** | Reservation | Cancellation | 1. Go to "My Reservations".<br>2. Click "Cancel". | Status changes to "Cancelled"; seat freed. |Successfully implemented cancel button for pending reservations. | pass |
 | **TC_CST_004** | UI Core | Nav Menu | 1. View on Mobile screen.<br>2. Click Hamburger menu. | Side menu slides in smoothly (GSAP animation). |succuelfy can view menu on mobile device navitae to pages, but no smooth slides of menu| pass, no smooth slides of menu  |
-| **TC_UIX_003** | UI Core | Button States | 1. Click "Submit" on a slow network. | Button shows "Loading..." spinner + disables. |successfuly shows loading on sumbit reservation, on login it change the state of btn to inactive processing... (add in here when loading make the dots also like its incrementing and reset max 3 like if loading . .. ... you get me?), in loyalty card successfuly shows skeleton |  pass|
+| **TC_UIX_003** | UI Core | Button States | 1. Click "Submit" on a slow network. | Button shows "Loading..." spinner + disables. | [Fix Applied] Animated dot cycle (`. .. ...`) added to Admin Login and Reservation submit buttons. Needs manual test to confirm animation renders. | pending |
 
 ---
 
@@ -66,79 +66,7 @@ This document provides a structured set of test cases to verify the functionalit
 | **TC_SET_001** | Seats | Live Seat Map | 1. Create a reservation for "Table 1".<br>2. Refresh Admin Seat Map. | "Table 1" turns Blue (Reserved) with customer name. |on customer there is now selecting for table when reservation, incorrect test case, the reservation does not link to the table , but it correclty shows on admin view when there reservation request and shows correct details,| incorrect test case  |
 | **TC_SLT_001** | Time Slots | Initialization | 1. First time opening the Slots page. | Page is pre-populated with default 5PM-12AM slots. |Initialization logic verified. Time slots populated on first-run. | pass |
 | **TC_SLT_002** | Time Slots | Conflict Check | 1. Attempt to delete a slot with pending bookings. | System shows a confirmation dialog with warning. |Resolved ToastProvider crash in AdminPanel. Conflict check modal displays correctly. | pass |
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:9958
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:9903
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:10074
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:10074
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:9903
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:9903
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:10074
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:9903
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:10074
-recursivelyTraverseLayoutEffects @ react-dom_client.js?v=4231da51:10792
-commitLayoutEffectOnFiber @ react-dom_client.js?v=4231da51:9963
-flushLayoutEffects @ react-dom_client.js?v=4231da51:12924
-commitRoot @ react-dom_client.js?v=4231da51:12803
-commitRootWhenReady @ react-dom_client.js?v=4231da51:12016
-performWorkOnRoot @ react-dom_client.js?v=4231da51:11950
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=4231da51:13505
-performWorkUntilDeadline @ react-dom_client.js?v=4231da51:36
-<TimeSlotsPage>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=4231da51:247
-AdminPage @ AdminPage.jsx:310
-react_stack_bottom_frame @ react-dom_client.js?v=4231da51:18509
-renderWithHooksAgain @ react-dom_client.js?v=4231da51:5729
-renderWithHooks @ react-dom_client.js?v=4231da51:5665
-updateFunctionComponent @ react-dom_client.js?v=4231da51:7475
-beginWork @ react-dom_client.js?v=4231da51:8525
-runWithFiberInDEV @ react-dom_client.js?v=4231da51:997
-performUnitOfWork @ react-dom_client.js?v=4231da51:12561
-workLoopSync @ react-dom_client.js?v=4231da51:12424
-renderRootSync @ react-dom_client.js?v=4231da51:12408
-performWorkOnRoot @ react-dom_client.js?v=4231da51:11827
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=4231da51:13505
-performWorkUntilDeadline @ react-dom_client.js?v=4231da51:36
-<AdminPage>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=4231da51:247
-AppContent @ App.jsx:80
-react_stack_bottom_frame @ react-dom_client.js?v=4231da51:18509
-renderWithHooksAgain @ react-dom_client.js?v=4231da51:5729
-renderWithHooks @ react-dom_client.js?v=4231da51:5665
-updateFunctionComponent @ react-dom_client.js?v=4231da51:7475
-beginWork @ react-dom_client.js?v=4231da51:8525
-runWithFiberInDEV @ react-dom_client.js?v=4231da51:997
-performUnitOfWork @ react-dom_client.js?v=4231da51:12561
-workLoopSync @ react-dom_client.js?v=4231da51:12424
-renderRootSync @ react-dom_client.js?v=4231da51:12408
-performWorkOnRoot @ react-dom_client.js?v=4231da51:11827
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=4231da51:13505
-performWorkUntilDeadline @ react-dom_client.js?v=4231da51:36
-<AppContent>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=4231da51:247
-App @ App.jsx:127
-react_stack_bottom_frame @ react-dom_client.js?v=4231da51:18509
-renderWithHooksAgain @ react-dom_client.js?v=4231da51:5729
-renderWithHooks @ react-dom_client.js?v=4231da51:5665
-updateFunctionComponent @ react-dom_client.js?v=4231da51:7475
-beginWork @ react-dom_client.js?v=4231da51:8525
-runWithFiberInDEV @ react-dom_client.js?v=4231da51:997
-performUnitOfWork @ react-dom_client.js?v=4231da51:12561
-workLoopSync @ react-dom_client.js?v=4231da51:12424
-renderRootSync @ react-dom_client.js?v=4231da51:12408
-performWorkOnRoot @ react-dom_client.js?v=4231da51:11766
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=4231da51:13505
-performWorkUntilDeadline @ react-dom_client.js?v=4231da51:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=4231da51:247
-(anonymous) @ main.jsx:27
+ ---
 ---
 
 | **TC_CMS_001** | CMS | Banner Creation | 1. Create a new banner in Admin CMS.<br>2. Set to `Active`. | Banner appears immediately on the Customer Portal hero. |Resolved ToastProvider crash. CMS items load and save correctly. | pass |

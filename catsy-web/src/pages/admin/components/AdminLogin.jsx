@@ -11,10 +11,20 @@ export default function AdminLogin({ onLoginSuccess }) {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [loadingDots, setLoadingDots] = useState('');
 
     const [success, setSuccess] = useState(false);
 
     const navigate = useNavigate();
+    
+    // Animate loading dots
+    useEffect(() => {
+        if (!loading) return;
+        const interval = setInterval(() => {
+            setLoadingDots(prev => prev.length >= 3 ? '' : prev + '.');
+        }, 400);
+        return () => clearInterval(interval);
+    }, [loading]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,6 +35,12 @@ export default function AdminLogin({ onLoginSuccess }) {
             const response = await adminService.login(email, password);
 
             if (response && response.user) {
+                // TC_ATH_003 FIX: Explicitly verify role for admin access
+                const role = response.user.role?.toLowerCase();
+                if (role !== 'admin' && role !== 'staff') {
+                    throw new Error("Access Denied: You do not have permission to enter the Admin Panel.");
+                }
+
                 logger.log("Admin Login Success:", response.user);
 
                 // Show success state
@@ -134,7 +150,10 @@ export default function AdminLogin({ onLoginSuccess }) {
                                     }`}
                             >
                                 {loading ? (
-                                    <Loader2 size={24} className="animate-spin" />
+                                    <div className="flex items-center gap-1">
+                                        <Loader2 size={24} className="animate-spin" />
+                                        <span>Processing{loadingDots}</span>
+                                    </div>
                                 ) : (
                                     <>
                                         <ShieldCheck size={22} />
