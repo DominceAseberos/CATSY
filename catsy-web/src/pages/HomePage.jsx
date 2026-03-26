@@ -6,13 +6,13 @@ import LiveFloorMap from '../components/Map/LiveFloorMap';
 
 import { useUser } from '../context/UserContext';
 
-export default function HomePage({ onNavigate, tablesData }) {
+export default function HomePage({ tablesData }) {
     const { isLoggedIn } = useUser();
     return (
         <div className="animate-fade-in bg-white">
             {/* 1. Hero Section (PRESERVED - DO NOT TOUCH) */}
             <div className="relative">
-                <HeroSection isLoggedIn={isLoggedIn} onLogin={() => onNavigate('login')} onSignup={() => onNavigate('signup')} onNavigate={onNavigate} />
+                <HeroSection isLoggedIn={isLoggedIn} />
             </div>
 
             {/* 2. Signature Three - Floating Spotlight Cards */}
@@ -22,7 +22,7 @@ export default function HomePage({ onNavigate, tablesData }) {
             <UnifiedMenu />
 
             {/* 4. Find Your Spot - Grand Finale Map */}
-            <LiveFloorMap tablesData={tablesData} onNavigate={onNavigate} />
+            <LiveFloorMap tablesData={tablesData} />
 
 
 

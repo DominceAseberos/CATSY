@@ -1,10 +1,22 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { MapPin, ArrowUpRight, X, LocateFixed } from 'lucide-react';
-import locationData from '../../data/location.json';
 
-export default function LiveFloorMap({ tablesData, onNavigate }) {
+const locationData = {
+    title: "Catsy Coffee HQ",
+    address: "123 Barista Avenue\nCoffee District, NY 10001",
+    embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.119763973046!3d40.69766374874431!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2sph!4v1709564634231!5m2!1sen!2sph",
+    directionsUrl: "https://maps.app.goo.gl/CatsyCoffeeMock",
+    images: [
+        { src: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2694&auto=format&fit=crop", alt: "Interior" },
+        { src: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2670&auto=format&fit=crop", alt: "Barista" }
+    ]
+};
+
+export default function LiveFloorMap({ tablesData }) {
+    const navigate = useNavigate();
     const containerRef = useRef(null);
     const [isVisible, setIsVisible] = useState(true);
     // dynamicData state removed, using props.tablesData
@@ -137,7 +149,7 @@ export default function LiveFloorMap({ tablesData, onNavigate }) {
                     <div className="space-y-3">
                         {/* Primary Action: Reservation */}
                         <button
-                            onClick={() => onNavigate('reservation')}
+                            onClick={() => navigate('/reservation')}
                             className="group flex items-center justify-center w-full text-center bg-white text-neutral-900 px-6 py-4 rounded-full font-bold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-xl shadow-white/10"
                         >
                             <span className="tracking-tight uppercase text-center">REserve TAble</span>

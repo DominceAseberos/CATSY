@@ -1,16 +1,17 @@
-import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Flip } from 'gsap/Flip';
 import CatsyLogo from './UI/CatsyLogo/CatsyLogo';
-import heroData from '../data/hero.json';
-import { useCallback } from 'react';
-import { mockSettings } from '../data/mockSettings';
+import { useSettings } from '../context/SettingsContext';
 
+
+import { useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(Flip);
 
-export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn }) {
+export default function HeroSection({ onLogin, onSignup, isLoggedIn }) {
+    const navigate = useNavigate();
     const container = useRef(null);
     const logoRef = useRef(null);
     const textContainerRef = useRef(null);
@@ -21,11 +22,20 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
     const leftCupRef = useRef(null);
     const rightCupRef = useRef(null);
 
-    // Asset Configuration Object
-    const assets = {
-        leftCup: heroData.assets.leftCup,
-        rightCup: heroData.assets.rightCup
+    // Local Hero Content (Marketing-driven static content)
+    const heroContent = {
+        title: "Brewing Joy in Every Cup",
+        description: "Experience the art of artisanal coffee and handcrafted pastries in a space designed for connection.",
+        primaryButton: "Login",
+        scrollText: "discover our story",
+        assets: {
+            leftCup: "https://images.unsplash.com/photo-1544787210-282744863030?q=80&w=2622&auto=format&fit=crop",
+            rightCup: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2670&auto=format&fit=crop"
+        }
     };
+
+    const { settings } = useSettings();
+    const isOpen = settings?.is_open ?? true;
 
     // Splash State: true = show splash, false = show hero
     const hasSeenSplash = typeof window !== 'undefined' && sessionStorage.getItem('hasSeenSplash') === 'true';
@@ -163,14 +173,14 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
             <div className={`absolute inset-0 pointer-events-none overflow-hidden z-10 ${!isSplashComplete ? 'hidden' : 'block'}`}>
                 <img
                     ref={leftCupRef}
-                    src={assets.leftCup}
+                    src={heroContent.assets.leftCup}
                     className={`absolute top-[100px] -left-[80px] w-[200px] cup-atmospheric`}
                     alt="Decorative Coffee"
                     style={{ transform: 'rotate(35deg)', opacity: 0 }}
                 />
                 <img
                     ref={rightCupRef}
-                    src={assets.rightCup}
+                    src={heroContent.assets.rightCup}
                     className={`absolute top-[230px] -right-[80px] w-[200px] cup-atmospheric`}
                     alt="Decorative Coffee"
                     style={{ transform: 'rotate(-50deg)', opacity: 0 }}
@@ -215,14 +225,14 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
                     `}
                 >
                     <h1 className="text-2xl md:text-4xl font-sans font-bold text-neutral-900 mb-2 leading-tight compact-text whitespace-nowrap">
-                        {heroData.title.split(" ").map((word, i) => (
+                        {heroContent.title.split(" ").map((word, i) => (
                             <span key={i} className={`word-span inline-block mr-2 text-brand-accent ${animClass}`}>
                                 {word}
                             </span>
                         ))}
                     </h1>
                     <p className={`compact-desc text-neutral-500 text-base md:text-lg mt-2 ${animClass}`}>
-                        {heroData.description}
+                        {heroContent.description}
                     </p>
                 </div>
 
@@ -235,7 +245,7 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
                     {/* Primary Button: Reserve a Table */}
                     <button
                         ref={btnRef}
-                        onClick={() => onNavigate('reservation')}
+                        onClick={() => navigate('/reservation')}
                         className={`compact-btn w-full bg-neutral-900 text-white py-4 rounded-full font-bold text-lg shadow-xl hover:scale-105 duration-500 active:scale-95 transition-all ${animClass}`}
                     >
                         Reserve a Table
@@ -243,17 +253,17 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
 
                     {/* Secondary Button: Login / Profile */}
                     <button
-                        onClick={isLoggedIn ? () => onNavigate('profile') : onLogin}
+                        onClick={isLoggedIn ? () => navigate('/profile') : () => navigate('/login')}
                         className={`compact-btn w-full bg-transparent border-2 border-neutral-900 text-neutral-900 py-4 rounded-full font-bold text-lg hover:bg-neutral-50 transition-colors duration-300 ${animClass}`}
                     >
-                        {isLoggedIn ? "Profile" : heroData.primaryButton}
+                        {isLoggedIn ? "Profile" : heroContent.primaryButton}
                     </button>
 
                     {/* Status Badge */}
                     <div className={`mt-2 flex items-center justify-center gap-2 ${animClass} transition-all duration-700`}>
-                        <div className={`w-2 h-2 rounded-full animate-pulse ${mockSettings.is_open ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.8)]' : 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]'}`}></div>
-                        <span className={`text-sm font-bold tracking-widest uppercase ${mockSettings.is_open ? 'text-green-600' : 'text-red-600'}`}>
-                            {mockSettings.is_open ? 'Open Now' : 'Closed for now'}
+                        <div className={`w-2 h-2 rounded-full animate-pulse ${isOpen ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.8)]' : 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]'}`}></div>
+                        <span className={`text-sm font-bold tracking-widest uppercase ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
+                            {isOpen ? 'Open Now' : 'Closed for now'}
                         </span>
                     </div>
 
@@ -272,7 +282,7 @@ export default function HeroSection({ onLogin, onSignup, onNavigate, isLoggedIn 
                     className={`scroll-indicator ${animClass}`}
                 >
                     <div className="flex flex-col items-center gap-2 animate-bounce">
-                        <span className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 whitespace-nowrap">{heroData.scrollText}</span>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 whitespace-nowrap">{heroContent.scrollText}</span>
                         <div className="w-px h-8 bg-neutral-300"></div>
                     </div>
                 </div>

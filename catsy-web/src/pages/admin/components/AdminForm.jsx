@@ -1,10 +1,51 @@
-import { Save, X, Eye, EyeOff } from 'lucide-react';
+import { Save, X, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { productSchema, categorySchema, materialSchema, accountSchema } from '../../../utils/validationSchemas';
 import RecipeEditor from './RecipeEditor';
 
 const UNITS = ['grams', 'ml', 'pcs', 'kg', 'liters', 'oz', 'tbsp', 'tsp'];
 
 export default function AdminForm({ activeTab, isEditing, setIsEditing, currentItem, setCurrentItem, categories, materials = [], products = [], handleSave, setProcessingMessage }) {
+    // Select schema based on active tab
+    const schemas = {
+        products: productSchema,
+        categories: categorySchema,
+        materials: materialSchema,
+        accounts: accountSchema
+    };
+
+    const schema = schemas[activeTab] || productSchema;
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+        watch,
+        setValue
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: currentItem || {}
+    });
+
+    // Sync form with currentItem when it changes (e.g. from parent openEdit/openCreate)
+    useEffect(() => {
+        if (currentItem) {
+            reset(currentItem);
+        }
+    }, [currentItem, reset]);
+
+    const onSubmit = (data) => {
+        // Sync local form data back to parent state before triggering parent's handleSave logic
+        setCurrentItem(data);
+        
+        // Trigger the parent's handleSave (which shows confirmation)
+        // We mock an event object for compatibility with parent's e.preventDefault()
+        handleSave({ preventDefault: () => {} });
+    };
+
     // Local UI states
     const [showPassword, setShowPassword] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,14 +58,17 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
         feedback: []
     });
 
+    // Watch password for strength calculation
+    const watchedPassword = watch('password');
+
     // Calculate password strength in real-time
     useEffect(() => {
-        if (activeTab !== 'accounts' || !currentItem?.password) {
+        if (activeTab !== 'accounts' || !watchedPassword) {
             setPasswordStrength({ score: 0, label: 'Weak', color: 'bg-red-500', feedback: [] });
             return;
         }
 
-        const p = currentItem.password;
+        const p = watchedPassword;
         const requirements = [
             { id: 'length', text: 'Min 8 characters', met: p.length >= 8 },
             { id: 'upper', text: 'Uppercase letter', met: /[A-Z]/.test(p) },
@@ -47,7 +91,7 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
         }
 
         setPasswordStrength({ score, label, color, feedback: requirements });
-    }, [currentItem?.password, activeTab]);
+    }, [watchedPassword, activeTab]);
 
     if (!isEditing) return null;
 
@@ -55,22 +99,24 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <div className="w-full max-w-3xl bg-neutral-800 p-8 md:p-10 rounded-[2.5rem] border border-neutral-700 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-8 sticky top-0 bg-neutral-800 z-10 pb-4 border-b border-neutral-700/50">
-                    <h2 className="text-3xl font-bold">{currentItem.product_id || currentItem.category_id || currentItem.material_id ? 'Edit' : 'Create'} {activeTab === 'products' ? 'Product' : activeTab === 'categories' ? 'Claimable Reward' : activeTab === 'materials' ? 'Material' : 'Account'}</h2>
+                    <h2 className="text-3xl font-bold">
+                        {currentItem?.id || currentItem?.product_id || currentItem?.category_id || currentItem?.material_id ? 'Edit' : 'Create'} 
+                        {activeTab === 'products' ? ' Product' : activeTab === 'categories' ? ' Claimable Reward' : activeTab === 'materials' ? ' Material' : ' Account'}
+                    </h2>
                     <button onClick={() => setIsEditing(false)} className="text-neutral-400 hover:text-white transition-colors"><X size={32} /></button>
                 </div>
 
-                <form onSubmit={handleSave} className="space-y-8">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                     {activeTab === 'products' ? (
                         <>
                             <div>
                                 <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Product Name</label>
                                 <input
                                     type="text"
-                                    value={currentItem.product_name}
-                                    onChange={e => setCurrentItem({ ...currentItem, product_name: e.target.value })}
-                                    className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                    required
+                                    {...register('product_name')}
+                                    className={`w-full bg-neutral-900 border ${errors.product_name ? 'border-red-500' : 'border-neutral-700'} rounded-lg px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                 />
+                                {errors.product_name && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.product_name.message}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -78,42 +124,40 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                     <input
                                         type="number"
                                         step="0.01"
-                                        value={currentItem.product_price}
-                                        onChange={e => setCurrentItem({ ...currentItem, product_price: parseFloat(e.target.value) })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                        required
+                                        {...register('product_price', { valueAsNumber: true })}
+                                        className={`w-full bg-neutral-900 border ${errors.product_price ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     />
+                                    {errors.product_price && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.product_price.message}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Category</label>
                                     <select
-                                        value={currentItem.category_id}
-                                        onChange={e => setCurrentItem({ ...currentItem, category_id: parseInt(e.target.value) })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                        required
+                                        {...register('category_id', { valueAsNumber: true })}
+                                        className={`w-full bg-neutral-900 border ${errors.category_id ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     >
                                         <option value="">Select Category</option>
                                         {categories.map(c => (
                                             <option key={c.category_id} value={c.category_id}>{c.name}</option>
                                         ))}
                                     </select>
+                                    {errors.category_id && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.category_id.message}</p>}
                                 </div>
                             </div>
                             <div className="flex gap-10 py-2">
                                 <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={currentItem.product_is_available} onChange={e => setCurrentItem({ ...currentItem, product_is_available: e.target.checked })} className="accent-green-500 w-6 h-6" />
+                                    <input type="checkbox" {...register('product_is_available')} className="accent-green-500 w-6 h-6" />
                                     <span className="text-xl text-neutral-300 group-hover:text-white transition-colors font-sans font-bold">Available</span>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={currentItem.product_is_featured} onChange={e => setCurrentItem({ ...currentItem, product_is_featured: e.target.checked })} className="accent-yellow-500 w-6 h-6" />
+                                    <input type="checkbox" {...register('product_is_featured')} className="accent-yellow-500 w-6 h-6" />
                                     <span className="text-xl text-neutral-300 group-hover:text-white transition-colors font-sans font-bold">Featured</span>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={currentItem.product_is_eligible} onChange={e => setCurrentItem({ ...currentItem, product_is_eligible: e.target.checked })} className="accent-blue-500 w-6 h-6" />
+                                    <input type="checkbox" {...register('product_is_eligible')} className="accent-blue-500 w-6 h-6" />
                                     <span className="text-xl text-neutral-300 group-hover:text-white transition-colors font-sans font-bold">+1 Stamp</span>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked={currentItem.product_is_reward} onChange={e => setCurrentItem({ ...currentItem, product_is_reward: e.target.checked })} className="accent-purple-500 w-6 h-6" />
+                                    <input type="checkbox" {...register('product_is_reward')} className="accent-purple-500 w-6 h-6" />
                                     <span className="text-xl text-neutral-300 group-hover:text-white transition-colors font-sans font-bold">Claimable Reward</span>
                                 </label>
                             </div>
@@ -137,27 +181,25 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                 <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Reward Name</label>
                                 <input
                                     type="text"
-                                    value={currentItem.name}
-                                    onChange={e => setCurrentItem({ ...currentItem, name: e.target.value })}
-                                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                    required
+                                    {...register('name')}
+                                    className={`w-full bg-neutral-900 border ${errors.name ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                 />
+                                {errors.name && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.name.message}</p>}
                             </div>
                             <div>
                                 <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Description</label>
                                 <textarea
-                                    value={currentItem.description || ''}
-                                    onChange={e => setCurrentItem({ ...currentItem, description: e.target.value })}
-                                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors resize-none font-sans"
+                                    {...register('description')}
+                                    className={`w-full bg-neutral-900 border ${errors.description ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors resize-none font-sans`}
                                     rows={4}
                                     placeholder="Optional description..."
                                 />
+                                {errors.description && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.description.message}</p>}
                             </div>
                             <div>
                                 <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Linked Product (Optional)</label>
                                 <select
-                                    value={currentItem.linked_product_id || ''}
-                                    onChange={e => setCurrentItem({ ...currentItem, linked_product_id: parseInt(e.target.value) || null })}
+                                    {...register('linked_product_id', { valueAsNumber: true })}
                                     className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
                                 >
                                     <option value="">None (Standalone Category/Reward)</option>
@@ -174,23 +216,21 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                 <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Material Name</label>
                                 <input
                                     type="text"
-                                    value={currentItem.material_name || ''}
-                                    onChange={e => setCurrentItem({ ...currentItem, material_name: e.target.value })}
-                                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                    required
+                                    {...register('material_name')}
+                                    className={`w-full bg-neutral-900 border ${errors.material_name ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                 />
+                                {errors.material_name && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.material_name.message}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Unit</label>
                                     <select
-                                        value={currentItem.material_unit || 'grams'}
-                                        onChange={e => setCurrentItem({ ...currentItem, material_unit: e.target.value })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                        required
+                                        {...register('material_unit')}
+                                        className={`w-full bg-neutral-900 border ${errors.material_unit ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     >
                                         {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                                     </select>
+                                    {errors.material_unit && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.material_unit.message}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Cost per Unit (₱)</label>
@@ -198,11 +238,11 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                         type="number"
                                         step="0.0001"
                                         min="0"
-                                        value={currentItem.cost_per_unit ?? ''}
-                                        onChange={e => setCurrentItem({ ...currentItem, cost_per_unit: e.target.value ? parseFloat(e.target.value) : null })}
+                                        {...register('cost_per_unit', { valueAsNumber: true })}
                                         placeholder="e.g. 0.0500"
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
+                                        className={`w-full bg-neutral-900 border ${errors.cost_per_unit ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     />
+                                    {errors.cost_per_unit && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.cost_per_unit.message}</p>}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-6">
@@ -212,10 +252,10 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                         type="number"
                                         step="any"
                                         min="0"
-                                        value={currentItem.material_stock ?? 0}
-                                        onChange={e => setCurrentItem({ ...currentItem, material_stock: parseFloat(e.target.value) || 0 })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
+                                        {...register('material_stock', { valueAsNumber: true })}
+                                        className={`w-full bg-neutral-900 border ${errors.material_stock ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     />
+                                    {errors.material_stock && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.material_stock.message}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Reorder Level <span className="text-neutral-600">(Optional)</span></label>
@@ -223,11 +263,11 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                         type="number"
                                         step="any"
                                         min="0"
-                                        value={currentItem.material_reorder_level ?? ''}
-                                        onChange={e => setCurrentItem({ ...currentItem, material_reorder_level: e.target.value ? parseFloat(e.target.value) : null })}
+                                        {...register('material_reorder_level', { valueAsNumber: true })}
                                         placeholder="Alert threshold..."
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
+                                        className={`w-full bg-neutral-900 border ${errors.material_reorder_level ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     />
+                                    {errors.material_reorder_level && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.material_reorder_level.message}</p>}
                                 </div>
                             </div>
                         </>
@@ -239,55 +279,50 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">First Name</label>
                                     <input
                                         type="text"
-                                        value={currentItem.first_name}
-                                        onChange={e => setCurrentItem({ ...currentItem, first_name: e.target.value })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                        required
+                                        {...register('first_name')}
+                                        className={`w-full bg-neutral-900 border ${errors.first_name ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     />
+                                    {errors.first_name && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.first_name.message}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Last Name</label>
                                     <input
                                         type="text"
-                                        value={currentItem.last_name}
-                                        onChange={e => setCurrentItem({ ...currentItem, last_name: e.target.value })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                        required
+                                        {...register('last_name')}
+                                        className={`w-full bg-neutral-900 border ${errors.last_name ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                     />
+                                    {errors.last_name && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.last_name.message}</p>}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Email Address</label>
                                 <input
                                     type="email"
-                                    value={currentItem.email}
-                                    onChange={e => setCurrentItem({ ...currentItem, email: e.target.value })}
-                                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                    required
+                                    {...register('email')}
+                                    className={`w-full bg-neutral-900 border ${errors.email ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                 />
+                                {errors.email && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.email.message}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Contact Number <span className="text-neutral-600">(Optional)</span></label>
                                     <input
                                         type="tel"
-                                        value={currentItem.contact}
-                                        onChange={e => setCurrentItem({ ...currentItem, contact: e.target.value })}
+                                        {...register('contact')}
                                         className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Role</label>
                                     <select
-                                        value={currentItem.role}
-                                        onChange={e => setCurrentItem({ ...currentItem, role: e.target.value })}
+                                        {...register('role')}
                                         className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors capitalize font-sans"
-                                        required
                                     >
                                         <option value="customer">Customer</option>
                                         <option value="staff">Staff</option>
                                         <option value="admin">Admin</option>
                                     </select>
+                                    {errors.role && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.role.message}</p>}
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,11 +331,8 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                     <div className="relative">
                                         <input
                                             type={showPassword ? "text" : "password"}
-                                            value={currentItem.password}
-                                            onChange={e => setCurrentItem({ ...currentItem, password: e.target.value })}
-                                            className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                            minLength={8}
-                                            required
+                                            {...register('password')}
+                                            className={`w-full bg-neutral-900 border ${errors.password ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                             placeholder="Set initial password..."
                                         />
                                         <button
@@ -311,6 +343,7 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                             {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
                                         </button>
                                     </div>
+                                    {errors.password && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.password.message}</p>}
                                 </div>
 
                                 <div>
@@ -322,29 +355,28 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                             onChange={e => setConfirmPassword(e.target.value)}
                                             className={`w-full bg-neutral-900 border rounded-xl px-5 py-4 text-xl focus:outline-none transition-colors font-sans
                                                 ${confirmPassword
-                                                    ? (confirmPassword === currentItem.password ? 'border-green-500/50 focus:border-green-500' : 'border-red-500/50 focus:border-red-500')
+                                                    ? (confirmPassword === watch('password') ? 'border-green-500/50 focus:border-green-500' : 'border-red-500/50 focus:border-red-500')
                                                     : 'border-neutral-700 focus:border-green-500'
                                                 }`}
-                                            required
                                             placeholder="Repeat password..."
                                         />
                                         {confirmPassword && (
                                             <div className="absolute right-12 top-1/2 -translate-y-1/2">
-                                                {confirmPassword === currentItem.password
+                                                {confirmPassword === watch('password')
                                                     ? <span className="text-green-500 text-sm font-bold uppercase font-sans">Match</span>
                                                     : <span className="text-red-500 text-sm font-bold uppercase font-sans">Mismatch</span>
                                                 }
                                             </div>
                                         )}
                                     </div>
-                                    {confirmPassword && confirmPassword !== currentItem.password && (
+                                    {confirmPassword && confirmPassword !== watch('password') && (
                                         <p className="mt-2 text-base text-red-500 font-sans">Passwords do not match.</p>
                                     )}
                                 </div>
                             </div>
 
                             {/* Full-width Password Strength Indicator */}
-                            {currentItem.password && (
+                            {watch('password') && (
                                 <div className="mt-6 p-6 bg-black/20 rounded-[2rem] border border-neutral-700/50 space-y-4">
                                     <div className="flex justify-between items-center px-1">
                                         <span className={`text-sm font-black uppercase tracking-widest font-sans ${passwordStrength.color.replace('bg-', 'text-')}`}>
@@ -381,9 +413,9 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                         <button type="button" onClick={() => setIsEditing(false)} className="px-10 py-5 rounded-2xl font-bold text-xl text-neutral-400 hover:bg-neutral-800 transition-colors font-sans">Cancel</button>
                         <button
                             type="submit"
-                            disabled={activeTab === 'accounts' && !currentItem.id && (passwordStrength.score < 5 || confirmPassword !== currentItem.password)}
+                            disabled={activeTab === 'accounts' && !currentItem.id && (passwordStrength.score < 5 || confirmPassword !== watch('password'))}
                             className={`px-10 py-5 rounded-2xl font-bold text-xl shadow-xl shadow-green-900/20 active:scale-95 transition-all flex items-center gap-3 font-sans
-                                ${activeTab === 'accounts' && !currentItem.id && (passwordStrength.score < 5 || confirmPassword !== currentItem.password)
+                                ${activeTab === 'accounts' && !currentItem.id && (passwordStrength.score < 5 || confirmPassword !== watch('password'))
                                     ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed opacity-50'
                                     : 'bg-green-600 hover:bg-green-500 text-white'}`}
                         >

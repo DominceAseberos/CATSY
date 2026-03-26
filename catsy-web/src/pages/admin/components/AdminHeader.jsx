@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Coffee, LayoutGrid, Users, LogOut, FlaskConical, Gift, BookOpen } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Coffee, LayoutGrid, Users, LogOut, FlaskConical, Gift, BookOpen, LayoutDashboard, Armchair, Clock, BarChart3, Megaphone, Download } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
 import StatusModal from '../../../components/UI/StatusModal';
 
-export default function AdminHeader({ activeTab, setActiveTab, setIsEditing, setSelectedUser, hasLowStock = false }) {
+export default function AdminHeader({ setIsEditing, setSelectedUser, hasLowStock = false }) {
     const { logout } = useUser();
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'info', title: '', message: '', onConfirm: null });
 
@@ -43,21 +44,24 @@ export default function AdminHeader({ activeTab, setActiveTab, setIsEditing, set
 
                 <div className="flex items-center gap-6">
                     <div className="flex gap-2 bg-neutral-800/50 p-1.5 rounded-xl border border-neutral-700/50">
-                        <button
-                            onClick={() => { setActiveTab('products'); setIsEditing(false); setSelectedUser(null); }}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${activeTab === 'products' ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        <NavLink
+                            to="/admin/products"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <Coffee size={20} /> Products
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab('categories'); setIsEditing(false); setSelectedUser(null); }}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${activeTab === 'categories' ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        </NavLink>
+                        <NavLink
+                            to="/admin/categories"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <LayoutGrid size={20} /> Claimable Rewards
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab('materials'); setIsEditing(false); setSelectedUser(null); }}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${activeTab === 'materials' ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        </NavLink>
+                        <NavLink
+                            to="/admin/materials"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <FlaskConical size={20} />
                             <span className="relative">
@@ -66,34 +70,84 @@ export default function AdminHeader({ activeTab, setActiveTab, setIsEditing, set
                                     <span className="absolute -top-1 -right-3 w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.7)]" />
                                 )}
                             </span>
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab('accounts'); setIsEditing(false); setSelectedUser(null); }}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${activeTab === 'accounts' ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        </NavLink>
+                        <NavLink
+                            to="/admin/accounts"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <Users size={20} /> Accounts
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab('reservations'); setIsEditing(false); setSelectedUser(null); }}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${activeTab === 'reservations' ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        </NavLink>
+                        <NavLink
+                            to="/admin/reservations"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <BookOpen size={20} /> Reservations
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab('loyalty'); setIsEditing(false); setSelectedUser(null); }}
-                            className={`px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${activeTab === 'loyalty' ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        </NavLink>
+                        <NavLink
+                            to="/admin/loyalty"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all duration-300 font-bold text-lg ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
                             <Gift size={20} /> Loyalty
-                        </button>
+                        </NavLink>
                     </div>
 
-                    <button
-                        onClick={() => { setActiveTab('profile'); setIsEditing(false); setSelectedUser(null); }}
-                        className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${activeTab === 'profile' ? 'border-brand-accent bg-brand-accent/10 text-brand-accent shadow-[0_0_20px_rgba(255,255,255,0.15)]' : 'border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white'}`}
+                    {/* Phase 3 Nav Group */}
+                    <div className="flex gap-2 bg-neutral-800/50 p-1.5 rounded-xl border border-neutral-700/50 mt-2">
+                        <NavLink
+                            to="/admin/dashboard"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <LayoutDashboard size={18} /> Dashboard
+                        </NavLink>
+                        <NavLink
+                            to="/admin/seats"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Armchair size={18} /> Seats
+                        </NavLink>
+                        <NavLink
+                            to="/admin/time-slots"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Clock size={18} /> Time Slots
+                        </NavLink>
+                        <NavLink
+                            to="/admin/reports"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <BarChart3 size={18} /> Reports
+                        </NavLink>
+                        <NavLink
+                            to="/admin/cms"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Megaphone size={18} /> CMS
+                        </NavLink>
+                        <NavLink
+                            to="/admin/apk"
+                            onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                            className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                        >
+                            <Download size={18} /> APK
+                        </NavLink>
+                    </div>
+
+                    <NavLink
+                        to="/admin/profile"
+                        onClick={() => { setIsEditing(false); setSelectedUser(null); }}
+                        className={({ isActive }) => `w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${isActive ? 'border-brand-accent bg-brand-accent/10 text-brand-accent shadow-[0_0_20px_rgba(255,255,255,0.15)]' : 'border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white'}`}
                         title="My Profile"
                     >
                         <Users size={20} />
-                    </button>
+                    </NavLink>
 
                     <div className="w-px h-8 bg-neutral-800 mx-2"></div>
 

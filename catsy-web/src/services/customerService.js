@@ -1,28 +1,17 @@
-import { apiClient } from './api';
+import { apiClient } from './apiClient';
 
 export const customerService = {
-    login: (username, password) => apiClient('/customer/login', {
-        method: 'POST',
-        body: JSON.stringify({ username, password }),
-        skipAuthError: true
+    login: (username, password) => apiClient.post('/customer/login', { username, password }),
+
+    signup: (userData) => apiClient.post('/customer/signup', userData),
+
+    updateProfile: (customerId, data) => apiClient.put(`/customer/update/${customerId}`, {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        contact: data.phone,
+        password: data.password
     }),
 
-    signup: (userData) => apiClient('/customer/signup', {
-        method: 'POST',
-        body: JSON.stringify(userData),
-        skipAuthError: true
-    }),
-
-    updateProfile: (customerId, data) => apiClient(`/customer/update/${customerId}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-            first_name: data.firstName,
-            last_name: data.lastName,
-            email: data.email,
-            contact: data.phone,
-            password: data.password // Added this field
-        })
-    }),
-
-    getProfile: (customerId) => apiClient(`/customer/${customerId}`, { method: 'GET' })
+    getProfile: (customerId) => apiClient.get(`/customer/${customerId}`)
 };

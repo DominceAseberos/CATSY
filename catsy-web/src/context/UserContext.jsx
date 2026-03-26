@@ -1,19 +1,21 @@
-import React, { createContext, useContext, useState } from 'react';
-import { mockAuth } from '../data/mockAuth';
-
-import { mockUser } from '../data/mockUser';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { loadSession, clearSession } from '../utils/sessionManager';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
-    const [userInfo, setUserInfo] = useState({
-        id: "mock-123",
-        ...mockUser,
-        favoriteItem: "Caramel Macchiato",
-        history: []
-    });
-    const [isLoggedIn, setIsLoggedIn] = useState(mockAuth.isLoggedIn);
-    const [isInitialized, setIsInitialized] = useState(true);
+    const [userInfo, setUserInfo] = useState(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    useEffect(() => {
+        const session = loadSession();
+        if (session) {
+            setUserInfo(session);
+            setIsLoggedIn(true);
+        }
+        setIsInitialized(true);
+    }, []);
 
     const login = (userData) => {
         setUserInfo(userData);
@@ -21,17 +23,21 @@ export function UserProvider({ children }) {
     };
 
     const logout = () => {
+        clearSession();
         setUserInfo(null);
         setIsLoggedIn(false);
     };
 
     const saveSession = (updates) => {
-        setUserInfo(prev => ({ ...prev, ...updates }));
+        setUserInfo(prev => {
+            const newUser = { ...prev, ...updates };
+            // Optional: persistence logic already in sessionManager but we can force it here
+            return newUser;
+        });
     };
 
     const confirmDeactivation = () => {
         logout();
-        window.location.href = '/';
     };
 
     return (

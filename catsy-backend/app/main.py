@@ -1,101 +1,96 @@
-from fastapi import FastAPI, HTTPException
+"""
+Catsy Coffee API — main entry point.
+
+Responsibilities of this file (and ONLY these):
+  1. Create the FastAPI application instance
+  2. Configure middleware (CORS, rate limiting)
+  3. Mount domain routers
+  4. Expose a health-check endpoint
+  5. SSE event stream for real-time UI updates
+
+All business logic lives in app/routers/ and app/services/.
+"""
+import asyncio
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database import supabase
+from fastapi.responses import StreamingResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
-app = FastAPI(title="Catsy Coffee API Bridge")
+# Domain routers — each owns its own slice of the API surface
+from app.routers import auth, products, categories, loyalty, reservations, settings, admin, orders, customer, rewards, time_slots, cms, reports, seats, materials
 
-# IMPORTANT: This allows your Web and Mobile apps to connect
+# --- App setup ---------------------------------------------------------------
+
+limiter = Limiter(key_func=get_remote_address)
+
+app = FastAPI(
+    title="Catsy Coffee API",
+    description="Secure FastAPI bridge → Supabase backend",
+    version="2.0.0",
+)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, replace with your specific domains
+    allow_origins=["*"],   # Replace with specific domains in production
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"status": "✅ Catsy API is online"}
+# --- Mount routers -----------------------------------------------------------
 
-# Example route for your classmates to fill in
-@app.get("/api/coffee")
-def get_coffee():
-    # TODO: Classmate needs to implement the logic here
-    # Example: response = supabase.table('coffee_items').select("*").execute()
-    return {"message": "Coffee list skeleton ready"}
+app.include_router(auth.router)
+app.include_router(products.router)
+app.include_router(categories.router)
+app.include_router(loyalty.router)
+app.include_router(reservations.router)
+app.include_router(reservations.customer_router)
+app.include_router(settings.router)
+app.include_router(admin.router)
+app.include_router(orders.router)
+app.include_router(customer.customer_router)  # GET /api/customer/orders
+app.include_router(customer.staff_router)     # GET /api/staff/members?search=
+app.include_router(rewards.admin_router)      # Admin CRUD for reward_items
+app.include_router(rewards.public_router)     # Public GET /api/rewards/active
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# Phase 3
+app.include_router(time_slots.router)
+app.include_router(cms.admin_router)
+app.include_router(cms.public_router)
+app.include_router(reports.router)
+app.include_router(seats.router)
+app.include_router(materials.router)
 
-from fastapi.responses import StreamingResponse
-import asyncio
+# --- Utility endpoints -------------------------------------------------------
 
-#This is the url
-@app.get("/api/db-check")
-def check_db():
-    try:
-        response = supabase.table('products').select("*", count='exact').limit(1).execute()
-        
-        return {
-            "status": "📡 Supabase Connected!",
-            "data_preview": response.data,
-            "count": response.count
-        }
-    except Exception as e:
-        return {
-            "status": "❌ Supabase Connection Failed",
-            "error": str(e)
-        }
+@app.get("/", tags=["Health"])
+def health_check():
+    return {"status": "✅ Catsy API is online", "version": "2.0.0"}
 
-@app.get("/products")
-def get_products():
-    try:
-        # Fetch all fields from products and join with categories
-        response = supabase.table('products').select(
-            "*, categories!products_category_id_fkey(name)"
-        ).execute()
-        
-        # Transform the data: preserve all required fields for the UI, but add the resolved 'category' name
-        formatted_products = []
-        for item in response.data:
-            category_data = item.get("categories")
-            item["category"] = category_data.get("name") if category_data else "Uncategorized"
-            formatted_products.append(item)
-            
-        return formatted_products
-    except Exception as e:
-        # Basic error handling for DB timeouts or connection issues
-        raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
 
-@app.get("/categories")
-def get_categories():
-    try:
-        response = supabase.table('categories').select("*").execute()
-        return response.data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
+# --- Server-Sent Events ------------------------------------------------------
 
-@app.get("/api/settings")
-def get_settings():
-    # Return default settings or fetch from a settings table if it exists
-    # For now, providing the defaults the UI expects to prevent crashing
-    return {
-        "theme": "dark",
-        "maintenance_mode": False,
-        "store_status": "open",
-        "currency": "PHP"
-    }
-
-async def event_generator():
-    """Simple SSE generator that sends a heartbeat ping to keep connection alive."""
+async def _event_generator():
+    """Heartbeat ping — keeps the SSE connection alive every 15 s."""
     try:
         while True:
-            # Yield a heartbeat comment to keep connection alive
             yield ": ping\n\n"
             await asyncio.sleep(15)
     except asyncio.CancelledError:
         pass
 
-@app.get("/api/events/stream")
+
+@app.get("/api/events/stream", tags=["Realtime"])
 async def stream_events():
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return StreamingResponse(_event_generator(), media_type="text/event-stream")
+
+
+# --- Dev entry point ---------------------------------------------------------
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

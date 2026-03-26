@@ -8,8 +8,12 @@ import { reservationService } from '../services/reservationService';
 import { settingsService } from '../services/settingsService';
 import CustomerToast from '../components/UI/CustomerToast';
 import { useSSE } from '../hooks/useSSE';
+import { useReservations } from '../hooks/useReservations';
+import { useNavigate } from 'react-router-dom';
+import { XCircle } from 'lucide-react';
 
-export default function ReservationPage({ onLoginReq, tablesData }) {
+export default function ReservationPage({ tablesData }) {
+    const navigate = useNavigate();
     const { isLoggedIn, userInfo } = useUser();
     const { settings: restaurantSettings, isLoading: settingsLoading } = useSettings();
     // Mock User Data - REPLACED with userInfo prop
@@ -26,28 +30,29 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', title: '', message: '' });
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
-    const [submittedReservation, setSubmittedReservation] = useState(null);
+    const [cancelModal, setCancelModal] = useState({ isOpen: false });
 
-    // Today's date in YYYY-MM-DD, used as min for the date input
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Zero-dependency local date formatting to prevent locale timezone bleed
+    const getLocalYYYYMMDD = (dateObj) => {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
-    // Fetch active reservation if logged in
-    const fetchActiveReservation = useCallback(async () => {
-        if (isLoggedIn) {
-            try {
-                const reservations = await reservationService.getMyReservations();
-                // Show ONLY active reservations (pending, confirmed).
-                // If it's cancelled, rejected, or completed, it goes to history,
-                // and the user sees the booking form again.
-                const active = reservations.find(r => ['pending', 'confirmed'].includes(r.status));
-                setSubmittedReservation(active || null);
-            } catch (error) {
-                logger.error("Failed to fetch user reservations", error);
-            }
-        }
-    }, [isLoggedIn]);
+    const todayStr = getLocalYYYYMMDD(new Date());
+    const selectedDateStr = formData.date ? formData.date : todayStr;
+
+    const { 
+        availableTables, 
+        TOTAL_TABLES, 
+        submittedReservation, 
+        fetchActiveReservation, 
+        setSubmittedReservation 
+    } = useReservations(selectedDateStr);
 
     useEffect(() => {
         fetchActiveReservation();
@@ -100,8 +105,11 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
         if (!formData.date || !formData.guests) return;
 
         // Block TODAY if restaurant is manually toggled closed
-        const selectedDate = new Date(formData.date).toISOString().split('T')[0];
-        if (restaurantSettings && !restaurantSettings.is_open && selectedDate === todayStr) {
+        const formDateObj = formData.date ? new Date(formData.date) : new Date();
+        const targetDate = formDateObj.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+        const currentDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+
+        if (restaurantSettings && !restaurantSettings.is_open && targetDate === currentDate) {
             setStatusModal({
                 isOpen: true,
                 type: 'error',
@@ -158,6 +166,35 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
         }
     };
 
+    const handleCancelClick = () => {
+        setCancelModal({ isOpen: true });
+    };
+
+    const executeCancellation = async () => {
+        if (isCancelling || !submittedReservation) return;
+        setCancelModal({ isOpen: false });
+        setIsCancelling(true);
+        try {
+            await reservationService.cancelReservation(submittedReservation.id);
+            setSubmittedReservation(null);
+            setStatusModal({
+                isOpen: true,
+                type: 'success',
+                title: 'Reservation Cancelled',
+                message: 'Your reservation has been cancelled. Feel free to book again anytime!'
+            });
+        } catch (error) {
+            setStatusModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Cancellation Failed',
+                message: error.message || 'Could not cancel your reservation. Please try again.'
+            });
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-neutral-900 pt-24 animate-fade-in flex flex-col items-center">
 
@@ -171,11 +208,22 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
                 </p>
 
                 {/* Availability Badge */}
-                <div className="inline-flex items-center gap-3 bg-neutral-800/50 border border-white/5 px-5 py-2 rounded-full backdrop-blur-md">
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                    <span className="text-sm font-bold text-white tracking-wide uppercase">
-                        5 Tables Currently Available
-                    </span>
+                <div className="inline-flex items-center gap-3 bg-neutral-800/50 border border-white/5 px-5 py-2 rounded-full backdrop-blur-md transition-all">
+                    {availableTables > 0 ? (
+                        <>
+                            <span className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse" />
+                            <span className="text-sm font-bold text-white tracking-wide uppercase">
+                                {availableTables} Tables Available on {selectedDateStr === todayStr ? 'Today' : new Date(selectedDateStr).toLocaleDateString()}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                            <span className="text-sm font-bold text-white tracking-wide uppercase">
+                                Fully Booked {selectedDateStr === todayStr ? 'Today' : 'on ' + new Date(selectedDateStr).toLocaleDateString()}
+                            </span>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -190,7 +238,7 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
                                 <h3 className="text-2xl font-bold text-neutral-900">Reservation Details</h3>
                                 {!isLoggedIn && (
                                     <button
-                                        onClick={onLoginReq}
+                                        onClick={() => navigate('/login')}
                                         className="text-sm font-bold text-brand-accent hover:text-brand-accent/80 underline"
                                     >
                                         Log in for auto-fill
@@ -274,7 +322,18 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
                             )}
                         </div>
 
-                        {/* Remove the redundant 'Book a Table' button because we only show this UI for active reservations now */}
+                        {/* Cancel button — only for pending reservations when logged in */}
+                        {isLoggedIn && submittedReservation.status === 'pending' && (
+                            <button
+                                onClick={handleCancelClick}
+                                disabled={isCancelling}
+                                className="mt-6 flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <XCircle size={16} />
+                                {isCancelling ? 'Cancelling...' : 'Cancel this Reservation'}
+                            </button>
+                        )}
+
                     </div>
                 ) : (
                     <div className="flex-1 p-8 pb-32 relative">
@@ -465,6 +524,18 @@ export default function ReservationPage({ onLoginReq, tablesData }) {
                 type={statusModal.type}
                 title={statusModal.title}
                 message={statusModal.message}
+            />
+
+            {/* Cancel Confirmation Toast */}
+            <CustomerToast
+                isOpen={cancelModal.isOpen}
+                onClose={() => setCancelModal({ isOpen: false })}
+                type="error"
+                title="Cancel Reservation?"
+                message="Are you sure you want to cancel your reservation? This action cannot be undone."
+                confirmLabel="Yes, Cancel It"
+                closeLabel="Keep It"
+                onConfirm={executeCancellation}
             />
         </div>
     );

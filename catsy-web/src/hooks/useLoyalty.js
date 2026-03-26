@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { loyaltyService } from '../services/loyaltyService';
 import { logger } from '../utils/logger';
-import { mockLoyaltyData } from '../data/mockLoyalty';
 
 /**
  * useLoyalty — Data Layer Hook (SRP)
@@ -31,9 +30,7 @@ export function useLoyalty(isLoggedIn = false) {
         setIsLoading(true);
         setError(null);
         try {
-            // Static implementation for now as requested
-            // const data = await loyaltyService.getStatus();
-            const data = mockLoyaltyData;
+            const data = await loyaltyService.getStatus();
 
             setUnspentCount(data.unspent_count ?? 0);
             setStamps(data.stamps ?? []);

@@ -1,40 +1,67 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ChevronDown, Coffee } from 'lucide-react';
-import STATIC_MENU from '../../data/menu.json';
+import { ChevronDown, Coffee, Loader2 } from 'lucide-react';
+import { productService } from '../../services/productService';
+import { logger } from '../../utils/logger';
 
 // ─── Grid limits ─────────────────────────────────────────────────────────────
-// Wide  (≥ 1024px): 3 cols × 6 rows = 18 items max
-// Mobile (< 1024px): 1–2 cols (dynamic) × 5 rows max
 const MAX_ROWS_WIDE = 6;
 const MAX_ROWS_MOBILE = 5;
 const COLS_WIDE = 3;
 const LIMIT_WIDE = COLS_WIDE * MAX_ROWS_WIDE; // 18
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export default function UnifiedMenu() {
     const containerRef = useRef(null);
     const gridRef = useRef(null);
 
-    const [selectedCategory, setSelectedCategory] = useState(STATIC_MENU[0]);
+    const [categories, setCategories] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
+    useEffect(() => {
+        const fetchMenu = async () => {
+            try {
+                const [catsData, prodsData] = await Promise.all([
+                    productService.getAllCategories(),
+                    productService.getAllProducts()
+                ]);
+                
+                setCategories(catsData);
+                setProducts(prodsData);
+                
+                if (catsData.length > 0) {
+                    setSelectedCategory(catsData[0]);
+                }
+            } catch (error) {
+                logger.error('Failed to fetch menu:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchMenu();
+    }, []);
+
     // Reset expansion when category changes
-    React.useEffect(() => {
+    useEffect(() => {
         setIsExpanded(false);
     }, [selectedCategory]);
 
     // ── Derived ──────────────────────────────────────────────────────────────
-    const allItems = selectedCategory.items;
+    const filteredItems = useMemo(() => {
+        if (!selectedCategory) return [];
+        return products.filter(p => p.category_id === selectedCategory.id || p.category === selectedCategory.name);
+    }, [products, selectedCategory]);
 
-    // Dynamic mobile columns: 1 col if only 1 item, otherwise 2 (max 2)
-    const colsMobile = Math.min(allItems.length, 2);
-    const limitMobile = colsMobile * MAX_ROWS_MOBILE; // 5 or 10
+    // Dynamic mobile columns
+    const colsMobile = Math.min(filteredItems.length, 2) || 1;
+    const limitMobile = colsMobile * MAX_ROWS_MOBILE; 
 
-    const visibleItems = isExpanded ? allItems : allItems.slice(0, LIMIT_WIDE);
-    const showSeeAll = allItems.length > limitMobile;
+    const visibleItems = isExpanded ? filteredItems : filteredItems.slice(0, LIMIT_WIDE);
+    const showSeeAll = filteredItems.length > limitMobile;
 
     // ── Animations ───────────────────────────────────────────────────────────
     useGSAP(() => {
@@ -70,6 +97,14 @@ export default function UnifiedMenu() {
     }, { scope: gridRef, dependencies: [selectedCategory, isExpanded] });
 
     // ── Render ────────────────────────────────────────────────────────────────
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center py-40 bg-white">
+                <Loader2 className="animate-spin text-amber-600" size={40} />
+            </div>
+        );
+    }
+
     return (
         <section
             ref={containerRef}
@@ -95,7 +130,7 @@ export default function UnifiedMenu() {
                         >
                             <Coffee size={16} className="text-amber-600 shrink-0" />
                             <span className="text-lg font-bold text-neutral-900 tracking-tight">
-                                {isOpen ? 'Select your Cup' : selectedCategory.name}
+                                {isOpen ? 'Select your Cup' : (selectedCategory?.name || 'Categories')}
                             </span>
                             <ChevronDown
                                 size={18}
@@ -106,14 +141,14 @@ export default function UnifiedMenu() {
                         {/* Dropdown list */}
                         {isOpen && (
                             <div className="absolute top-full left-1/2 -translate-x-1/2 z-50 mt-3 w-64 bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.12)] border border-neutral-100 rounded-[2rem] overflow-hidden py-3">
-                                {STATIC_MENU.map((cat) => (
+                                {categories.map((cat) => (
                                     <button
                                         key={cat.id}
                                         onClick={() => {
                                             setSelectedCategory(cat);
                                             setIsOpen(false);
                                         }}
-                                        className={`w-full flex items-center gap-3 px-6 py-3.5 text-left transition-colors ${selectedCategory.id === cat.id
+                                        className={`w-full flex items-center gap-3 px-6 py-3.5 text-left transition-colors ${selectedCategory?.id === cat.id
                                             ? 'bg-neutral-900 text-white'
                                             : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
                                             }`}

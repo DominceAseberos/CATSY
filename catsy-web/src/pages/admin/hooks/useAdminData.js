@@ -1,107 +1,74 @@
-import { useState, useEffect, useCallback } from 'react';
-import { adminService } from '../../../services/adminService';
-import { materialsService } from '../../../services/materialsService';
-import { logger } from '../../../utils/logger';
+import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSSE } from '../../../hooks/useSSE';
 
+import { useProducts } from './useProducts';
+import { useCategories } from './useCategories';
+import { useAccounts } from './useAccounts';
+import { useMaterials } from './useMaterials';
+import { useReservations } from './useReservations';
+
 /**
- * useAdminData — Data Layer Hook (SRP)
- * Owns all server-state for the admin dashboard.
- * Extended to include materials inventory (OCP — no existing logic changed).
+ * useAdminData — Legacy Composition Hook
+ * Composes the new specific TanStack Query hooks so AdminPage.jsx 
+ * continues to function until it is fully decoupled.
  */
 export function useAdminData(isLoggedIn = false) {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [materials, setMaterials] = useState([]);
-    const [reservations, setReservations] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const queryClient = useQueryClient();
 
-    const loadData = useCallback(async () => {
-        if (!isLoggedIn) {
-            setIsLoading(false);
-            return;
-        }
+    const { products, isLoading: prodLoad, createProduct, updateProduct, deleteProduct } = useProducts(isLoggedIn);
+    const { categories, isLoading: catLoad, createCategory, updateCategory, deleteCategory } = useCategories(isLoggedIn);
+    const { users, isLoading: usrLoad, createUser, deleteUser } = useAccounts(isLoggedIn);
+    const { materials, isLoading: matLoad, hasLowStock, createMaterial, updateMaterial, deleteMaterial } = useMaterials(isLoggedIn);
+    const { reservations, isLoading: rsvLoad, updateReservationState } = useReservations(isLoggedIn);
 
-        setIsLoading(true);
-        try {
-            const [prods, cats, allUsers, mats, rsvps] = await Promise.all([
-                adminService.getProducts(),
-                adminService.getCategories(),
-                adminService.getUsers(),
-                materialsService.getAll(),
-                adminService.getReservations(),
-            ]);
-            setProducts(prods || []);
-            setCategories(cats || []);
-            setUsers(allUsers || []);
-            setMaterials(mats || []);
-            setReservations(rsvps || []);
-        } catch (error) {
-            logger.error("Failed to load admin data", error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [isLoggedIn]);
-
-    useEffect(() => {
-        loadData();
-    }, [loadData]);
+    const isLoading = prodLoad || catLoad || usrLoad || matLoad || rsvLoad;
 
     // Real-time: auto-refresh on ANY relevant data change from the server
     useSSE({
-        'reservation.updated': loadData,
-        'menu.updated': loadData,
-        'inventory.updated': loadData,
+        'reservation.updated': () => queryClient.invalidateQueries({ queryKey: ['admin', 'reservations'] }),
+        'menu.updated': () => {
+             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+             queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+        },
+        'inventory.updated': () => queryClient.invalidateQueries({ queryKey: ['admin', 'materials'] }),
     });
 
     const performSave = async (activeTab, currentItem) => {
         if (activeTab === 'products') {
             if (currentItem.product_id) {
-                await adminService.updateProduct(currentItem.product_id, currentItem);
+                await updateProduct({ id: currentItem.product_id, data: currentItem });
             } else {
-                await adminService.createProduct(currentItem);
+                await createProduct(currentItem);
             }
         } else if (activeTab === 'categories') {
             if (currentItem.category_id) {
-                await adminService.updateCategory(currentItem.category_id, currentItem);
+                await updateCategory({ id: currentItem.category_id, data: currentItem });
             } else {
-                await adminService.createCategory(currentItem);
+                await createCategory(currentItem);
             }
         } else if (activeTab === 'accounts') {
-            await adminService.createUser(currentItem);
+            await createUser(currentItem);
         } else if (activeTab === 'materials') {
             if (currentItem.material_id) {
-                await materialsService.update(currentItem.material_id, currentItem);
+                await updateMaterial({ id: currentItem.material_id, data: currentItem });
             } else {
-                await materialsService.create(currentItem);
+                await createMaterial(currentItem);
             }
         }
-        await loadData();
     };
 
     const performDelete = async (activeTab, id) => {
         if (activeTab === 'products') {
-            await adminService.deleteProduct(id);
+            await deleteProduct(id);
         } else if (activeTab === 'categories') {
-            await adminService.deleteCategory(id);
+            await deleteCategory(id);
         } else if (activeTab === 'accounts') {
-            await adminService.deleteUser(id);
+            await deleteUser(id);
         } else if (activeTab === 'materials') {
-            await materialsService.delete(id);
+            await deleteMaterial(id);
         }
-        await loadData();
     };
-
-    const updateReservationState = async (id, status) => {
-        await adminService.updateReservationStatus(id, status);
-        await loadData();
-    };
-
-    // Derived: true if any material's stock is at or below its reorder level
-    const hasLowStock = materials.some(
-        (m) => m.material_reorder_level != null && m.material_stock <= m.material_reorder_level
-    );
 
     return {
         products,
@@ -111,7 +78,7 @@ export function useAdminData(isLoggedIn = false) {
         reservations,
         isLoading,
         hasLowStock,
-        refreshData: loadData,
+        refreshData: () => {}, // No-op, managed by react-query cache and SSE
         performSave,
         performDelete,
         updateReservationState,

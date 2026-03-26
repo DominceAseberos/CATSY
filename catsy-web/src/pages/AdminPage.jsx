@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import DebugConsole from '../components/Admin/DebugConsole';
 import StatusModal from '../components/UI/StatusModal';
 import { useAdminTabs } from '../hooks/useAdminTabs';
@@ -16,23 +17,33 @@ import AdminForm from './admin/components/AdminForm';
 import RedeemPanel from './admin/components/RedeemPanel';
 import ReservationManager from './admin/components/ReservationManager';
 
-// Auth handled by parent
-import AdminProfile from './admin/components/AdminProfile';
+// Phase 3 pages
+import DashboardPage from './admin/components/DashboardPage';
+import SeatOverviewPage from './admin/components/SeatOverviewPage';
+import TimeSlotsPage from './admin/components/TimeSlotsPage';
+import ReportsPage from './admin/components/ReportsPage';
+import CmsPage from './admin/components/CmsPage';
+import ApkDownloadPage from './admin/components/ApkDownloadPage';
 
 export default function AdminPage() {
+    const navigate = useNavigate();
+    const { tab } = useParams();
+    const activeTab = tab || 'products';
+    
+    // Redirect unknown tabs safely
+    const validTabs = ['products', 'categories', 'materials', 'accounts', 'reservations', 'loyalty', 'profile', 'dashboard', 'seats', 'time-slots', 'reports', 'cms', 'apk'];
+    
     const { isLoggedIn, userInfo, login } = useUser();
 
     // Data & Logic Hooks
     const { products, categories, users, materials, reservations, isLoading, hasLowStock, refreshData, performSave: hookSave, performDelete: hookDelete, updateReservationState } = useAdminData(isLoggedIn);
 
-    // Tab & Filtering Hooks
+    // Filter Hooks (removed tab swapping logic, just filters now)
     const {
-        activeTab,
         selectedCategoryId,
         sortBy,
         sortOrder,
         sortedAndFilteredProducts,
-        setActiveTab,
         setSelectedCategoryId,
         toggleSort
     } = useAdminTabs(products, categories);
@@ -165,18 +176,20 @@ export default function AdminPage() {
             <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center p-10">
                 <div className="max-w-md w-full text-center space-y-6">
                     <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
-                        <StatusModal isOpen={true} type="error" title="Access Denied" message="You do not have permission to access the Backstage Admin. Only Staff and Administrators can enter." onClose={() => window.location.href = '/admin'} />
+                        <StatusModal isOpen={true} type="error" title="Access Denied" message="You do not have permission to access the Backstage Admin. Only Staff and Administrators can enter." onClose={() => navigate('/admin/login')} />
                     </div>
                 </div>
             </div>
         );
     }
 
+    if (!validTabs.includes(activeTab)) {
+        return <Navigate to="/admin/products" replace />;
+    }
+
     return (
         <div className="min-h-screen bg-neutral-900 text-white p-10 pb-40">
             <AdminHeader
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
                 setIsEditing={setIsEditing}
                 setSelectedUser={setSelectedUser}
                 hasLowStock={hasLowStock}
@@ -245,7 +258,7 @@ export default function AdminPage() {
                             toggleSort={toggleSort}
                             openCreate={openCreate}
                             openEdit={(item) => {
-                                setActiveTab('products');
+                                navigate('/admin/products');
                                 openEdit(item);
                             }}
                             handleDelete={(id) => hookDelete('products', id).then(refreshData)}
@@ -290,6 +303,14 @@ export default function AdminPage() {
                     setProcessingMessage={setProcessingMessage}
                 />
             )}
+
+            {/* ===== PHASE 3 TABS ===== */}
+            {activeTab === 'dashboard' && <DashboardPage />}
+            {activeTab === 'seats' && <SeatOverviewPage />}
+            {activeTab === 'time-slots' && <TimeSlotsPage />}
+            {activeTab === 'reports' && <ReportsPage />}
+            {activeTab === 'cms' && <CmsPage />}
+            {activeTab === 'apk' && <ApkDownloadPage />}
 
             <DebugConsole />
 

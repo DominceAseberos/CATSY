@@ -1,96 +1,92 @@
+/**
+ * useAuth — Thin auth coordinator (SRP-compliant after Fix #3).
+ *
+ * Responsibilities:
+ *   • Drive react-hook-form with Zod validation
+ *   • Delegate password strength → usePasswordStrength
+ *   • Delegate API calls → customerService
+ *   • Delegate session persistence → sessionManager
+ */
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { customerService } from '../services/customerService';
 import { mapAuthError } from '../utils/errorHandler';
 import { logger } from '../utils/logger';
 import { saveSession } from '../utils/sessionManager';
-import { validatePassword, validateFormData } from '../utils/formValidator';
+import { authLoginSchema, authSignupSchema } from '../utils/validationSchemas';
+import { usePasswordStrength } from './usePasswordStrength';
 
 export function useAuth(onLoginSuccess, initialIsLogin = true) {
     const [isLogin, setIsLogin] = useState(initialIsLogin);
     const [loading, setLoading] = useState(false);
     const [formError, setFormError] = useState('');
-    const [formData, setFormData] = useState({
-        email: '',
-        username: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        firstName: '',
-        lastName: ''
-    });
-    const [passwordStrength, setPasswordStrength] = useState({
-        score: 0,
-        label: 'Weak',
-        color: 'bg-red-500',
-        feedback: []
-    });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setFormError('');
-    };
+    const schema = isLogin ? authLoginSchema : authSignupSchema;
 
-    useEffect(() => {
-        if (isLogin || !formData.password) {
-            setPasswordStrength({ score: 0, label: 'Weak', color: 'bg-red-500', feedback: [] });
-            return;
+    const {
+        register,
+        handleSubmit: hookHandleSubmit,
+        reset,
+        watch,
+        formState: { errors, isValid }
+    } = useForm({
+        resolver: zodResolver(schema),
+        mode: 'onChange',
+        defaultValues: {
+            email: '',
+            username: '',
+            phone: '',
+            password: '',
+            confirmPassword: '',
+            firstName: '',
+            lastName: ''
         }
+    });
 
-        const strength = validatePassword(formData.password);
-        setPasswordStrength(strength);
-    }, [formData.password, isLogin]);
+    // Reset form when switching Login ↔ Signup
+    useEffect(() => {
+        reset();
+        setFormError('');
+    }, [isLogin, reset]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const watchedPassword = watch('password');
+
+    // Delegated to usePasswordStrength (SRP)
+    const passwordStrength = usePasswordStrength(watchedPassword, !isLogin);
+
+    const onSubmit = async (data) => {
         setLoading(true);
         setFormError('');
-
-        const validationError = validateFormData(formData, isLogin, passwordStrength);
-        if (validationError) {
-            setFormError(validationError);
-            setLoading(false);
-            return;
-        }
-
         try {
             if (isLogin) {
-                // Add artificial delay purely to VISUALLY demonstrate the "loading" button state requirement
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
-                // Mock success: username `test` / password `test123`
-                if (formData.email === 'test' && formData.password === 'test123') {
-                    const mockUser = { id: 'mock-id', firstName: 'Tester', accountId: '12345678', role: 'customer' };
-                    saveSession(mockUser);
-                    onLoginSuccess(mockUser);
-                } else {
-                    // Mock error: any other input → show error message UI
-                    throw new Error('Invalid username or password');
+                const response = await customerService.login(data.email, data.password);
+                const user = mapUserData({
+                    ...response.user,
+                    access_token: response.access_token,
+                    refresh_token: response.refresh_token
+                });
+                if (user) {
+                    saveSession(user);
+                    onLoginSuccess(user);
                 }
             } else {
-                // Mock success: Account created! Please log in.
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
-                // Set success state via onLoginSuccess or a dedicated feedback mechanism
-                // For this specific requirement, we show the message and switch to login
+                await customerService.signup({
+                    email: data.email,
+                    password: data.password,
+                    username: data.username,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    phone: data.phone
+                });
                 onLoginSuccess({
-                    isMockSignupSuccess: true,
-                    message: "Account created! Please log in."
+                    isSignupSuccess: true,
+                    message: 'Account created! Please check your email for confirmation.'
                 });
-
-                // Switch to login view after successful "creation"
                 setIsLogin(true);
-                setFormData({
-                    email: '',
-                    username: '',
-                    phone: '',
-                    password: '',
-                    confirmPassword: '',
-                    firstName: '',
-                    lastName: ''
-                });
             }
         } catch (err) {
-            logger.error(err);
+            logger.error('Auth Error:', err);
             const { title, message } = mapAuthError(err, isLogin);
             setFormError(`${title ? title + ': ' : ''}${message}`);
         } finally {
@@ -101,26 +97,30 @@ export function useAuth(onLoginSuccess, initialIsLogin = true) {
     return {
         isLogin,
         setIsLogin,
-        formData,
-        handleChange,
-        handleSubmit,
+        register,
+        watch,
+        errors,
+        handleSubmit: hookHandleSubmit(onSubmit),
         loading,
         formError,
         passwordStrength,
-        isPasswordStrong: isLogin || passwordStrength.score >= 5
+        isPasswordStrong: isLogin || (passwordStrength.score >= 5 && isValid),
     };
 }
 
+// ── Data mapping (pure function — no side effects) ───────────────────────────
 const mapUserData = (userData) => ({
     id: userData.id,
     email: userData.email,
+    username: userData.username || userData.user_name || null,
     firstName: userData.first_name || userData.firstName,
     lastName: userData.last_name || userData.lastName,
     phone: userData.contact || userData.phone,
-    accountId: (userData.account_id || userData.accountId) ? String(userData.account_id || userData.accountId) : null,
+    accountId: (userData.account_id || userData.accountId)
+        ? String(userData.account_id || userData.accountId) : null,
     role: userData.role || 'customer',
     access_token: userData.access_token,
     refresh_token: userData.refresh_token,
     favoriteItem: userData.favoriteItem || null,
-    history: userData.history || []
+    history: userData.history || [],
 });
