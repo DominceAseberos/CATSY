@@ -14,4 +14,7 @@ analyze:
 test:
 	flutter test
 
-.PHONY: gen watch clean analyze test
+release-apk:
+	flutter build apk --release --obfuscate --split-debug-info=build/debug-info
+
+.PHONY: gen watch clean analyze test release-apk
