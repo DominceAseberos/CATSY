@@ -1,6 +1,6 @@
-﻿import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/transactions_table.dart';
+import 'package:drift/drift.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/transactions_table.dart';
 
 part 'transaction_dao.g.dart';
 

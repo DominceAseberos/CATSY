@@ -1,12 +1,12 @@
-﻿import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../../core/network/connectivity_service.dart';
-import '../../domain/entities/reward.dart';
-import '../../domain/models/reward_result.dart';
-import '../../domain/repositories/reward_repository.dart';
-import '../local/database/daos/customer_dao.dart';
-import '../local/database/daos/reward_dao.dart';
-import '../local/database/app_database.dart';
+import 'package:dartz/dartz.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
+import 'package:catsy_pos/domain/entities/reward.dart';
+import 'package:catsy_pos/domain/models/reward_result.dart';
+import 'package:catsy_pos/domain/repositories/reward_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/customer_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/reward_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Phase 9 — Implements local-first reward validation and claiming.
 class RewardRepositoryImpl implements RewardRepository {

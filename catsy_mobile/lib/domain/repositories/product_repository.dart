@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/product.dart';
-import '../entities/category.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/domain/entities/category.dart';
 
 abstract class ProductRepository {
   /// Watch all products (stream).

@@ -1,5 +1,5 @@
-import '../../domain/entities/reward.dart';
-import '../remote/dtos/reward_dto.dart';
+import 'package:catsy_pos/domain/entities/reward.dart';
+import 'package:catsy_pos/data/remote/dtos/reward_dto.dart';
 
 class RewardMapper {
   static Reward fromDto(RewardDto dto) => Reward(

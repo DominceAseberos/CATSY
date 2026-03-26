@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import '../../core/error/failures.dart';
+import 'package:catsy_pos/core/error/failures.dart';
 
 /// AppErrorHandler converts complex technical exceptions into user-friendly messages.
 class AppErrorHandler {

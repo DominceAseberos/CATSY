@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/product.dart';
-import '../providers/cart_controller.dart';
-import '../providers/product_controller.dart';
-import '../../../../core/utils/app_haptics.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/presentation/order/providers/cart_controller.dart';
+import 'package:catsy_pos/presentation/order/providers/product_controller.dart';
+import 'package:catsy_pos/core/utils/app_haptics.dart';
 
 class ItemDetailsScreen extends ConsumerStatefulWidget {
   final Product product;
@@ -143,14 +143,14 @@ class _ItemDetailsScreenState extends ConsumerState<ItemDetailsScreen> {
                     const SizedBox(height: 8),
 
                     // ── Stamp Eligible Badge ──────────────────────────
-                    Row(
+                    const Row(
                       children: [
                         Icon(
                           Icons.star,
                           size: 16,
                           color: AppColors.dashboardPurple,
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: 4),
                         Text(
                           'Stamp Eligible +1',
                           style: TextStyle(
@@ -244,9 +244,9 @@ class _ItemDetailsScreenState extends ConsumerState<ItemDetailsScreen> {
                             child: Container(
                               width: 36,
                               height: 36,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color(0xFF2C3E50),
+                                color: Color(0xFF2C3E50),
                               ),
                               child: const Icon(
                                 Icons.remove,
@@ -275,9 +275,9 @@ class _ItemDetailsScreenState extends ConsumerState<ItemDetailsScreen> {
                             child: Container(
                               width: 36,
                               height: 36,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color(0xFF2C3E50),
+                                color: Color(0xFF2C3E50),
                               ),
                               child: const Icon(
                                 Icons.add,
@@ -341,7 +341,7 @@ class _ItemDetailsScreenState extends ConsumerState<ItemDetailsScreen> {
   }
 
   Widget _buildPlaceholder() {
-    return Center(
+    return const Center(
       child: Text(
         'Product Image',
         style: TextStyle(

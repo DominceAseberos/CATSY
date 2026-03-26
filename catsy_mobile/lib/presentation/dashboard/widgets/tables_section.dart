@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../table_management/providers/table_provider.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/routes/route_names.dart';
-import '../../../domain/enums/table_status.dart';
+import 'package:catsy_pos/presentation/table_management/providers/table_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
 
 class TablesSection extends ConsumerWidget {
   const TablesSection({super.key});

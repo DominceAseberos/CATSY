@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../config/routes/route_names.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../core/error/app_error_handler.dart';
-import '../../../../core/utils/app_audio.dart';
-import '../../../../core/utils/app_haptics.dart';
-import '../../../../data/local/providers.dart';
-import '../../../../domain/enums/payment_method.dart';
-import '../../../../domain/models/payment_details.dart';
-import '../../common_widgets/error_snackbar.dart';
-import '../../common_widgets/success_overlay.dart';
-import '../../loyalty/screens/qr_scanner_screen.dart' as import_loyalty;
-import '../providers/cart_controller.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/core/error/app_error_handler.dart';
+import 'package:catsy_pos/core/utils/app_audio.dart';
+import 'package:catsy_pos/core/utils/app_haptics.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
+import 'package:catsy_pos/domain/models/payment_details.dart';
+import 'package:catsy_pos/presentation/common_widgets/error_snackbar.dart';
+import 'package:catsy_pos/presentation/common_widgets/success_overlay.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/qr_scanner_screen.dart' as import_loyalty;
+import 'package:catsy_pos/presentation/order/providers/cart_controller.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   const PaymentScreen({super.key});

@@ -1,5 +1,5 @@
-import '../../domain/entities/inventory_item.dart';
-import '../remote/dtos/inventory_dto.dart';
+import 'package:catsy_pos/domain/entities/inventory_item.dart';
+import 'package:catsy_pos/data/remote/dtos/inventory_dto.dart';
 
 class InventoryMapper {
   static InventoryItem fromDto(InventoryDto dto) => InventoryItem(

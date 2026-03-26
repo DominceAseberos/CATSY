@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'addon.dart';
+import 'package:catsy_pos/domain/entities/addon.dart';
 
 /// A single line item within an order.
 class OrderItem extends Equatable {

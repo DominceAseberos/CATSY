@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/reward.dart';
-import '../models/reward_result.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/reward.dart';
+import 'package:catsy_pos/domain/models/reward_result.dart';
 
 /// Abstract contract for reward operations.
 abstract class RewardRepository {

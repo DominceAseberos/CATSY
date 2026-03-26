@@ -1,4 +1,4 @@
-import '../enums/payment_method.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
 
 class PaymentDetails {
   final PaymentMethod method;

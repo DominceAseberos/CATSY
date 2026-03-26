@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/enums/reservation_status.dart';
-import '../../../../domain/entities/reservation.dart';
-import '../providers/reservation_provider.dart';
-import '../widgets/reservation_card.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/enums/reservation_status.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
+import 'package:catsy_pos/presentation/reservation/providers/reservation_provider.dart';
+import 'package:catsy_pos/presentation/reservation/widgets/reservation_card.dart';
 import 'package:intl/intl.dart';
-import '../../common_widgets/empty_state_widget.dart';
-import '../../common_widgets/shimmer_loading.dart';
+import 'package:catsy_pos/presentation/common_widgets/empty_state_widget.dart';
+import 'package:catsy_pos/presentation/common_widgets/shimmer_loading.dart';
 
 class ReservationScreen extends ConsumerWidget {
   const ReservationScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../domain/entities/product.dart';
-import '../../../../domain/entities/category.dart';
-import '../../../../data/local/providers.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/domain/entities/category.dart';
+import 'package:catsy_pos/data/local/providers.dart';
 
 // ── State ────────────────────────────────────────────────────────────────────
 

@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app.dart';
-import 'core/error/error_reporting_service.dart';
-import 'core/utils/logger.dart';
-import 'data/local/database/app_database.dart';
-import 'sync/sync_engine.dart';
+import 'package:catsy_pos/app.dart';
+import 'package:catsy_pos/core/error/error_reporting_service.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/sync/sync_engine.dart';
 
 Future<void> main() async {
   ErrorReportingService? globalErrorReporter;

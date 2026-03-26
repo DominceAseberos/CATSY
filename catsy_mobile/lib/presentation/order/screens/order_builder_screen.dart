@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../providers/cart_controller.dart';
-import 'payment_screen.dart';
-import 'product_catalog_screen.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/order/providers/cart_controller.dart';
+import 'package:catsy_pos/presentation/order/screens/payment_screen.dart';
+import 'package:catsy_pos/presentation/order/screens/product_catalog_screen.dart';
 
 class OrderBuilderScreen extends ConsumerWidget {
   const OrderBuilderScreen({super.key});
@@ -157,7 +157,7 @@ class OrderBuilderScreen extends ConsumerWidget {
             // ── Footer: Summary + Buttons ───────────────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(top: BorderSide(color: AppColors.divider)),
               ),

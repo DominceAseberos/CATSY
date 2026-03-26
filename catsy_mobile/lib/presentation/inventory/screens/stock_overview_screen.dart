@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/inventory_item.dart';
-import '../providers/inventory_provider.dart';
-import '../../common_widgets/empty_state_widget.dart';
-import '../../common_widgets/shimmer_loading.dart';
-import '../../common_widgets/animated_list_item.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/inventory_item.dart';
+import 'package:catsy_pos/presentation/inventory/providers/inventory_provider.dart';
+import 'package:catsy_pos/presentation/common_widgets/empty_state_widget.dart';
+import 'package:catsy_pos/presentation/common_widgets/shimmer_loading.dart';
+import 'package:catsy_pos/presentation/common_widgets/animated_list_item.dart';
 
 class StockOverviewScreen extends ConsumerWidget {
   const StockOverviewScreen({super.key});

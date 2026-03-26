@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/staff.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/staff.dart';
 
 /// Abstract contract for authentication operations.
 abstract class AuthRepository {

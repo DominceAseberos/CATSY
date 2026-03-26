@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../config/theme/app_colors.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 /// Small badge overlaid on an icon (e.g. notification count).
 class BadgeIcon extends StatelessWidget {

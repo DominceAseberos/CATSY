@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:go_router/go_router.dart'; // Unused
 
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/customer.dart';
-import '../../../../data/local/providers.dart';
-import '../../../../core/utils/debounce.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/core/utils/debounce.dart';
 
 class CustomerSearchScreen extends ConsumerStatefulWidget {
   const CustomerSearchScreen({super.key});

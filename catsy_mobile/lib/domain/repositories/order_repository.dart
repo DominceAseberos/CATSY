@@ -1,6 +1,6 @@
-import '../entities/order.dart';
-import '../models/cart_state.dart';
-import '../models/payment_details.dart';
+import 'package:catsy_pos/domain/entities/order.dart';
+import 'package:catsy_pos/domain/models/cart_state.dart';
+import 'package:catsy_pos/domain/models/payment_details.dart';
 
 abstract class OrderRepository {
   /// Create a new order from cart state and payment details.

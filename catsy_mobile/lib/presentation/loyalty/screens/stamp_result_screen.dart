@@ -1,16 +1,16 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
 
-import '../../../../core/error/app_error_handler.dart';
-import '../../common_widgets/error_snackbar.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/customer.dart';
-import '../../../../domain/entities/order.dart';
-import '../../../../domain/entities/loyalty_stamp.dart';
-import '../../../../data/local/providers.dart';
-import '../widgets/stamp_card_widget.dart';
-import '../../order/screens/receipt_screen.dart';
+import 'package:catsy_pos/core/error/app_error_handler.dart';
+import 'package:catsy_pos/presentation/common_widgets/error_snackbar.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/domain/entities/order.dart';
+import 'package:catsy_pos/domain/entities/loyalty_stamp.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/presentation/loyalty/widgets/stamp_card_widget.dart';
+import 'package:catsy_pos/presentation/order/screens/receipt_screen.dart';
 
 class StampResultScreen extends ConsumerStatefulWidget {
   final Customer customer;

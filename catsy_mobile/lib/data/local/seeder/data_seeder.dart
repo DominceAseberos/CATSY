@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import '../database/app_database.dart';
-import '../providers.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/providers.dart';
 
 final dataSeederProvider = Provider((ref) => DataSeeder(ref));
 

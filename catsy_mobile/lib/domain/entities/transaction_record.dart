@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../enums/payment_method.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
 
 /// Financial transaction record.
 class TransactionRecord extends Equatable {

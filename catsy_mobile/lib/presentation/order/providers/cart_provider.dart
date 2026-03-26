@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../domain/entities/addon.dart';
-import '../../../domain/entities/product.dart';
+import 'package:catsy_pos/domain/entities/addon.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
 
 part 'cart_provider.freezed.dart';
 

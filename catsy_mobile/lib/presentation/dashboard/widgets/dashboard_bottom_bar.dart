@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/routes/route_names.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
 
 class DashboardBottomBar extends StatelessWidget {
   const DashboardBottomBar({super.key});

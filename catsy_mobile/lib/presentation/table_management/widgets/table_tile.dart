@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/cafe_table.dart';
-import '../../../../domain/enums/table_status.dart';
-import '../providers/table_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/cafe_table.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
+import 'package:catsy_pos/presentation/table_management/providers/table_provider.dart';
 
 class TableTile extends ConsumerWidget {
   final CafeTable table;

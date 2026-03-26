@@ -1,6 +1,6 @@
-﻿import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/reservations_table.dart';
+import 'package:drift/drift.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/reservations_table.dart';
 
 part 'reservation_dao.g.dart';
 

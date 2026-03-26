@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import '../config/app_constants.dart';
-import '../core/error/failures.dart';
-import '../core/network/api_client.dart';
-import '../core/utils/logger.dart';
-import '../data/local/database/daos/sync_queue_dao.dart';
-import '../data/local/database/app_database.dart';
-import 'sync_providers.dart';
+import 'package:catsy_pos/config/app_constants.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/data/local/database/daos/sync_queue_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/sync/sync_providers.dart';
 
 /// Priority levels for the sync queue.
 ///

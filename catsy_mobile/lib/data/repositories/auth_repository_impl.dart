@@ -2,16 +2,16 @@ import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 
 import 'package:flutter/foundation.dart';
-import '../../core/error/failures.dart';
-import '../../core/network/connectivity_service.dart';
-import '../../core/utils/logger.dart';
-import '../../domain/entities/staff.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../local/database/app_database.dart';
-import '../local/database/daos/auth_dao.dart';
-import '../local/secure_storage/secure_storage_service.dart';
-import '../remote/sources/auth_remote_source.dart';
-import '../../core/network/api_client.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/domain/entities/staff.dart';
+import 'package:catsy_pos/domain/repositories/auth_repository.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/daos/auth_dao.dart';
+import 'package:catsy_pos/data/local/secure_storage/secure_storage_service.dart';
+import 'package:catsy_pos/data/remote/sources/auth_remote_source.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
 
 /// Phase 12 — tries API Bridge login first, falls back to local session.
 class AuthRepositoryImpl implements AuthRepository {

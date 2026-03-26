@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/theme/app_colors.dart';
-import '../providers/auth_provider.dart';
-import '../providers/auth_state.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_provider.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_state.dart';
 
 /// Splash screen that checks the cached session on launch.
 ///

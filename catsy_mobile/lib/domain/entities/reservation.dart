@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../enums/reservation_status.dart';
+import 'package:catsy_pos/domain/enums/reservation_status.dart';
 
 /// Reservation entity.
 class Reservation extends Equatable {

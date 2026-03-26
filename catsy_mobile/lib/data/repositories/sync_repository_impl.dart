@@ -1,13 +1,13 @@
-﻿import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
-import '../../core/error/failures.dart';
-import '../../domain/entities/sync_action.dart';
-import '../../domain/enums/sync_status.dart';
-import '../../domain/repositories/sync_repository.dart';
-import '../local/database/daos/sync_queue_dao.dart';
-import '../local/database/app_database.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/sync_action.dart';
+import 'package:catsy_pos/domain/enums/sync_status.dart';
+import 'package:catsy_pos/domain/repositories/sync_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/sync_queue_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Phase 1 — LOCAL ONLY. Queues actions but does not process them remotely.
 class SyncRepositoryImpl implements SyncRepository {

@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/receipts_table.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/receipts_table.dart';
 
 part 'receipt_dao.g.dart';
 

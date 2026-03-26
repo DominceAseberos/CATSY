@@ -1,9 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/models/reward_result.dart';
-import '../../../../data/local/providers.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/models/reward_result.dart';
+import 'package:catsy_pos/data/local/providers.dart';
 
 // ── State machine ─────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../../config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 class StampsSection extends ConsumerWidget {
   const StampsSection({super.key});
@@ -15,15 +15,15 @@ class StampsSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.loyalty_rounded,
                 color: AppColors.textPrimary,
                 size: 20,
               ),
-              const SizedBox(width: 8),
-              const Text(
+              SizedBox(width: 8),
+              Text(
                 'Stamps',
                 style: TextStyle(
                   fontSize: 18,
