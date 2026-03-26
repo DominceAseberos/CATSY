@@ -11,7 +11,7 @@ import '../../domain/repositories/order_repository.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../../domain/repositories/table_repository.dart';
-import 'secure_storage/secure_storage_service.dart';
+
 import '../../domain/repositories/customer_repository.dart';
 import '../../data/repositories/customer_repository_impl.dart';
 import '../../domain/repositories/reward_repository.dart';
@@ -95,7 +95,6 @@ final authDaoProvider = Provider(
   (ref) => ref.watch(appDatabaseProvider).authDao,
 );
 
-final secureStorageServiceProvider = Provider((ref) => SecureStorageService());
 
 // ── Table Providers ─────────────────────────────────────────────────────────
 
@@ -161,6 +160,6 @@ final rewardRepositoryProvider = Provider<RewardRepository>((ref) {
   return RewardRepositoryImpl(
     rewardDao: ref.watch(rewardDaoProvider),
     customerDao: ref.watch(customerDaoProvider),
-    connectivity: ConnectivityService(),
+    connectivity: ref.watch(connectivityServiceProvider),
   );
 });

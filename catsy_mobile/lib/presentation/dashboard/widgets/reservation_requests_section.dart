@@ -188,8 +188,8 @@ class _ReservationCard extends ConsumerWidget {
                       .read(reservationControllerProvider.notifier)
                       .rejectReservation(
                         reservation.id,
-                        "staff_123",
-                        "User rejected",
+                        'staff_123',
+                        'User rejected',
                       );
                 },
                 child: Container(
@@ -212,7 +212,7 @@ class _ReservationCard extends ConsumerWidget {
                 onTap: () {
                   ref
                       .read(reservationControllerProvider.notifier)
-                      .approveReservation(reservation.id, "staff_123");
+                      .approveReservation(reservation.id, 'staff_123');
                 },
                 child: Container(
                   width: 36,

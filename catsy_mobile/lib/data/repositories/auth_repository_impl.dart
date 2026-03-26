@@ -18,19 +18,22 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthDao _authDao;
   final SecureStorageService _secureStorage;
   final ApiClient _apiClient;
+  final ConnectivityService _connectivity;
 
   AuthRepositoryImpl({
     required AuthDao authDao,
     required SecureStorageService secureStorage,
     required ApiClient apiClient,
+    required ConnectivityService connectivity,
   }) : _authDao = authDao,
        _secureStorage = secureStorage,
-       _apiClient = apiClient;
+       _apiClient = apiClient,
+       _connectivity = connectivity;
 
   @override
   Future<Either<Failure, Staff>> login(String email, String password) async {
     // 1. Try online login against the API Bridge
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (isOnline) {
       try {
         final remote = AuthRemoteSource(_apiClient);
@@ -132,7 +135,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      final isOnline = await ConnectivityService().isConnected;
+      final isOnline = await _connectivity.isConnected;
       if (isOnline) {
         try {
           await AuthRemoteSource(_apiClient).logout();

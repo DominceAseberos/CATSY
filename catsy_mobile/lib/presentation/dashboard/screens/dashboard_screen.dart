@@ -319,7 +319,7 @@ class _ProfileDropdown extends ConsumerWidget {
             const SizedBox(width: 6),
             Text(
               user.when(
-                data: (u) => u?.firstName ?? 'Staff',
+                data: (u) => u?.name ?? 'Staff',
                 loading: () => '...',
                 error: (_, _) => 'Staff',
               ),
@@ -345,7 +345,7 @@ class _ProfileDropdown extends ConsumerWidget {
             children: [
               Text(
                 user.when(
-                  data: (u) => '${u?.firstName ?? ""} ${u?.lastName ?? ""}',
+                  data: (u) => u?.name ?? '',
                   loading: () => 'Loading...',
                   error: (_, _) => 'Staff',
                 ),
