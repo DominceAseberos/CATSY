@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+// ignore_for_file: deprecated_member_use
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../config/theme/app_colors.dart';
@@ -39,7 +40,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -95,7 +96,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                           // Clear cart
                           ref.read(cartProvider.notifier).clearCart();
 
-                          if (mounted) {
+                          if (context.mounted) {
                             AppAudio.playSuccess();
                             AppHaptics.mediumImpact();
                             await SuccessOverlay.show(
@@ -104,7 +105,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                             );
                           }
 
-                          if (mounted) {
+                          if (context.mounted) {
                             // Ask for Loyalty
                             final wantLoyalty = await showDialog<bool>(
                               context: context,
@@ -128,7 +129,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               ),
                             );
 
-                            if (mounted) {
+                            if (context.mounted) {
                               if (wantLoyalty == true) {
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
@@ -149,14 +150,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                             }
                           }
                         } catch (e) {
-                          if (mounted) {
+                          if (context.mounted) {
                             ErrorSnackBar.show(
                               context,
                               AppErrorHandler.getMessage(e),
                             );
                           }
                         } finally {
-                          if (mounted) setState(() => _isProcessing = false);
+                          if (context.mounted) setState(() => _isProcessing = false);
                         }
                       },
                 style: ElevatedButton.styleFrom(

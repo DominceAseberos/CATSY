@@ -9,7 +9,7 @@ import '../widgets/reward_requests_section.dart';
 import '../widgets/dashboard_bottom_bar.dart';
 
 class NewDashboardScreen extends StatelessWidget {
-  const NewDashboardScreen({Key? key}) : super(key: key);
+  const NewDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -321,7 +321,7 @@ class _ProfileDropdown extends ConsumerWidget {
               user.when(
                 data: (u) => u?.firstName ?? 'Staff',
                 loading: () => '...',
-                error: (_, __) => 'Staff',
+                error: (_, _) => 'Staff',
               ),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -347,7 +347,7 @@ class _ProfileDropdown extends ConsumerWidget {
                 user.when(
                   data: (u) => '${u?.firstName ?? ""} ${u?.lastName ?? ""}',
                   loading: () => 'Loading...',
-                  error: (_, __) => 'Staff',
+                  error: (_, _) => 'Staff',
                 ),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -593,7 +593,7 @@ class _TableLegend extends StatelessWidget {
         );
       },
       loading: () => const SizedBox(),
-      error: (_, __) => const SizedBox(),
+      error: (_, _) => const SizedBox(),
     );
   }
 }

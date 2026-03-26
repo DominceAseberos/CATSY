@@ -4,7 +4,7 @@ import '../../../config/theme/app_colors.dart';
 import '../providers/dashboard_provider.dart';
 
 class DashboardHeader extends ConsumerWidget {
-  const DashboardHeader({Key? key}) : super(key: key);
+  const DashboardHeader({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,13 +56,13 @@ class DashboardHeader extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isOnline
-                      ? AppColors.dashboardGreen.withOpacity(0.1)
-                      : AppColors.dashboardRed.withOpacity(0.1),
+                      ? AppColors.dashboardGreen.withValues(alpha: 0.1)
+                      : AppColors.dashboardRed.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isOnline
-                        ? AppColors.dashboardGreen.withOpacity(0.3)
-                        : AppColors.dashboardRed.withOpacity(0.3),
+                        ? AppColors.dashboardGreen.withValues(alpha: 0.3)
+                        : AppColors.dashboardRed.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
