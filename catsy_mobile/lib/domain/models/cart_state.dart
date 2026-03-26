@@ -1,8 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../entities/cart_item.dart';
-import '../enums/order_type.dart';
-import '../enums/payment_status.dart';
-import '../enums/payment_method.dart';
+import 'package:catsy_pos/domain/entities/cart_item.dart';
+import 'package:catsy_pos/domain/enums/order_type.dart';
+import 'package:catsy_pos/domain/enums/payment_status.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
 
 part 'cart_state.freezed.dart';
 

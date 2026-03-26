@@ -1,8 +1,8 @@
-﻿import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/products_table.dart';
-import '../tables/categories_table.dart';
-import '../tables/addons_table.dart';
+import 'package:drift/drift.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/products_table.dart';
+import 'package:catsy_pos/data/local/database/tables/categories_table.dart';
+import 'package:catsy_pos/data/local/database/tables/addons_table.dart';
 
 part 'product_dao.g.dart';
 

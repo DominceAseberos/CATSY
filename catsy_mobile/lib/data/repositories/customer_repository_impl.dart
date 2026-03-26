@@ -1,12 +1,12 @@
-﻿import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
-import '../../core/error/failures.dart';
-import '../../domain/entities/customer.dart';
-import '../../domain/entities/loyalty_stamp.dart';
-import '../../domain/repositories/customer_repository.dart';
-import '../local/database/daos/customer_dao.dart';
-import '../local/database/app_database.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/domain/entities/loyalty_stamp.dart';
+import 'package:catsy_pos/domain/repositories/customer_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/customer_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Phase 1 — LOCAL ONLY. Uses CustomerDao.
 class CustomerRepositoryImpl implements CustomerRepository {

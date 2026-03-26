@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../data/local/database/app_database.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 class HeldOrdersSection extends ConsumerWidget {
   const HeldOrdersSection({super.key});
@@ -19,15 +19,15 @@ class HeldOrdersSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
+              const Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.add,
                     color: AppColors.dashboardPink,
                     size: 20,
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     'Held Orders',
                     style: TextStyle(
                       fontSize: 18,

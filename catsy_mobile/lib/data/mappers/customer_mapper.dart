@@ -1,5 +1,5 @@
-import '../../domain/entities/customer.dart';
-import '../remote/dtos/customer_dto.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/data/remote/dtos/customer_dto.dart';
 
 class CustomerMapper {
   static Customer fromDto(CustomerDto dto) => Customer(

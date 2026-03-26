@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../../../../config/theme/app_colors.dart';
-import '../../../../core/utils/app_audio.dart';
-import '../../../../core/utils/app_haptics.dart';
-import '../../../../data/local/providers.dart';
-import '../../../../domain/entities/customer.dart';
-import '../../../../domain/entities/order.dart';
-import '../../common_widgets/error_snackbar.dart';
-import 'customer_search_screen.dart';
-import 'stamp_result_screen.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/core/utils/app_audio.dart';
+import 'package:catsy_pos/core/utils/app_haptics.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/domain/entities/order.dart';
+import 'package:catsy_pos/presentation/common_widgets/error_snackbar.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/customer_search_screen.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/stamp_result_screen.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
   final Order? order;

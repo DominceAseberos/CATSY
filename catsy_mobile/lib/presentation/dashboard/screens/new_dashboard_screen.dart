@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
-import '../../../config/theme/app_colors.dart';
-import '../widgets/dashboard_header.dart';
-import '../widgets/tables_section.dart';
-import '../widgets/held_orders_section.dart';
-import '../widgets/reservation_requests_section.dart';
-import '../widgets/stamps_section.dart';
-import '../widgets/reward_requests_section.dart';
-import '../widgets/dashboard_bottom_bar.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/dashboard_header.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/tables_section.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/held_orders_section.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/reservation_requests_section.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/stamps_section.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/reward_requests_section.dart';
+import 'package:catsy_pos/presentation/dashboard/widgets/dashboard_bottom_bar.dart';
 
 class NewDashboardScreen extends StatelessWidget {
   const NewDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: AppColors.dashboardBg,
       body: Column(
         children: [
           // Header (Online Status & Branding)
-          const DashboardHeader(),
+          DashboardHeader(),
 
           // Scrollable Content
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: const [
+                children: [
                   TablesSection(),
                   HeldOrdersSection(),
                   ReservationRequestsSection(),
@@ -40,7 +40,7 @@ class NewDashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const DashboardBottomBar(),
+      bottomNavigationBar: DashboardBottomBar(),
     );
   }
 }

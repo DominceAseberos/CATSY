@@ -1,5 +1,5 @@
-﻿import '../../domain/entities/product.dart';
-import '../remote/dtos/product_dto.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/data/remote/dtos/product_dto.dart';
 
 class ProductMapper {
   static Product fromDto(ProductDto dto) => Product(

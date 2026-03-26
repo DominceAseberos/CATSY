@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../reservation/providers/reservation_provider.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../domain/entities/reservation.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/presentation/reservation/providers/reservation_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
 
 class ReservationRequestsSection extends ConsumerWidget {
   const ReservationRequestsSection({super.key});

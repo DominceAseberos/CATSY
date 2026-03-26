@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../domain/entities/order.dart'; // Ensure this matches your Order entity location
+import 'package:catsy_pos/domain/entities/order.dart'; // Ensure this matches your Order entity location
 import 'package:intl/intl.dart';
 
 class ReceiptScreen extends StatelessWidget {

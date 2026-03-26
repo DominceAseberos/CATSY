@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../../domain/entities/product.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../common_widgets/animated_bounce.dart';
-import '../../../../core/utils/app_haptics.dart';
-import '../../common_widgets/shimmer_loading.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/common_widgets/animated_bounce.dart';
+import 'package:catsy_pos/core/utils/app_haptics.dart';
+import 'package:catsy_pos/presentation/common_widgets/shimmer_loading.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;

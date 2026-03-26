@@ -33,5 +33,6 @@ class AppConstants {
   static const int defaultTableCapacity = 4;
 
   // ── Inventory ─────────────────────────────────────────────────────────
-  static const int safetyLevel = 10; // low-stock safety threshold
+  // Low-stock threshold is intentionally env-configurable.
+  // Use Env.lowStockSafetyLevel (default 10, override via --dart-define=LOW_STOCK_SAFETY_LEVEL=N).
 }

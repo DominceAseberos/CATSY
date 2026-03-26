@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../utils/logger.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
 
 /// Abstract service for reporting unhandled errors and crashes to a remote service.
 /// This acts as a boundary to swap between Crashlytics, Sentry, or simple logging.

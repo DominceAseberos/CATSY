@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/local/providers.dart';
-import '../../../domain/enums/payment_status.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/enums/payment_status.dart';
 
-import '../../../domain/entities/staff.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../../auth/providers/auth_state.dart';
+import 'package:catsy_pos/domain/entities/staff.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_provider.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_state.dart';
 
 /// Current logged in user provider derived from global auth state
 final currentUserProvider = Provider<AsyncValue<Staff?>>((ref) {

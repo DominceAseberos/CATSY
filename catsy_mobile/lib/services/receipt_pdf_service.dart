@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import '../data/local/providers.dart';
+import 'package:catsy_pos/data/local/providers.dart';
 
 /// Generates a PDF Uint8List for a given orderId.
 /// All data sourced from local SQLite — 100% offline.
@@ -153,7 +153,7 @@ class ReceiptPdfService {
                         padding: const pw.EdgeInsets.only(left: 14),
                         child: pw.Text(
                           '+ ${a.addonName}  ${currency.format(a.price)}',
-                          style: pw.TextStyle(fontSize: 7.5, color: _grey),
+                          style: const pw.TextStyle(fontSize: 7.5, color: _grey),
                         ),
                       ),
                     ),
@@ -234,7 +234,7 @@ class ReceiptPdfService {
   // ── Private helpers ───────────────────────────────────────────────────────
 
   pw.Widget _dottedDivider() =>
-      pw.Text('- ' * 38, style: pw.TextStyle(fontSize: 6, color: _grey));
+      pw.Text('- ' * 38, style: const pw.TextStyle(fontSize: 6, color: _grey));
 
   pw.Widget _metaRow(String label, String value) => pw.Padding(
     padding: const pw.EdgeInsets.symmetric(vertical: 1),
@@ -242,7 +242,7 @@ class ReceiptPdfService {
       children: [
         pw.SizedBox(
           width: 60,
-          child: pw.Text(label, style: pw.TextStyle(fontSize: 8, color: _grey)),
+          child: pw.Text(label, style: const pw.TextStyle(fontSize: 8, color: _grey)),
         ),
         pw.Text(': ', style: const pw.TextStyle(fontSize: 8)),
         pw.Expanded(

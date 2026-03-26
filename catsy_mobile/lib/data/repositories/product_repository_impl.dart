@@ -1,10 +1,10 @@
-﻿import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../../domain/entities/product.dart';
-import '../../domain/entities/category.dart';
-import '../../domain/repositories/product_repository.dart';
-import '../local/database/daos/product_dao.dart';
-import '../local/database/app_database.dart'; // For generated data classes
+import 'package:dartz/dartz.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/domain/entities/category.dart';
+import 'package:catsy_pos/domain/repositories/product_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/product_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart'; // For generated data classes
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductDao _productDao;

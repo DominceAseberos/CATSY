@@ -1,4 +1,4 @@
-import '../entities/reward.dart';
+import 'package:catsy_pos/domain/entities/reward.dart';
 
 /// Result type for the [validateAndClaimReward] flow.
 ///

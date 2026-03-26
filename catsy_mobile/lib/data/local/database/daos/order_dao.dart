@@ -1,9 +1,9 @@
-﻿import 'package:drift/drift.dart';
+import 'package:drift/drift.dart';
 import 'package:intl/intl.dart';
-import '../app_database.dart';
-import '../tables/orders_table.dart';
-import '../tables/order_items_table.dart';
-import '../tables/order_item_addons_table.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/orders_table.dart';
+import 'package:catsy_pos/data/local/database/tables/order_items_table.dart';
+import 'package:catsy_pos/data/local/database/tables/order_item_addons_table.dart';
 
 part 'order_dao.g.dart';
 

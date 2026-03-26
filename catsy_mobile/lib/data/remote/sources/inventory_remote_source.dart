@@ -1,5 +1,5 @@
-import '../../../core/network/api_client.dart';
-import '../dtos/inventory_dto.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/inventory_dto.dart';
 
 class InventoryRemoteSource {
   final ApiClient _api;

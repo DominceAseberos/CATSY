@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
-import 'logger.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
 
 /// Centralized utility to play sound effects across the app.
 class AppAudio {

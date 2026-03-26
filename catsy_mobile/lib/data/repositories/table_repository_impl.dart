@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../core/error/failures.dart';
-import '../../core/network/api_client.dart';
-import '../../data/remote/dtos/table_dto.dart';
-import '../../data/remote/sources/table_remote_source.dart';
-import '../../domain/entities/cafe_table.dart';
-import '../../domain/enums/table_status.dart';
-import '../../domain/repositories/table_repository.dart';
-import '../local/database/daos/table_dao.dart';
-import '../local/database/app_database.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/table_dto.dart';
+import 'package:catsy_pos/data/remote/sources/table_remote_source.dart';
+import 'package:catsy_pos/domain/entities/cafe_table.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
+import 'package:catsy_pos/domain/repositories/table_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/table_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Phase 2 — LOCAL + REMOTE sync. Uses TableDao (local) and TableRemoteSource (remote).
 class TableRepositoryImpl implements TableRepository {

@@ -1,6 +1,6 @@
-﻿import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/inventory_table.dart';
+import 'package:drift/drift.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/inventory_table.dart';
 
 part 'inventory_dao.g.dart';
 

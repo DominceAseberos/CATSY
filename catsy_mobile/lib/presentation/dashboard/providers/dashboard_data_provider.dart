@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../domain/entities/reservation.dart';
-import '../../../domain/entities/reward.dart';
-import '../../../domain/entities/customer.dart';
-import '../../../data/local/providers.dart';
-import '../../../data/local/database/app_database.dart';
-import '../../reservation/providers/reservation_provider.dart';
-import '../../../domain/enums/order_status.dart';
-import '../../../domain/enums/payment_status.dart';
-import '../../../domain/enums/reservation_status.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
+import 'package:catsy_pos/domain/entities/reward.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/presentation/reservation/providers/reservation_provider.dart';
+import 'package:catsy_pos/domain/enums/order_status.dart';
+import 'package:catsy_pos/domain/enums/payment_status.dart';
+import 'package:catsy_pos/domain/enums/reservation_status.dart';
 
 // ── Held Orders ────────────────────────────────────────────────────────
 final heldOrdersProvider = Provider<List<OrdersTableData>>((ref) {

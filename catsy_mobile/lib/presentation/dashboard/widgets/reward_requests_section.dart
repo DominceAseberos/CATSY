@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../../config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 class RewardRequestsSection extends ConsumerWidget {
   const RewardRequestsSection({super.key});

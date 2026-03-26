@@ -1,6 +1,6 @@
-import '../../../core/network/api_client.dart';
-import '../dtos/product_dto.dart';
-import '../dtos/category_dto.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/product_dto.dart';
+import 'package:catsy_pos/data/remote/dtos/category_dto.dart';
 
 class ProductRemoteSource {
   final ApiClient _api;

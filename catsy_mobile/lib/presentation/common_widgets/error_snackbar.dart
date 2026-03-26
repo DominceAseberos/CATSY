@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../config/theme/app_colors.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 class ErrorSnackBar extends SnackBar {
   ErrorSnackBar({super.key, required String message, VoidCallback? onRetry})

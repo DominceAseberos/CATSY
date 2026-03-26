@@ -1,5 +1,5 @@
-﻿import '../../../core/network/api_client.dart';
-import '../dtos/table_dto.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/table_dto.dart';
 
 /// Remote data source for café tables.
 class TableRemoteSource {

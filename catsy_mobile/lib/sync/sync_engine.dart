@@ -3,21 +3,21 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/app_constants.dart';
-import '../core/network/api_client.dart';
-import '../core/network/connectivity_service.dart';
-import '../core/utils/logger.dart';
-import '../data/local/database/app_database.dart';
-import '../data/local/secure_storage/secure_storage_service.dart';
-import '../data/remote/sources/customer_remote_source.dart';
-import '../data/remote/sources/inventory_remote_source.dart';
-import '../data/remote/sources/order_remote_source.dart';
-import '../data/remote/sources/product_remote_source.dart';
-import '../data/remote/sources/reservation_remote_source.dart';
-import '../data/remote/sources/reward_remote_source.dart';
-import '../data/remote/sources/table_remote_source.dart';
-import 'sync_providers.dart';
-import 'sync_queue_manager.dart';
+import 'package:catsy_pos/config/app_constants.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/secure_storage/secure_storage_service.dart';
+import 'package:catsy_pos/data/remote/sources/customer_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/inventory_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/order_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/product_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/reservation_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/reward_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/table_remote_source.dart';
+import 'package:catsy_pos/sync/sync_providers.dart';
+import 'package:catsy_pos/sync/sync_queue_manager.dart';
 
 /// Orchestrates all sync operations with three lifecycle hooks:
 ///

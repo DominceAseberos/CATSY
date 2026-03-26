@@ -1,4 +1,4 @@
-import '../../../core/network/api_client.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
 
 /// Response model for API Bridge login.
 class AuthTokenResponse {

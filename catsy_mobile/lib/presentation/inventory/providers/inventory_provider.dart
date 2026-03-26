@@ -1,6 +1,6 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../domain/entities/inventory_item.dart';
-import '../../../../data/local/providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:catsy_pos/domain/entities/inventory_item.dart';
+import 'package:catsy_pos/data/local/providers.dart';
 
 // ── State ────────────────────────────────────────────────────────────────────
 

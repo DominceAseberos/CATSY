@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
-import '../data/local/providers.dart';
+import 'package:catsy_pos/data/local/providers.dart';
 
 /// Prints a text receipt to the Sunmi built-in thermal printer.
 /// Gracefully degrades (returns false) on non-Sunmi devices.

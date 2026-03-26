@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/customer.dart';
-import '../entities/loyalty_stamp.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/domain/entities/loyalty_stamp.dart';
 
 /// Abstract contract for customer / loyalty operations.
 abstract class CustomerRepository {

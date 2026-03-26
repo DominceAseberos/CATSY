@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../domain/entities/cart_item.dart';
-import '../../../domain/entities/product.dart';
-import '../../../domain/entities/addon.dart';
-import '../../../domain/enums/order_type.dart';
-import '../../../domain/enums/payment_method.dart';
-import '../../../domain/models/cart_state.dart';
+import 'package:catsy_pos/domain/entities/cart_item.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/domain/entities/addon.dart';
+import 'package:catsy_pos/domain/enums/order_type.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
+import 'package:catsy_pos/domain/models/cart_state.dart';
 
 class CartController extends Notifier<CartState> {
   @override

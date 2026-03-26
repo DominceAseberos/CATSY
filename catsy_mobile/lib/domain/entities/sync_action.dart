@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../enums/sync_status.dart';
+import 'package:catsy_pos/domain/enums/sync_status.dart';
 
 /// Offline sync queue action.
 class SyncAction extends Equatable {

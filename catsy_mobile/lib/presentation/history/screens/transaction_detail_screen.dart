@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/routes/route_names.dart';
-import '../../../data/local/providers.dart';
-import '../../../data/local/database/app_database.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 // ── Detail provider (scoped to this screen) ───────────────────────────────────
 

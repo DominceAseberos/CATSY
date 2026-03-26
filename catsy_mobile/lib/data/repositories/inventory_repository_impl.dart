@@ -1,10 +1,10 @@
-﻿import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../core/error/failures.dart';
-import '../../domain/entities/inventory_item.dart';
-import '../../domain/repositories/inventory_repository.dart';
-import '../local/database/daos/inventory_dao.dart';
-import '../local/database/app_database.dart'; // For generated data classes
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/inventory_item.dart';
+import 'package:catsy_pos/domain/repositories/inventory_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/inventory_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart'; // For generated data classes
 
 class InventoryRepositoryImpl implements InventoryRepository {
   final InventoryDao _inventoryDao;

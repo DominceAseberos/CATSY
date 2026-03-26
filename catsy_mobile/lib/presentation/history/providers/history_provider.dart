@@ -1,7 +1,7 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/local/providers.dart';
-import '../../../data/local/database/app_database.dart';
-import '../../../domain/models/daily_summary.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/domain/models/daily_summary.dart';
 
 // ── Filter Preset ─────────────────────────────────────────────────────────────
 

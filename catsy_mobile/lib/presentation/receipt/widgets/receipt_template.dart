@@ -1,7 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../data/local/database/app_database.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Branded on-screen receipt for Cutsy Café.
 /// Accepts the raw Drift data objects so it can be used both
@@ -35,9 +35,9 @@ class ReceiptTemplate extends StatelessWidget {
           Container(
             color: const Color(0xFF5C3317),
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Column(
+            child: const Column(
               children: [
-                const Text(
+                Text(
                   'CUTSY CAFÉ',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -47,8 +47,8 @@ class ReceiptTemplate extends StatelessWidget {
                     letterSpacing: 3,
                   ),
                 ),
-                const SizedBox(height: 2),
-                const Text(
+                SizedBox(height: 2),
+                Text(
                   'Your Cozy Corner ☕',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -57,8 +57,8 @@ class ReceiptTemplate extends StatelessWidget {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                const SizedBox(height: 6),
-                const Text(
+                SizedBox(height: 6),
+                Text(
                   '123 Brew Street, Café City\nTel: (02) 555-CAFE',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white60, fontSize: 10),
@@ -189,8 +189,8 @@ class ReceiptTemplate extends StatelessWidget {
           Container(
             color: const Color(0xFF5C3317),
             padding: const EdgeInsets.all(16),
-            child: Column(
-              children: const [
+            child: const Column(
+              children: [
                 Text(
                   'Thank you for visiting Cutsy Café!',
                   textAlign: TextAlign.center,

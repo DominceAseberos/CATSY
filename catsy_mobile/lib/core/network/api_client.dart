@@ -6,10 +6,10 @@ import 'package:http/io_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/env.dart';
-import '../../core/error/failures.dart';
-import '../../core/utils/logger.dart';
-import '../../data/local/secure_storage/secure_storage_service.dart';
+import 'package:catsy_pos/config/env.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/data/local/secure_storage/secure_storage_service.dart';
 
 /// HTTP client that wraps calls to the Catsy API Bridge server.
 ///
@@ -159,18 +159,18 @@ class ApiClient {
       return response;
     } on TimeoutException {
       AppLogger.e('[ApiClient] Request timed out');
-      throw ServerFailure(
+      throw const ServerFailure(
         message: 'Request timed out after 15 seconds. Please check your connection.',
       );
     } on SocketException {
       AppLogger.e('[ApiClient] Socket exception (No Internet)');
-      throw ServerFailure(
+      throw const ServerFailure(
         message: 'No internet connection. Please verify your network.',
       );
     } catch (e) {
       if (e is ServerFailure) rethrow; // Pass-through known failures
       AppLogger.e('[ApiClient] Unexpected error: $e');
-      throw ServerFailure(message: 'An unexpected network error occurred.');
+      throw const ServerFailure(message: 'An unexpected network error occurred.');
     }
   }
 

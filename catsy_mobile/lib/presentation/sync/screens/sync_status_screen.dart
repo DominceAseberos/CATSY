@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../sync/sync_engine.dart';
-import '../../../sync/sync_providers.dart';
-import '../../../data/local/database/app_database.dart';
+import 'package:catsy_pos/sync/sync_engine.dart';
+import 'package:catsy_pos/sync/sync_providers.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Full-screen sync status panel.
 ///

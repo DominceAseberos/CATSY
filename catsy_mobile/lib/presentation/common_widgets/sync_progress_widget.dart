@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../sync/sync_providers.dart';
+import 'package:catsy_pos/sync/sync_providers.dart';
 
 /// A slim animated progress bar + status label shown on the dashboard
 /// whenever a sync operation is running.

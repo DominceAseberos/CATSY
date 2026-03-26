@@ -2,10 +2,10 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
 import 'package:drift/drift.dart' show Value;
-import '../../../data/local/database/app_database.dart';
-import '../../../data/local/providers.dart';
-import '../../../services/receipt_pdf_service.dart';
-import '../../../services/thermal_printer_service.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/services/receipt_pdf_service.dart';
+import 'package:catsy_pos/services/thermal_printer_service.dart';
 import 'package:uuid/uuid.dart';
 
 // ── State ─────────────────────────────────────────────────────────────────────
