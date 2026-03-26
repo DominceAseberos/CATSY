@@ -94,3 +94,51 @@ This session focused on completing the **Admin Web Panel** and performing a **SO
 - [x] Centralized all system Pydantic schemas.
 - [x] Added JSDoc SRP documentation to all custom hooks.
 - [x] Verified 100% Phase 3 parity against the Development Phases Guide.
+
+---
+
+## Session Date: 2026-03-26 (QA & Stability Audit)
+
+This session focused on resolving critical runtime errors, addressing UX gaps identified in the `test_cases.md` suite, and seeding the database for final verification.
+
+### 1. 🔴 Critical Runtime & Logic Fixes
+**Objective:** Eliminate crashes and 404/500 errors in the Admin Panel.
+
+- **Files Edited/Created:**
+  - `catsy-web/src/App.jsx` (Wrapped admin route in `ToastProvider`)
+  - `catsy-backend/app/routers/materials.py` [NEW] (Missing CRUD router)
+  - `catsy-backend/app/repositories/materials_repo.py` [NEW] (Missing repository)
+  - `catsy-backend/app/repositories/reports_repo.py` (Fixed 500 Column Error)
+- **Changes:**
+  - **Context Fix:** Resolved a fatal crash on the Time Slots and CMS pages by ensuring `ToastProvider` is present in the admin route tree.
+  - **Inventory API:** Implemented the missing Materials CRUD and Recipe management endpoints that were causing 404 errors on the Inventory page.
+  - **Reports Query:** Fixed a 500 error in the sales report query by correcting the column filter from `payment_status` (non-existent) to `status = 'served'`.
+  - **Schema Alignment:** Corrected `products_repo.py` to use `raw_materials_inventory` and `product_recipe` table names, matching the production schema.
+
+### 2. ✨ Customer UX Enhancements
+**Objective:** Provide essential feedback and control features requested in QA.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/ReservationPage.jsx` (Added Cancel button)
+  - `catsy-web/src/pages/LoginPage.jsx` (Animated dot cycle)
+- **Changes:**
+  - **Self-Service Cancellation:** Customers can now cancel `pending` reservations directly from their portal, complete with a confirmation toast.
+  - **Animated Feedback:** Replaced the static "Processing..." text on the login button with a dynamic `. .. ...` dot cycle to indicate active server communication.
+
+### 3. 🌱 Database Seeding & Testing Visibility
+**Objective:** Populate the database to enable testing of the Dashboard and Analytics modules.
+
+- **Seeding performed via Supabase migrations:**
+  - **Orders & Sales:** Inserted 10 orders and 18 order items spread across the last 30 days to populate the Reports and Dashboard charts.
+  - **Operational Data:** Seeded 11 time slots and 4 CMS content items to verify list rendering and management.
+
+---
+
+### ✅ Summary of QA Resolution:
+- [x] Fixed fatal "useToast must be used within ToastProvider" crashes.
+- [x] Resolved 404/500 errors on Inventory and Reports pages.
+- [x] Implemented customer-side reservation cancellation.
+- [x] Added animated loading states to the authentication flow.
+- [x] Seeded data for Sales, Orders, Inventory, and CMS verification.
+- [x] Finalized 100% test case readiness for Sections 3 and 4.
+
