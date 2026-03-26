@@ -1,6 +1,7 @@
-﻿import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 
+import 'package:flutter/foundation.dart';
 import '../../core/error/failures.dart';
 import '../../core/network/connectivity_service.dart';
 import '../../core/utils/logger.dart';
@@ -26,13 +27,6 @@ class AuthRepositoryImpl implements AuthRepository {
        _secureStorage = secureStorage,
        _apiClient = apiClient;
 
-  // ── Fallback credentials (offline mode only) ─────────────────────────
-  static const _offlineEmail = 'staff@cutsycafe.com';
-  static const _offlinePassword = 'catsy123';
-  static const _offlineStaffId = 'staff-001';
-  static const _offlineStaffName = 'Test Staff';
-  static const _offlineStaffRole = 'cashier';
-
   @override
   Future<Either<Failure, Staff>> login(String email, String password) async {
     // 1. Try online login against the API Bridge
@@ -47,10 +41,11 @@ class AuthRepositoryImpl implements AuthRepository {
         }
         AppLogger.i('[Auth] API Bridge login succeeded');
 
-        // Store staff profile (minimal, API Bridge doesn't return full profile)
+        // Store staff profile (using email as ID since no userId is returned from API Bridge)
         final now = DateTime.now();
+        final staffId = email;
         final staff = Staff(
-          id: _offlineStaffId,
+          id: staffId,
           name: email.split('@').first,
           email: email,
           role: 'cashier',
@@ -77,38 +72,51 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     }
 
-    // 2. Offline fallback — validate against hardcoded credentials
-    if (email != _offlineEmail || password != _offlinePassword) {
-      return const Left(AuthFailure(message: 'Invalid email or password'));
-    }
-
+    // 2. Offline fallback — validate against cached session
     try {
-      final now = DateTime.now();
-      final staff = Staff(
-        id: _offlineStaffId,
-        name: _offlineStaffName,
-        email: _offlineEmail,
-        role: _offlineStaffRole,
-        createdAt: now,
-        updatedAt: now,
-      );
-      await _authDao.saveStaffProfile(
-        StaffTableCompanion(
-          id: Value(staff.id),
-          name: Value(staff.name),
-          email: Value(staff.email),
-          role: Value(staff.role),
-          isActive: const Value(true),
-          createdAt: Value(staff.createdAt),
-          updatedAt: Value(staff.updatedAt),
-        ),
-      );
-      await _secureStorage.saveAuthToken('offline-token-${staff.id}');
-      await _secureStorage.saveStaffId(staff.id);
-      AppLogger.i('[Auth] Offline login succeeded');
-      return Right(staff);
+      // Dev-only offline shortcut
+      if (kDebugMode && email == 'staff@cutsycafe.com' && password == 'catsy123') {
+        final now = DateTime.now();
+        final staff = Staff(
+          id: 'dev-staff-001',
+          name: 'Dev Staff',
+          email: 'staff@cutsycafe.com',
+          role: 'cashier',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await _authDao.saveStaffProfile(
+          StaffTableCompanion(
+            id: Value(staff.id),
+            name: Value(staff.name),
+            email: Value(staff.email),
+            role: Value(staff.role),
+            isActive: const Value(true),
+            createdAt: Value(staff.createdAt),
+            updatedAt: Value(staff.updatedAt),
+          ),
+        );
+        await _secureStorage.saveAuthToken('offline-dev-token');
+        await _secureStorage.saveStaffId(staff.id);
+        AppLogger.i('[Auth] Offline Dev login succeeded');
+        return Right(staff);
+      }
+
+      final cachedToken = await _secureStorage.getAuthToken();
+      final cachedStaffId = await _secureStorage.getStaffId();
+      
+      if (cachedToken != null && cachedStaffId != null) {
+        final staffRow = await _authDao.getStaffProfile();
+        // Return success if there is a cached session for the requested email
+        if (staffRow != null && staffRow.email == email) {
+          AppLogger.i('[Auth] Offline cached session login succeeded');
+          return Right(_mapToStaff(staffRow));
+        }
+      }
+      
+      return const Left(AuthFailure(message: 'You must log in online at least once'));
     } catch (e) {
-      return Left(CacheFailure(message: 'Login failed: $e'));
+      return Left(CacheFailure(message: 'Offline login failed: $e'));
     }
   }
 

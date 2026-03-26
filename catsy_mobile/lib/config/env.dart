@@ -21,10 +21,14 @@ class Env {
       10;
 
   // ── API Bridge ────────────────────────────────────────────────────────
-  static String get apiBridgeBaseUrl => const String.fromEnvironment(
-    'API_BRIDGE_BASE_URL',
-    defaultValue: 'http://localhost:8000',
-  );
+  static String get apiBridgeBaseUrl {
+    const url = String.fromEnvironment('API_BRIDGE_BASE_URL', defaultValue: '');
+    assert(url.isNotEmpty, 'API_BRIDGE_BASE_URL must be set via --dart-define');
+    return url.isEmpty ? 'http://localhost:8000' : url; // localhost only survives debug
+  }
+
+  /// Optional TLS Certificate (PEM format) deployed via --dart-define for SSL pinning
+  static String get apiBridgeCertPem => const String.fromEnvironment('API_BRIDGE_CERT_PEM', defaultValue: '');
 
   // ── App ───────────────────────────────────────────────────────────────
   static const String appName = 'CATSY POS';

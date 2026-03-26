@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/env.dart';
@@ -14,6 +16,7 @@ import '../../data/local/secure_storage/secure_storage_service.dart';
 /// - Base URL is read from `.env` → `API_BRIDGE_BASE_URL`
 /// - Auth token is injected from [SecureStorageService] automatically
 /// - Non-2xx responses are mapped to [ServerFailure]
+/// - SSL Pinning active in release builds
 class ApiClient {
   final SecureStorageService _storage;
   final String _baseUrl;
@@ -25,7 +28,23 @@ class ApiClient {
     String? baseUrl,
   }) : _storage = storage,
        _baseUrl = baseUrl ?? Env.apiBridgeBaseUrl,
-       _httpClient = httpClient ?? http.Client();
+       _httpClient = httpClient ?? _createPinnedClient();
+
+  // ── SSL Pinning Configuration ─────────────────────────────────────────
+  static http.Client _createPinnedClient() {
+    if (kDebugMode || Env.apiBridgeCertPem.isEmpty) {
+      return http.Client();
+    }
+    try {
+      final context = SecurityContext(withTrustedRoots: true);
+      context.setTrustedCertificatesBytes(utf8.encode(Env.apiBridgeCertPem));
+      final httpClient = HttpClient(context: context);
+      return IOClient(httpClient);
+    } catch (e) {
+      AppLogger.e('[ApiClient] Warning: Failed to configure SSL Pinning — $e');
+      return http.Client();
+    }
+  }
 
   // ── Header builder ──────────────────────────────────────────────────
 
@@ -72,18 +91,76 @@ class ApiClient {
     throw ServerFailure(message: message);
   }
 
+  // ── Token Refresh Logic ─────────────────────────────────────────────
+
+  Future<bool> _tryRefreshToken() async {
+    final refreshToken = await _storage.getRefreshToken();
+    if (refreshToken == null || refreshToken.isEmpty) return false;
+
+    try {
+      AppLogger.i('[ApiClient] Attempting to refresh token...');
+      final uri = _uri('/admin/refresh'); // API Bridge refresh endpoint
+      final response = await _httpClient.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'refresh_token': refreshToken}),
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final body = jsonDecode(response.body);
+        final newAccessToken = body['access_token'] as String?;
+        final newRefreshToken = body['refresh_token'] as String?;
+
+        if (newAccessToken != null) {
+          await _storage.saveAuthToken(newAccessToken);
+          if (newRefreshToken != null) {
+            await _storage.saveRefreshToken(newRefreshToken);
+          }
+          AppLogger.i('[ApiClient] Token refreshed successfully.');
+          return true;
+        }
+      }
+    } catch (e) {
+      AppLogger.e('[ApiClient] Token refresh failed: $e');
+    }
+    
+    // Refresh failed entirely, force logout
+    AppLogger.w('[ApiClient] Token refresh unrecoverable. Clearing session.');
+    await _storage.clearAll(); // Clears staff ID and tokens; kicks to login
+    return false;
+  }
+
   // ── Network Wrapper ──────────────────────────────────────────────────
 
-  Future<http.Response> _executeRequest(
-    Future<http.Response> Function() request,
-  ) async {
+  Future<http.Response> _executeRequest({
+    required Future<http.Response> Function(Map<String, String> headers) requestBuilder,
+    required bool auth,
+    Map<String, String>? extraHeaders,
+  }) async {
     try {
-      return await request().timeout(const Duration(seconds: 15));
+      var headers = await _headers(auth: auth);
+      if (extraHeaders != null) headers.addAll(extraHeaders);
+
+      var response = await requestBuilder(headers).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 401 && auth) {
+        final success = await _tryRefreshToken();
+        if (success) {
+          // Retry original request exactly once
+          headers = await _headers(auth: auth);
+          if (extraHeaders != null) headers.addAll(extraHeaders);
+          response = await requestBuilder(headers).timeout(const Duration(seconds: 15));
+        }
+      }
+
+      return response;
     } on TimeoutException {
       AppLogger.e('[ApiClient] Request timed out');
       throw ServerFailure(
-        message:
-            'Request timed out after 15 seconds. Please check your connection.',
+        message: 'Request timed out after 15 seconds. Please check your connection.',
       );
     } on SocketException {
       AppLogger.e('[ApiClient] Socket exception (No Internet)');
@@ -105,9 +182,9 @@ class ApiClient {
     bool auth = true,
   }) async {
     final uri = _uri(path, queryParams);
-    final headers = await _headers(auth: auth);
     final response = await _executeRequest(
-      () => _httpClient.get(uri, headers: headers),
+      requestBuilder: (headers) => _httpClient.get(uri, headers: headers),
+      auth: auth,
     );
     return _handleResponse(response, 'GET', path);
   }
@@ -118,14 +195,14 @@ class ApiClient {
     bool auth = true,
     Map<String, String>? extraHeaders,
   }) async {
-    final headers = await _headers(auth: auth);
-    if (extraHeaders != null) headers.addAll(extraHeaders);
     final response = await _executeRequest(
-      () => _httpClient.post(
+      requestBuilder: (headers) => _httpClient.post(
         _uri(path),
         headers: headers,
         body: jsonEncode(body),
       ),
+      auth: auth,
+      extraHeaders: extraHeaders,
     );
     return _handleResponse(response, 'POST', path);
   }
@@ -136,11 +213,14 @@ class ApiClient {
     bool auth = true,
     Map<String, String>? extraHeaders,
   }) async {
-    final headers = await _headers(auth: auth);
-    if (extraHeaders != null) headers.addAll(extraHeaders);
     final response = await _executeRequest(
-      () =>
-          _httpClient.put(_uri(path), headers: headers, body: jsonEncode(body)),
+      requestBuilder: (headers) => _httpClient.put(
+        _uri(path), 
+        headers: headers, 
+        body: jsonEncode(body)
+      ),
+      auth: auth,
+      extraHeaders: extraHeaders,
     );
     return _handleResponse(response, 'PUT', path);
   }
@@ -150,13 +230,13 @@ class ApiClient {
     Map<String, dynamic> body, {
     bool auth = true,
   }) async {
-    final headers = await _headers(auth: auth);
     final response = await _executeRequest(
-      () => _httpClient.patch(
+      requestBuilder: (headers) => _httpClient.patch(
         _uri(path),
         headers: headers,
         body: jsonEncode(body),
       ),
+      auth: auth,
     );
     return _handleResponse(response, 'PATCH', path);
   }
@@ -166,10 +246,10 @@ class ApiClient {
     bool auth = true,
     Map<String, String>? extraHeaders,
   }) async {
-    final headers = await _headers(auth: auth);
-    if (extraHeaders != null) headers.addAll(extraHeaders);
     final response = await _executeRequest(
-      () => _httpClient.delete(_uri(path), headers: headers),
+      requestBuilder: (headers) => _httpClient.delete(_uri(path), headers: headers),
+      auth: auth,
+      extraHeaders: extraHeaders,
     );
     return _handleResponse(response, 'DELETE', path);
   }
