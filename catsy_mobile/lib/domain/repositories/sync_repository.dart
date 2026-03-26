@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/sync_action.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/sync_action.dart';
 
 /// Abstract contract for offline sync queue management.
 abstract class SyncRepository {

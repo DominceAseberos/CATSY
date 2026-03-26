@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../config/theme/app_colors.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 /// Displays an animated illustration + message when a list is empty.
 class EmptyStateWidget extends StatefulWidget {
@@ -61,13 +61,13 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.08),
+                      color: AppColors.primary.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       widget.icon,
                       size: 64,
-                      color: AppColors.primary.withOpacity(0.6),
+                      color: AppColors.primary.withValues(alpha: 0.6),
                     ),
                   ),
                 );

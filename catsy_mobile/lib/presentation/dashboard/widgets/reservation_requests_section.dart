@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../reservation/providers/reservation_provider.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../domain/entities/reservation.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/presentation/reservation/providers/reservation_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
 
 class ReservationRequestsSection extends ConsumerWidget {
-  const ReservationRequestsSection({Key? key}) : super(key: key);
+  const ReservationRequestsSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +42,7 @@ class ReservationRequestsSection extends ConsumerWidget {
                   height: 24,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.dashboardPurple.withOpacity(0.8),
+                    color: AppColors.dashboardPurple.withValues(alpha: 0.8),
                   ),
                   child: Center(
                     child: Text(
@@ -89,10 +89,9 @@ class _ReservationCard extends ConsumerWidget {
   final Reservation reservation;
   final int index;
   const _ReservationCard({
-    Key? key,
     required this.reservation,
     required this.index,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -117,7 +116,7 @@ class _ReservationCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -149,8 +148,8 @@ class _ReservationCard extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isVerified
-                            ? AppColors.dashboardGreen.withOpacity(0.1)
-                            : AppColors.dashboardRed.withOpacity(0.1),
+                            ? AppColors.dashboardGreen.withValues(alpha: 0.1)
+                            : AppColors.dashboardRed.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -189,8 +188,8 @@ class _ReservationCard extends ConsumerWidget {
                       .read(reservationControllerProvider.notifier)
                       .rejectReservation(
                         reservation.id,
-                        "staff_123",
-                        "User rejected",
+                        'staff_123',
+                        'User rejected',
                       );
                 },
                 child: Container(
@@ -198,7 +197,7 @@ class _ReservationCard extends ConsumerWidget {
                   height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.dashboardRed.withOpacity(0.1),
+                    color: AppColors.dashboardRed.withValues(alpha: 0.1),
                   ),
                   child: const Icon(
                     Icons.close,
@@ -213,14 +212,14 @@ class _ReservationCard extends ConsumerWidget {
                 onTap: () {
                   ref
                       .read(reservationControllerProvider.notifier)
-                      .approveReservation(reservation.id, "staff_123");
+                      .approveReservation(reservation.id, 'staff_123');
                 },
                 child: Container(
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.dashboardGreen.withOpacity(0.1),
+                    color: AppColors.dashboardGreen.withValues(alpha: 0.1),
                   ),
                   child: const Icon(
                     Icons.check,

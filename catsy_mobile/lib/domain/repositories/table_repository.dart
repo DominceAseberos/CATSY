@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/cafe_table.dart';
-import '../enums/table_status.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/cafe_table.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
 
 /// Abstract contract for table management.
 abstract class TableRepository {

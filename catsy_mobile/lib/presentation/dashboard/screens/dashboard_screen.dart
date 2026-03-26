@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/theme/app_colors.dart';
-import '../../../config/routes/route_names.dart';
-import '../../../data/local/providers.dart';
-import '../../../sync/sync_providers.dart';
-import '../../common_widgets/sync_progress_widget.dart';
-import '../../table_management/providers/table_provider.dart';
-import '../../table_management/widgets/table_tile.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../providers/dashboard_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/sync/sync_providers.dart';
+import 'package:catsy_pos/presentation/common_widgets/sync_progress_widget.dart';
+import 'package:catsy_pos/presentation/table_management/providers/table_provider.dart';
+import 'package:catsy_pos/presentation/table_management/widgets/table_tile.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_provider.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_provider.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -319,9 +319,9 @@ class _ProfileDropdown extends ConsumerWidget {
             const SizedBox(width: 6),
             Text(
               user.when(
-                data: (u) => u?.firstName ?? 'Staff',
+                data: (u) => u?.name ?? 'Staff',
                 loading: () => '...',
-                error: (_, __) => 'Staff',
+                error: (_, _) => 'Staff',
               ),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -345,13 +345,13 @@ class _ProfileDropdown extends ConsumerWidget {
             children: [
               Text(
                 user.when(
-                  data: (u) => '${u?.firstName ?? ""} ${u?.lastName ?? ""}',
+                  data: (u) => u?.name ?? '',
                   loading: () => 'Loading...',
-                  error: (_, __) => 'Staff',
+                  error: (_, _) => 'Staff',
                 ),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
+              const Text(
                 'Staff',
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
@@ -392,7 +392,7 @@ class _ProfileDropdown extends ConsumerWidget {
         const PopupMenuDivider(),
         PopupMenuItem(
           value: 'logout',
-          child: Row(
+          child: const Row(
             children: [
               Icon(Icons.logout, size: 20, color: AppColors.error),
               SizedBox(width: 12),
@@ -448,10 +448,10 @@ class _ActionRequiredCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(Icons.priority_high, color: AppColors.error, size: 20),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text(
                 'ACTION REQUIRED',
                 style: TextStyle(
@@ -593,7 +593,7 @@ class _TableLegend extends StatelessWidget {
         );
       },
       loading: () => const SizedBox(),
-      error: (_, __) => const SizedBox(),
+      error: (_, _) => const SizedBox(),
     );
   }
 }

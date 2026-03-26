@@ -1,10 +1,10 @@
-﻿import '../../domain/entities/order.dart';
-import '../../domain/entities/order_item.dart';
-import '../../domain/enums/order_status.dart';
-import '../../domain/enums/order_type.dart';
-import '../../domain/enums/payment_method.dart';
-import '../../domain/enums/payment_status.dart';
-import '../remote/dtos/order_dto.dart';
+import 'package:catsy_pos/domain/entities/order.dart';
+import 'package:catsy_pos/domain/entities/order_item.dart';
+import 'package:catsy_pos/domain/enums/order_status.dart';
+import 'package:catsy_pos/domain/enums/order_type.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
+import 'package:catsy_pos/domain/enums/payment_status.dart';
+import 'package:catsy_pos/data/remote/dtos/order_dto.dart';
 
 class OrderMapper {
   static Order fromDto(OrderDto dto) => Order(

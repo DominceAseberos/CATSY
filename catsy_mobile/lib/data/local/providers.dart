@@ -1,22 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/network/api_client.dart';
-import '../../data/local/database/app_database.dart';
-import '../../data/repositories/inventory_repository_impl.dart';
-import '../../data/repositories/order_repository_impl.dart';
-import '../../data/repositories/product_repository_impl.dart';
-import '../../data/repositories/reservation_repository_impl.dart';
-import '../../data/repositories/table_repository_impl.dart';
-import '../../domain/repositories/inventory_repository.dart';
-import '../../domain/repositories/order_repository.dart';
-import '../../domain/repositories/product_repository.dart';
-import '../../domain/repositories/reservation_repository.dart';
-import '../../domain/repositories/table_repository.dart';
-import 'secure_storage/secure_storage_service.dart';
-import '../../domain/repositories/customer_repository.dart';
-import '../../data/repositories/customer_repository_impl.dart';
-import '../../domain/repositories/reward_repository.dart';
-import '../../data/repositories/reward_repository_impl.dart';
-import '../../core/network/connectivity_service.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/repositories/inventory_repository_impl.dart';
+import 'package:catsy_pos/data/repositories/order_repository_impl.dart';
+import 'package:catsy_pos/data/repositories/product_repository_impl.dart';
+import 'package:catsy_pos/data/repositories/reservation_repository_impl.dart';
+import 'package:catsy_pos/data/repositories/table_repository_impl.dart';
+import 'package:catsy_pos/domain/repositories/inventory_repository.dart';
+import 'package:catsy_pos/domain/repositories/order_repository.dart';
+import 'package:catsy_pos/domain/repositories/product_repository.dart';
+import 'package:catsy_pos/domain/repositories/reservation_repository.dart';
+import 'package:catsy_pos/domain/repositories/table_repository.dart';
+
+import 'package:catsy_pos/domain/repositories/customer_repository.dart';
+import 'package:catsy_pos/data/repositories/customer_repository_impl.dart';
+import 'package:catsy_pos/domain/repositories/reward_repository.dart';
+import 'package:catsy_pos/data/repositories/reward_repository_impl.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
 
 // ── Database Provider ────────────────────────────────────────────────────────
 // Re-exporting from app_database.dart for convenience, or we can just rely on the import.
@@ -95,7 +95,6 @@ final authDaoProvider = Provider(
   (ref) => ref.watch(appDatabaseProvider).authDao,
 );
 
-final secureStorageServiceProvider = Provider((ref) => SecureStorageService());
 
 // ── Table Providers ─────────────────────────────────────────────────────────
 
@@ -161,6 +160,6 @@ final rewardRepositoryProvider = Provider<RewardRepository>((ref) {
   return RewardRepositoryImpl(
     rewardDao: ref.watch(rewardDaoProvider),
     customerDao: ref.watch(customerDaoProvider),
-    connectivity: ConnectivityService(),
+    connectivity: ref.watch(connectivityServiceProvider),
   );
 });

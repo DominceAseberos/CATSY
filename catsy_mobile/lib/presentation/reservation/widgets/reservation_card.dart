@@ -1,9 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/reservation.dart';
-import '../../../../domain/enums/reservation_status.dart';
-import '../providers/reservation_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
+import 'package:catsy_pos/domain/enums/reservation_status.dart';
+import 'package:catsy_pos/presentation/reservation/providers/reservation_provider.dart';
 
 class ReservationCard extends ConsumerWidget {
   final Reservation reservation;
@@ -50,7 +50,7 @@ class ReservationCard extends ConsumerWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: color),
                   ),

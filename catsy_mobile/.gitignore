@@ -48,3 +48,4 @@ app.*.map.json
 # Environment — NEVER commit secrets
 .env
 .env.*
+key.properties

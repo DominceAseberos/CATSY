@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import '../../domain/entities/order.dart';
-import '../../domain/entities/customer.dart';
+import 'package:catsy_pos/domain/entities/order.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
 
-import '../../presentation/auth/screens/login_screen.dart';
-import '../../presentation/auth/screens/splash_screen.dart';
-import '../../presentation/dashboard/screens/new_dashboard_screen.dart';
-import '../../presentation/reservation/screens/reservation_screen.dart';
-import '../../presentation/table_management/screens/table_management_screen.dart';
-import '../../presentation/order/screens/product_catalog_screen.dart';
-import '../../presentation/order/screens/order_builder_screen.dart';
-import '../../presentation/order/screens/order_summary_screen.dart';
-import '../../presentation/order/screens/payment_screen.dart';
-import '../../presentation/loyalty/screens/qr_scanner_screen.dart';
-import '../../presentation/loyalty/screens/customer_search_screen.dart';
-import '../../presentation/loyalty/screens/stamp_result_screen.dart';
-import '../../presentation/reward/screens/claim_reward_screen.dart';
-import '../../presentation/history/screens/order_history_screen.dart';
-import '../../presentation/history/screens/transaction_detail_screen.dart';
-import '../../presentation/inventory/screens/stock_overview_screen.dart';
-import '../../presentation/receipt/screens/receipt_preview_screen.dart';
-import '../../presentation/sync/screens/sync_status_screen.dart';
-import 'route_names.dart';
-import 'page_transitions.dart';
+import 'package:catsy_pos/presentation/auth/screens/login_screen.dart';
+import 'package:catsy_pos/presentation/auth/screens/splash_screen.dart';
+import 'package:catsy_pos/presentation/dashboard/screens/new_dashboard_screen.dart';
+import 'package:catsy_pos/presentation/reservation/screens/reservation_screen.dart';
+import 'package:catsy_pos/presentation/table_management/screens/table_management_screen.dart';
+import 'package:catsy_pos/presentation/order/screens/product_catalog_screen.dart';
+import 'package:catsy_pos/presentation/order/screens/order_builder_screen.dart';
+import 'package:catsy_pos/presentation/order/screens/order_summary_screen.dart';
+import 'package:catsy_pos/presentation/order/screens/payment_screen.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/qr_scanner_screen.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/customer_search_screen.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/stamp_result_screen.dart';
+import 'package:catsy_pos/presentation/reward/screens/claim_reward_screen.dart';
+import 'package:catsy_pos/presentation/history/screens/order_history_screen.dart';
+import 'package:catsy_pos/presentation/history/screens/transaction_detail_screen.dart';
+import 'package:catsy_pos/presentation/inventory/screens/stock_overview_screen.dart';
+import 'package:catsy_pos/presentation/receipt/screens/receipt_preview_screen.dart';
+import 'package:catsy_pos/presentation/sync/screens/sync_status_screen.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/config/routes/page_transitions.dart';
 
 /// GoRouter configuration for the entire CATSY POS app.
 class AppRouter {

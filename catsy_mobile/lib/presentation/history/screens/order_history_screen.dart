@@ -1,14 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/routes/route_names.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
 import 'package:go_router/go_router.dart';
-import '../../../data/local/database/app_database.dart';
-import '../providers/history_provider.dart';
-import '../../common_widgets/empty_state_widget.dart';
-import '../../common_widgets/shimmer_loading.dart';
-import '../../common_widgets/animated_list_item.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/presentation/history/providers/history_provider.dart';
+import 'package:catsy_pos/presentation/common_widgets/empty_state_widget.dart';
+import 'package:catsy_pos/presentation/common_widgets/shimmer_loading.dart';
+import 'package:catsy_pos/presentation/common_widgets/animated_list_item.dart';
 
 class OrderHistoryScreen extends ConsumerStatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -152,7 +152,7 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
                     ),
                   ),
                 ),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
               ),
             ),
 

@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import '../../config/app_constants.dart';
+import 'package:catsy_pos/config/app_constants.dart';
 
 /// Currency formatting utilities for PH Peso (₱).
 class CurrencyFormatter {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'config/routes/app_router.dart';
-import 'config/theme/app_theme.dart';
-import 'presentation/common_widgets/connectivity_banner.dart';
+import 'package:catsy_pos/config/routes/app_router.dart';
+import 'package:catsy_pos/config/theme/app_theme.dart';
+import 'package:catsy_pos/presentation/common_widgets/connectivity_banner.dart';
 
 /// Root widget of the CATSY POS application.
 class CatsyPosApp extends StatelessWidget {

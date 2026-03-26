@@ -1,6 +1,6 @@
-import '../../domain/entities/reservation.dart';
-import '../../domain/enums/reservation_status.dart';
-import '../remote/dtos/reservation_dto.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
+import 'package:catsy_pos/domain/enums/reservation_status.dart';
+import 'package:catsy_pos/data/remote/dtos/reservation_dto.dart';
 
 class ReservationMapper {
   static Reservation fromDto(ReservationDto dto) => Reservation(

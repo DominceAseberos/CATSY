@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme/app_colors.dart';
-import '../../core/network/connectivity_service.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
 
 /// Banner shown at the top of the screen when the device is offline.
 class ConnectivityBanner extends ConsumerWidget {

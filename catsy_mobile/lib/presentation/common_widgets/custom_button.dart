@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../config/theme/app_colors.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 /// Primary action button with loading state.
 class CustomButton extends StatelessWidget {

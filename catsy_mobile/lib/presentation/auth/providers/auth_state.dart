@@ -1,4 +1,4 @@
-import '../../../domain/entities/staff.dart';
+import 'package:catsy_pos/domain/entities/staff.dart';
 
 /// Possible authentication statuses.
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }

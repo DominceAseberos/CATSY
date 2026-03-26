@@ -1,15 +1,15 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../providers/product_controller.dart';
-import '../providers/cart_controller.dart';
-import 'order_builder_screen.dart';
-import 'item_details_screen.dart';
-import '../../inventory/providers/inventory_provider.dart';
-import '../widgets/product_card.dart';
-import '../../../../data/local/seeder/data_seeder.dart';
-import '../../common_widgets/shimmer_loading.dart';
-import '../../common_widgets/animated_list_item.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/order/providers/product_controller.dart';
+import 'package:catsy_pos/presentation/order/providers/cart_controller.dart';
+import 'package:catsy_pos/presentation/order/screens/order_builder_screen.dart';
+import 'package:catsy_pos/presentation/order/screens/item_details_screen.dart';
+import 'package:catsy_pos/presentation/inventory/providers/inventory_provider.dart';
+import 'package:catsy_pos/presentation/order/widgets/product_card.dart';
+import 'package:catsy_pos/data/local/seeder/data_seeder.dart';
+import 'package:catsy_pos/presentation/common_widgets/shimmer_loading.dart';
+import 'package:catsy_pos/presentation/common_widgets/animated_list_item.dart';
 
 class ProductCatalogScreen extends ConsumerWidget {
   const ProductCatalogScreen({super.key});
@@ -204,7 +204,7 @@ class ProductCatalogScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 20,
                         offset: const Offset(0, 6),
                       ),

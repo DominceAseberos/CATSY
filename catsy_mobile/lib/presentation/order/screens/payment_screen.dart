@@ -1,18 +1,22 @@
-﻿import 'package:flutter/material.dart';
+// ignore_for_file: deprecated_member_use
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../config/routes/route_names.dart';
-import '../../../../domain/enums/payment_method.dart';
-import '../../../../domain/models/payment_details.dart';
-import '../../../../data/local/providers.dart';
-import '../providers/cart_controller.dart';
-import '../../loyalty/screens/qr_scanner_screen.dart' as import_loyalty;
-import '../../common_widgets/success_overlay.dart';
-import '../../../../core/error/app_error_handler.dart';
-import '../../../../core/utils/app_haptics.dart';
-import '../../../../core/utils/app_audio.dart';
-import '../../common_widgets/error_snackbar.dart';
+
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/core/error/app_error_handler.dart';
+import 'package:catsy_pos/core/utils/app_audio.dart';
+import 'package:catsy_pos/core/utils/app_haptics.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/enums/payment_method.dart';
+import 'package:catsy_pos/domain/models/payment_details.dart';
+import 'package:catsy_pos/presentation/common_widgets/error_snackbar.dart';
+import 'package:catsy_pos/presentation/common_widgets/success_overlay.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/qr_scanner_screen.dart' as import_loyalty;
+import 'package:catsy_pos/presentation/order/providers/cart_controller.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   const PaymentScreen({super.key});
@@ -24,6 +28,72 @@ class PaymentScreen extends ConsumerStatefulWidget {
 class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   PaymentMethod _selectedMethod = PaymentMethod.cash;
   bool _isProcessing = false;
+
+  Future<void> _processPayment(BuildContext context, dynamic cart) async {
+    setState(() => _isProcessing = true);
+    try {
+      final payment = PaymentDetails(
+        method: _selectedMethod,
+        amountTendered: cart.total,
+      );
+
+      final order = await ref
+          .read(orderRepositoryProvider)
+          .createOrder(cart, payment);
+
+      // Clear cart
+      ref.read(cartProvider.notifier).clearCart();
+
+      if (!context.mounted) return;
+      unawaited(AppAudio.playSuccess());
+      unawaited(AppHaptics.mediumImpact());
+      await SuccessOverlay.show(
+        context,
+        message: 'Payment Successful!',
+      );
+
+      if (!context.mounted) return;
+      final wantLoyalty = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Collect Points?'),
+          content: const Text(
+            'Does the customer want to collect loyalty points?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('NO'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('YES'),
+            ),
+          ],
+        ),
+      );
+
+      if (!context.mounted) return;
+      if (wantLoyalty == true) {
+        unawaited(Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => import_loyalty.QrScannerScreen(order: order),
+          ),
+        ));
+      } else {
+        context.goNamed(
+          RouteNames.receiptPreview,
+          extra: order.id,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ErrorSnackBar.show(context, AppErrorHandler.getMessage(e));
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +109,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -77,88 +147,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: _isProcessing
-                    ? null
-                    : () async {
-                        setState(() => _isProcessing = true);
-                        try {
-                          final payment = PaymentDetails(
-                            method: _selectedMethod,
-                            amountTendered:
-                                cart.total, // Assuming exact amount for now
-                          );
-
-                          final order = await ref
-                              .read(orderRepositoryProvider)
-                              .createOrder(cart, payment);
-
-                          // Clear cart
-                          ref.read(cartProvider.notifier).clearCart();
-
-                          if (mounted) {
-                            AppAudio.playSuccess();
-                            AppHaptics.mediumImpact();
-                            await SuccessOverlay.show(
-                              context,
-                              message: 'Payment Successful!',
-                            );
-                          }
-
-                          if (mounted) {
-                            // Ask for Loyalty
-                            final wantLoyalty = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Collect Points?'),
-                                content: const Text(
-                                  'Does the customer want to collect loyalty points?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, false),
-                                    child: const Text('NO'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, true),
-                                    child: const Text('YES'),
-                                  ),
-                                ],
-                              ),
-                            );
-
-                            if (mounted) {
-                              if (wantLoyalty == true) {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        import_loyalty.QrScannerScreen(
-                                          order: order,
-                                        ),
-                                  ),
-                                );
-                              } else {
-                                if (context.mounted) {
-                                  context.goNamed(
-                                    RouteNames.receiptPreview,
-                                    extra: order.id,
-                                  );
-                                }
-                              }
-                            }
-                          }
-                        } catch (e) {
-                          if (mounted) {
-                            ErrorSnackBar.show(
-                              context,
-                              AppErrorHandler.getMessage(e),
-                            );
-                          }
-                        } finally {
-                          if (mounted) setState(() => _isProcessing = false);
-                        }
-                      },
+                onPressed:
+                    _isProcessing ? null : () => _processPayment(context, cart),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../../config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 class StampsSection extends ConsumerWidget {
-  const StampsSection({Key? key}) : super(key: key);
+  const StampsSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,15 +15,15 @@ class StampsSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.loyalty_rounded,
                 color: AppColors.textPrimary,
                 size: 20,
               ),
-              const SizedBox(width: 8),
-              const Text(
+              SizedBox(width: 8),
+              Text(
                 'Stamps',
                 style: TextStyle(
                   fontSize: 18,
@@ -71,11 +71,10 @@ class _StampCard extends StatelessWidget {
   final Color color;
 
   const _StampCard({
-    Key? key,
     required this.title,
     required this.count,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,7 @@ class _StampCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

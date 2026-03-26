@@ -3,21 +3,21 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/app_constants.dart';
-import '../core/network/api_client.dart';
-import '../core/network/connectivity_service.dart';
-import '../core/utils/logger.dart';
-import '../data/local/database/app_database.dart';
-import '../data/local/secure_storage/secure_storage_service.dart';
-import '../data/remote/sources/customer_remote_source.dart';
-import '../data/remote/sources/inventory_remote_source.dart';
-import '../data/remote/sources/order_remote_source.dart';
-import '../data/remote/sources/product_remote_source.dart';
-import '../data/remote/sources/reservation_remote_source.dart';
-import '../data/remote/sources/reward_remote_source.dart';
-import '../data/remote/sources/table_remote_source.dart';
-import 'sync_providers.dart';
-import 'sync_queue_manager.dart';
+import 'package:catsy_pos/config/app_constants.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/secure_storage/secure_storage_service.dart';
+import 'package:catsy_pos/data/remote/sources/customer_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/inventory_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/order_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/product_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/reservation_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/reward_remote_source.dart';
+import 'package:catsy_pos/data/remote/sources/table_remote_source.dart';
+import 'package:catsy_pos/sync/sync_providers.dart';
+import 'package:catsy_pos/sync/sync_queue_manager.dart';
 
 /// Orchestrates all sync operations with three lifecycle hooks:
 ///
@@ -42,6 +42,7 @@ class SyncEngine {
   SecureStorageService get _storage => _ref.read(secureStorageServiceProvider);
   SyncStatusNotifier get _status => _ref.read(syncStatusProvider.notifier);
   IsSyncingNotifier get _legacySyncing => _ref.read(isSyncingProvider.notifier);
+  ConnectivityService get _connectivity => _ref.read(connectivityServiceProvider);
 
   SyncQueueManager get _queueManager => SyncQueueManager(
     dao: _db.syncQueueDao,
@@ -74,7 +75,7 @@ class SyncEngine {
   /// Runs a full paginated pull of all resources, then drains the queue so
   /// any optimistic mutations created offline reach the server.
   Future<void> onLogin() async {
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (!isOnline) {
       AppLogger.i('[SyncEngine] Login sync skipped — offline');
       return;
@@ -97,7 +98,7 @@ class SyncEngine {
   ///
   /// Pushes any remaining queued mutations so data is not lost.
   Future<void> onLogout() async {
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (!isOnline) {
       AppLogger.i('[SyncEngine] Logout sync skipped — offline');
       return;
@@ -117,7 +118,7 @@ class SyncEngine {
   /// 2. Schedules a periodic incremental sync every 5 minutes
   void start() {
     AppLogger.i('[SyncEngine] Starting…');
-    _connectivitySub = ConnectivityService().onConnectivityChanged.listen((
+    _connectivitySub = _connectivity.onConnectivityChanged.listen((
       isOnline,
     ) {
       if (isOnline) {
@@ -155,7 +156,7 @@ class SyncEngine {
   // ── Incremental sync (periodic) ────────────────────────────────────────
 
   Future<void> _incrementalSync() async {
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (!isOnline) return;
     await _guardedSync(() async {
       _setSyncing(true);

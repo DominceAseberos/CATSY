@@ -1,5 +1,5 @@
-import '../../../core/network/api_client.dart';
-import '../dtos/reward_dto.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/reward_dto.dart';
 
 class RewardRemoteSource {
   final ApiClient _api;

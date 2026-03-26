@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import '../core/utils/logger.dart';
-import '../data/local/database/daos/sync_queue_dao.dart';
+import 'package:catsy_pos/core/utils/logger.dart';
+import 'package:catsy_pos/data/local/database/daos/sync_queue_dao.dart';
 
 /// Resolves conflicts between local and remote data.
 ///

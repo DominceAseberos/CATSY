@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:uuid/uuid.dart';
-import 'product.dart';
-import 'addon.dart';
+import 'package:catsy_pos/domain/entities/product.dart';
+import 'package:catsy_pos/domain/entities/addon.dart';
 
 class CartItem extends Equatable {
   final String id;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/dashboard_data_provider.dart';
-import '../../../config/theme/app_colors.dart';
+import 'package:catsy_pos/presentation/dashboard/providers/dashboard_data_provider.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
 
 class RewardRequestsSection extends ConsumerWidget {
-  const RewardRequestsSection({Key? key}) : super(key: key);
+  const RewardRequestsSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,7 +97,7 @@ class RewardRequestsSection extends ConsumerWidget {
 class _RewardCard extends StatelessWidget {
   final RewardWithCustomer request;
 
-  const _RewardCard({Key? key, required this.request}) : super(key: key);
+  const _RewardCard({required this.request});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,7 @@ class _RewardCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -188,7 +188,7 @@ class _RewardCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.dashboardPurple.withOpacity(0.1),
+                        color: AppColors.dashboardPurple.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(

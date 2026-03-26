@@ -1,14 +1,15 @@
-﻿import 'package:dartz/dartz.dart';
+import 'dart:async';
+import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../core/error/failures.dart';
-import '../../core/network/api_client.dart';
-import '../../data/remote/dtos/table_dto.dart';
-import '../../data/remote/sources/table_remote_source.dart';
-import '../../domain/entities/cafe_table.dart';
-import '../../domain/enums/table_status.dart';
-import '../../domain/repositories/table_repository.dart';
-import '../local/database/daos/table_dao.dart';
-import '../local/database/app_database.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/table_dto.dart';
+import 'package:catsy_pos/data/remote/sources/table_remote_source.dart';
+import 'package:catsy_pos/domain/entities/cafe_table.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
+import 'package:catsy_pos/domain/repositories/table_repository.dart';
+import 'package:catsy_pos/data/local/database/daos/table_dao.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
 
 /// Phase 2 — LOCAL + REMOTE sync. Uses TableDao (local) and TableRemoteSource (remote).
 class TableRepositoryImpl implements TableRepository {
@@ -101,7 +102,7 @@ class TableRepositoryImpl implements TableRepository {
 
       // 2. If online, push to remote (fire-and-forget — don't block local success)
       if (_apiClient != null) {
-        TableRemoteSource(_apiClient)
+        unawaited(TableRemoteSource(_apiClient)
             .createTable(
               TableDto(
                 id: table.id,
@@ -111,7 +112,7 @@ class TableRepositoryImpl implements TableRepository {
                 currentOrderId: table.currentOrderId,
               ),
             )
-            .catchError((e) => throw Exception('[TableRepo] Remote create failed: $e'));
+            .catchError((e) => throw Exception('[TableRepo] Remote create failed: $e')));
       }
 
       return const Right(null);
@@ -128,9 +129,9 @@ class TableRepositoryImpl implements TableRepository {
 
       // 2. If online, delete from remote too (fire-and-forget)
       if (_apiClient != null) {
-        TableRemoteSource(_apiClient)
+        unawaited(TableRemoteSource(_apiClient)
             .deleteTable(id)
-            .catchError((e) => throw Exception('[TableRepo] Remote delete failed: $e'));
+            .catchError((e) => throw Exception('[TableRepo] Remote delete failed: $e')));
       }
 
       return const Right(null);

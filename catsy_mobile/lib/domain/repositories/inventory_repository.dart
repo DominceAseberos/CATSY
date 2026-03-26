@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../core/error/failures.dart';
-import '../entities/inventory_item.dart';
+import 'package:catsy_pos/core/error/failures.dart';
+import 'package:catsy_pos/domain/entities/inventory_item.dart';
 
 abstract class InventoryRepository {
   /// Watch all inventory items (stream).

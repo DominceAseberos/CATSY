@@ -1,8 +1,8 @@
-﻿import 'package:drift/drift.dart';
+import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
-import '../app_database.dart';
-import '../tables/sync_queue_table.dart';
-import '../tables/sync_conflict_log_table.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/sync_queue_table.dart';
+import 'package:catsy_pos/data/local/database/tables/sync_conflict_log_table.dart';
 
 part 'sync_queue_dao.g.dart';
 

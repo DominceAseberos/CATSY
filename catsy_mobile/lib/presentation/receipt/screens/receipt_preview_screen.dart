@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/theme/app_colors.dart';
-import '../../../config/routes/route_names.dart';
-import '../../../data/local/providers.dart';
-import '../providers/receipt_provider.dart';
-import '../widgets/receipt_template.dart';
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/config/routes/route_names.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/presentation/receipt/providers/receipt_provider.dart';
+import 'package:catsy_pos/presentation/receipt/widgets/receipt_template.dart';
 
 class ReceiptPreviewScreen extends ConsumerStatefulWidget {
   final String orderId;
@@ -102,10 +102,10 @@ class _OrderDetailLoader extends ConsumerWidget {
           );
         }
         if (snapshot.hasError || snapshot.data == null) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Icon(Icons.error_outline, color: AppColors.error, size: 48),
                 SizedBox(height: 12),
                 Text('Could not load receipt'),

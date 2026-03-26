@@ -7,36 +7,36 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 // ── Table imports ──────────────────────────────────────────────────────
-import 'tables/staff_table.dart';
-import 'tables/products_table.dart';
-import 'tables/categories_table.dart';
-import 'tables/addons_table.dart';
-import 'tables/orders_table.dart';
-import 'tables/order_items_table.dart';
-import 'tables/order_item_addons_table.dart';
-import 'tables/reservations_table.dart';
-import 'tables/cafe_tables_table.dart';
-import 'tables/customers_table.dart';
-import 'tables/loyalty_stamps_table.dart';
-import 'tables/inventory_table.dart';
-import 'tables/transactions_table.dart';
-import 'tables/receipts_table.dart';
-import 'tables/rewards_table.dart';
-import 'tables/sync_queue_table.dart';
-import 'tables/sync_conflict_log_table.dart';
+import 'package:catsy_pos/data/local/database/tables/staff_table.dart';
+import 'package:catsy_pos/data/local/database/tables/products_table.dart';
+import 'package:catsy_pos/data/local/database/tables/categories_table.dart';
+import 'package:catsy_pos/data/local/database/tables/addons_table.dart';
+import 'package:catsy_pos/data/local/database/tables/orders_table.dart';
+import 'package:catsy_pos/data/local/database/tables/order_items_table.dart';
+import 'package:catsy_pos/data/local/database/tables/order_item_addons_table.dart';
+import 'package:catsy_pos/data/local/database/tables/reservations_table.dart';
+import 'package:catsy_pos/data/local/database/tables/cafe_tables_table.dart';
+import 'package:catsy_pos/data/local/database/tables/customers_table.dart';
+import 'package:catsy_pos/data/local/database/tables/loyalty_stamps_table.dart';
+import 'package:catsy_pos/data/local/database/tables/inventory_table.dart';
+import 'package:catsy_pos/data/local/database/tables/transactions_table.dart';
+import 'package:catsy_pos/data/local/database/tables/receipts_table.dart';
+import 'package:catsy_pos/data/local/database/tables/rewards_table.dart';
+import 'package:catsy_pos/data/local/database/tables/sync_queue_table.dart';
+import 'package:catsy_pos/data/local/database/tables/sync_conflict_log_table.dart';
 
 // ── DAO imports ────────────────────────────────────────────────────────
-import 'daos/auth_dao.dart';
-import 'daos/product_dao.dart';
-import 'daos/order_dao.dart';
-import 'daos/inventory_dao.dart';
-import 'daos/customer_dao.dart';
-import 'daos/reservation_dao.dart';
-import 'daos/table_dao.dart';
-import 'daos/transaction_dao.dart';
-import 'daos/sync_queue_dao.dart';
-import 'daos/reward_dao.dart';
-import 'daos/receipt_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/auth_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/product_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/order_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/inventory_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/customer_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/reservation_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/table_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/transaction_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/sync_queue_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/reward_dao.dart';
+import 'package:catsy_pos/data/local/database/daos/receipt_dao.dart';
 
 part 'app_database.g.dart';
 

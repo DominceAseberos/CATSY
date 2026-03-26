@@ -2,10 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:uuid/uuid.dart';
 
-import '../../../../data/local/providers.dart';
-import '../../../../domain/entities/cafe_table.dart';
-import '../../../../domain/enums/table_status.dart';
-import '../../../../domain/repositories/table_repository.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/entities/cafe_table.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
+import 'package:catsy_pos/domain/repositories/table_repository.dart';
 
 // ── Stream Provider ──────────────────────────────────────────────────────────
 

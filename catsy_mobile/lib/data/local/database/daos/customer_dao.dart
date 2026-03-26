@@ -1,7 +1,7 @@
-﻿import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/customers_table.dart';
-import '../tables/loyalty_stamps_table.dart';
+import 'package:drift/drift.dart';
+import 'package:catsy_pos/data/local/database/app_database.dart';
+import 'package:catsy_pos/data/local/database/tables/customers_table.dart';
+import 'package:catsy_pos/data/local/database/tables/loyalty_stamps_table.dart';
 
 part 'customer_dao.g.dart';
 

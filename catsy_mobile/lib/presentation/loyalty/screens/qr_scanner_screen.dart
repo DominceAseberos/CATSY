@@ -1,15 +1,18 @@
-﻿import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../../../config/theme/app_colors.dart';
-import '../../../../domain/entities/order.dart';
-import '../../../../domain/entities/customer.dart';
-import '../../../../data/local/providers.dart';
-import 'customer_search_screen.dart';
-import 'stamp_result_screen.dart';
-import '../../../../core/utils/app_haptics.dart';
-import '../../../../core/utils/app_audio.dart';
-import '../../common_widgets/error_snackbar.dart';
+
+import 'package:catsy_pos/config/theme/app_colors.dart';
+import 'package:catsy_pos/core/utils/app_audio.dart';
+import 'package:catsy_pos/core/utils/app_haptics.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/entities/customer.dart';
+import 'package:catsy_pos/domain/entities/order.dart';
+import 'package:catsy_pos/presentation/common_widgets/error_snackbar.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/customer_search_screen.dart';
+import 'package:catsy_pos/presentation/loyalty/screens/stamp_result_screen.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
   final Order? order;
@@ -44,8 +47,8 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
     setState(() => _isProcessing = true);
 
     // Provide feedback a code was successfully read
-    AppAudio.playBeep();
-    AppHaptics.lightImpact();
+    unawaited(AppAudio.playBeep());
+    unawaited(AppHaptics.lightImpact());
 
     try {
       final result = await ref
@@ -54,27 +57,29 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
 
       if (!mounted) return;
 
-      result.fold(
-        (failure) {
-          if (!mounted) return;
-          ErrorSnackBar.show(context, 'Error: ${failure.message}');
-          setState(() => _isProcessing = false);
-        },
-        (customer) {
-          if (customer == null) {
-            if (!mounted) return;
-            ErrorSnackBar.show(context, 'Customer not found');
-            setState(() => _isProcessing = false);
-          } else {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) =>
-                    StampResultScreen(customer: customer, order: widget.order),
-              ),
-            );
-          }
-        },
-      );
+      // Unpack the Either result imperatively to avoid context-after-await
+      // inside synchronous fold callbacks.
+      final failure = result.fold((l) => l, (_) => null);
+      if (failure != null) {
+        ErrorSnackBar.show(context, 'Error: ${failure.message}');
+        setState(() => _isProcessing = false);
+        return;
+      }
+
+      final customer = result.fold((_) => null, (r) => r);
+      if (!mounted) return;
+
+      if (customer == null) {
+        ErrorSnackBar.show(context, 'Customer not found');
+        setState(() => _isProcessing = false);
+      } else {
+        unawaited(Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) =>
+                StampResultScreen(customer: customer, order: widget.order),
+          ),
+        ));
+      }
     } catch (e) {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -82,21 +87,25 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
     }
   }
 
-  void _onManualSearch() async {
-    controller.stop();
+  Future<void> _onManualSearch() async {
+    await controller.stop();
+    if (!mounted) return;
+
     final customer = await Navigator.of(context).push<Customer>(
       MaterialPageRoute(builder: (_) => const CustomerSearchScreen()),
     );
 
-    if (customer != null && mounted) {
-      Navigator.of(context).pushReplacement(
+    if (!mounted) return;
+
+    if (customer != null) {
+      unawaited(Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) =>
               StampResultScreen(customer: customer, order: widget.order),
         ),
-      );
+      ));
     } else {
-      controller.start();
+      await controller.start();
     }
   }
 

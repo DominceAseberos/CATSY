@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../enums/table_status.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
 
 /// Physical café table entity.
 class CafeTable extends Equatable {

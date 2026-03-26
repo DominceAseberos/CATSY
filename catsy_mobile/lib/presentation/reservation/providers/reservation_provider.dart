@@ -1,8 +1,8 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../domain/entities/reservation.dart';
-import '../../../../domain/enums/reservation_status.dart';
-import '../../../../domain/repositories/reservation_repository.dart';
-import '../../../../data/local/providers.dart' as local_providers;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:catsy_pos/domain/entities/reservation.dart';
+import 'package:catsy_pos/domain/enums/reservation_status.dart';
+import 'package:catsy_pos/domain/repositories/reservation_repository.dart';
+import 'package:catsy_pos/data/local/providers.dart' as local_providers;
 
 // ── Filters & State ──────────────────────────────────────────────────────────
 

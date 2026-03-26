@@ -1,9 +1,11 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart';
-import '../../../data/local/providers.dart';
-import '../../../data/repositories/auth_repository_impl.dart';
-import '../../../domain/repositories/auth_repository.dart';
-import 'auth_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/core/network/connectivity_service.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/data/local/secure_storage/secure_storage_service.dart';
+import 'package:catsy_pos/data/repositories/auth_repository_impl.dart';
+import 'package:catsy_pos/domain/repositories/auth_repository.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_state.dart';
 
 // ── Auth Repository Provider ────────────────────────────────────────────────
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -11,6 +13,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
     authDao: ref.watch(authDaoProvider),
     secureStorage: ref.watch(secureStorageServiceProvider),
     apiClient: ref.watch(apiClientProvider),
+    connectivity: ref.watch(connectivityServiceProvider),
   );
 });
 

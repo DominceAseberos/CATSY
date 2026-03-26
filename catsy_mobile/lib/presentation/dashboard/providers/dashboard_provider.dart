@@ -1,15 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/local/providers.dart';
-import '../../../domain/enums/payment_status.dart';
+import 'package:catsy_pos/data/local/providers.dart';
+import 'package:catsy_pos/domain/enums/payment_status.dart';
 
-class User {
-  final String? firstName;
-  final String? lastName;
-  User({this.firstName, this.lastName});
-}
+import 'package:catsy_pos/domain/entities/staff.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_provider.dart';
+import 'package:catsy_pos/presentation/auth/providers/auth_state.dart';
 
-/// Current logged in user provider (placeholder)
-final currentUserProvider = StreamProvider<User?>((ref) => Stream.value(null));
+/// Current logged in user provider derived from global auth state
+final currentUserProvider = Provider<AsyncValue<Staff?>>((ref) {
+  final authState = ref.watch(authNotifierProvider);
+  switch (authState.status) {
+    case AuthStatus.loading:
+      return const AsyncValue.loading();
+    case AuthStatus.authenticated:
+      return AsyncValue.data(authState.staff);
+    case AuthStatus.error:
+      return AsyncValue.error(authState.errorMessage ?? 'Auth Error', StackTrace.empty);
+    default:
+      return const AsyncValue.data(null);
+  }
+});
 
 /// Restaurant open/close status provider
 class RestaurantStatusNotifier extends Notifier<bool> {

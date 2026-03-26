@@ -1,5 +1,5 @@
-﻿import '../../../core/network/api_client.dart';
-import '../dtos/customer_dto.dart';
+import 'package:catsy_pos/core/network/api_client.dart';
+import 'package:catsy_pos/data/remote/dtos/customer_dto.dart';
 
 /// Remote data source for customers.
 class CustomerRemoteSource {

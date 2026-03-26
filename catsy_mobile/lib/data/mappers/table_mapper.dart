@@ -1,6 +1,6 @@
-import '../../domain/entities/cafe_table.dart';
-import '../../domain/enums/table_status.dart';
-import '../remote/dtos/table_dto.dart';
+import 'package:catsy_pos/domain/entities/cafe_table.dart';
+import 'package:catsy_pos/domain/enums/table_status.dart';
+import 'package:catsy_pos/data/remote/dtos/table_dto.dart';
 
 class TableMapper {
   static CafeTable fromDto(TableDto dto) => CafeTable(
