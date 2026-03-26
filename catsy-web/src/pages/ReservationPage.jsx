@@ -10,6 +10,7 @@ import CustomerToast from '../components/UI/CustomerToast';
 import { useSSE } from '../hooks/useSSE';
 import { useReservations } from '../hooks/useReservations';
 import { useNavigate } from 'react-router-dom';
+import { XCircle } from 'lucide-react';
 
 export default function ReservationPage({ tablesData }) {
     const navigate = useNavigate();
@@ -29,8 +30,10 @@ export default function ReservationPage({ tablesData }) {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', title: '', message: '' });
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
+    const [cancelModal, setCancelModal] = useState({ isOpen: false });
 
     // Zero-dependency local date formatting to prevent locale timezone bleed
     const getLocalYYYYMMDD = (dateObj) => {
@@ -163,6 +166,35 @@ export default function ReservationPage({ tablesData }) {
         }
     };
 
+    const handleCancelClick = () => {
+        setCancelModal({ isOpen: true });
+    };
+
+    const executeCancellation = async () => {
+        if (isCancelling || !submittedReservation) return;
+        setCancelModal({ isOpen: false });
+        setIsCancelling(true);
+        try {
+            await reservationService.cancelReservation(submittedReservation.id);
+            setSubmittedReservation(null);
+            setStatusModal({
+                isOpen: true,
+                type: 'success',
+                title: 'Reservation Cancelled',
+                message: 'Your reservation has been cancelled. Feel free to book again anytime!'
+            });
+        } catch (error) {
+            setStatusModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Cancellation Failed',
+                message: error.message || 'Could not cancel your reservation. Please try again.'
+            });
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-neutral-900 pt-24 animate-fade-in flex flex-col items-center">
 
@@ -290,7 +322,18 @@ export default function ReservationPage({ tablesData }) {
                             )}
                         </div>
 
-                        {/* Remove the redundant 'Book a Table' button because we only show this UI for active reservations now */}
+                        {/* Cancel button — only for pending reservations when logged in */}
+                        {isLoggedIn && submittedReservation.status === 'pending' && (
+                            <button
+                                onClick={handleCancelClick}
+                                disabled={isCancelling}
+                                className="mt-6 flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <XCircle size={16} />
+                                {isCancelling ? 'Cancelling...' : 'Cancel this Reservation'}
+                            </button>
+                        )}
+
                     </div>
                 ) : (
                     <div className="flex-1 p-8 pb-32 relative">
@@ -481,6 +524,18 @@ export default function ReservationPage({ tablesData }) {
                 type={statusModal.type}
                 title={statusModal.title}
                 message={statusModal.message}
+            />
+
+            {/* Cancel Confirmation Toast */}
+            <CustomerToast
+                isOpen={cancelModal.isOpen}
+                onClose={() => setCancelModal({ isOpen: false })}
+                type="error"
+                title="Cancel Reservation?"
+                message="Are you sure you want to cancel your reservation? This action cannot be undone."
+                confirmLabel="Yes, Cancel It"
+                closeLabel="Keep It"
+                onConfirm={executeCancellation}
             />
         </div>
     );

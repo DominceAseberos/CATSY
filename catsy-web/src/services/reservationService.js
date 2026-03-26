@@ -7,6 +7,9 @@ export const reservationService = {
     getMyReservations: () => 
         apiClient.get('/api/customer/reservations'),
 
+    cancelReservation: (id) =>
+        apiClient.delete(`/api/customer/reservations/${id}`),
+
     getAllReservations: () => 
         apiClient.get('/api/staff/reservations'),
 

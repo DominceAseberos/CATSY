@@ -70,12 +70,12 @@ def get_low_stock_inventory(
         # Supabase API does not support native column-to-column comparison in standard select(),
         # so we fetch all and filter in Python for ease, OR if possible we'd do a postgres function.
         # Given small inventory dataset, fetching all active materials is fine:
-        res = supabase.table("raw_materials_inventory").select("*").eq("is_active", True).execute()
+        res = supabase.table("raw_materials_inventory").select("*").execute()
         materials = res.data or []
         
         low_stock_items = [
             m for m in materials 
-            if (m.get("material_stock", 0) <= m.get("minimum_threshold", 0))
+            if (float(m.get("material_stock", 0)) <= float(m.get("material_reorder_level", 0)))
         ]
         return low_stock_items
     except Exception as e:

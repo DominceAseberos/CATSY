@@ -59,6 +59,16 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
 
     const [showPassword, setShowPassword] = useState(false);
 
+    // Animated loading dots: cycles . → .. → ...
+    const [dotCount, setDotCount] = useState(1);
+    useEffect(() => {
+        if (!loading) { setDotCount(1); return; }
+        const interval = setInterval(() => {
+            setDotCount(prev => prev >= 3 ? 1 : prev + 1);
+        }, 400);
+        return () => clearInterval(interval);
+    }, [loading]);
+
     // UI-specific State: Modal for error display
     const [modal, setModal] = useState({
         isOpen: false,
@@ -245,7 +255,7 @@ export default function LoginPage({ onLoginSuccess, initialIsLogin = true }) {
                         `}
                     >
                         <div className="relative z-10 flex items-center justify-center gap-2 w-full h-full">
-                            <span>{loading ? "Processing..." : (isLogin ? "Login" : "Create Account")}</span>
+                            <span>{loading ? `Processing${'.'.repeat(dotCount)}` : (isLogin ? "Login" : "Create Account")}</span>
                             {!loading && <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />}
                         </div>
                     </MagneticButton>

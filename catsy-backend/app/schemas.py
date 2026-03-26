@@ -154,3 +154,27 @@ class CMSUpdate(BaseModel):
     body: Optional[str] = None
     image_url: Optional[str] = None
     is_active: Optional[bool] = None
+
+# ── Phase 3: Materials & Inventory ──────────────────────────────────────────
+
+class MaterialCreate(BaseModel):
+    material_name: str
+    material_unit: str = "unit"
+    material_stock: float = 0
+    material_reorder_level: float = 0
+    cost_per_unit: float = 0
+
+class MaterialUpdate(BaseModel):
+    material_name: Optional[str] = None
+    material_unit: Optional[str] = None
+    material_stock: Optional[float] = None
+    material_reorder_level: Optional[float] = None
+    cost_per_unit: Optional[float] = None
+
+class IngredientItem(BaseModel):
+    material_id: int
+    quantity_required: float
+
+class RecipeUpsert(BaseModel):
+    ingredients: List[IngredientItem]
+

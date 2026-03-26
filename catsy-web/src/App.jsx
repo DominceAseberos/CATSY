@@ -17,6 +17,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTableAvailability } from './hooks/useTableAvailability';
 import { logger } from './utils/logger';
 import { UserProvider, useUser } from './context/UserContext';
+import { ToastProvider } from './context/ToastContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { useRoleGuard } from './hooks/useRoleGuard';
 import AdminWarningBanner from './components/UI/AdminWarningBanner';
@@ -76,10 +77,10 @@ function AppContent() {
 
             <Route path="/admin/:tab" element={
                 <ProtectedRoute isAllowed={isLoggedIn && isAdmin} redirectTo="/admin/login">
-                    <>
+                    <ToastProvider>
                         <AdminPage />
                         {adminAuthErrorModal}
-                    </>
+                    </ToastProvider>
                 </ProtectedRoute>
             } />
 

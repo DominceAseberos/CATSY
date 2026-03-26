@@ -41,7 +41,7 @@ class ReportsRepository:
         Returns:
             List of raw order dicts from Supabase.
         """
-        query = supabase.table("orders").select("*").eq("payment_status", "paid")
+        query = supabase.table("orders").select("*").eq("status", "served")
         if period == "today":
             today = date.today().isoformat()
             query = query.gte("created_at", f"{today}T00:00:00").lte("created_at", f"{today}T23:59:59")

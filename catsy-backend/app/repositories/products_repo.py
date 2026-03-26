@@ -55,26 +55,26 @@ class ProductRepository(IRepository):
         Non-fatal: callers should catch exceptions.
         """
         db = get_db()
-        # Find linked material(s) for this product via product_materials join table
-        links = db.table('product_materials').select("material_id, quantity_used").eq('product_id', product_id).execute()
+        # Find linked material(s) for this product via product_recipe join table
+        links = db.table('product_recipe').select("material_id, quantity_required").eq('product_id', product_id).execute()
         for link in (links.data or []):
             material_id = link.get('material_id')
-            qty_used = float(link.get('quantity_used', 1)) * quantity
+            qty_used = float(link.get('quantity_required', 1)) * quantity
             # Fetch current stock
-            mat = db.table('materials').select('material_stock').eq('material_id', material_id).execute()
+            mat = db.table('raw_materials_inventory').select('material_stock').eq('material_id', material_id).execute()
             if mat.data:
                 current = float(mat.data[0].get('material_stock', 0))
                 new_stock = max(0, current - qty_used)
-                db.table('materials').update({'material_stock': new_stock}).eq('material_id', material_id).execute()
+                db.table('raw_materials_inventory').update({'material_stock': new_stock}).eq('material_id', material_id).execute()
 
     def restore_stock(self, product_id: int, quantity: int):
         """Restore stock to materials linked to this product (on void or refund)."""
         db = get_db()
-        links = db.table('product_materials').select("material_id, quantity_used").eq('product_id', product_id).execute()
+        links = db.table('product_recipe').select("material_id, quantity_required").eq('product_id', product_id).execute()
         for link in (links.data or []):
             material_id = link.get('material_id')
-            qty_used = float(link.get('quantity_used', 1)) * quantity
-            mat = db.table('materials').select('material_stock').eq('material_id', material_id).execute()
+            qty_used = float(link.get('quantity_required', 1)) * quantity
+            mat = db.table('raw_materials_inventory').select('material_stock').eq('material_id', material_id).execute()
             if mat.data:
                 current = float(mat.data[0].get('material_stock', 0))
-                db.table('materials').update({'material_stock': current + qty_used}).eq('material_id', material_id).execute()
+                db.table('raw_materials_inventory').update({'material_stock': current + qty_used}).eq('material_id', material_id).execute()

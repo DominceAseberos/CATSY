@@ -7,19 +7,19 @@ import { apiClient } from './apiClient';
 
 export const materialsService = {
     // --- Raw Materials CRUD ---
-    getAll: () => apiClient.get('/admin/materials'),
+    getAll: () => apiClient.get('/api/admin/materials'),
 
-    create: (data) => apiClient.post('/admin/materials', data),
+    create: (data) => apiClient.post('/api/admin/materials', data),
 
-    update: (id, data) => apiClient.put(`/admin/materials/${id}`, data),
+    update: (id, data) => apiClient.put(`/api/admin/materials/${id}`, data),
 
-    delete: (id) => apiClient.delete(`/admin/materials/${id}`),
+    delete: (id) => apiClient.delete(`/api/admin/materials/${id}`),
 
     /** Unit-change guard: returns { in_use: boolean } */
-    checkInUse: (id) => apiClient.get(`/admin/materials/${id}/in-use`),
+    checkInUse: (id) => apiClient.get(`/api/admin/materials/${id}/in-use`),
 
     // --- Product Recipes ---
-    getRecipe: (productId) => apiClient.get(`/admin/products/${productId}/recipe`),
+    getRecipe: (productId) => apiClient.get(`/api/admin/materials/products/${productId}/recipe`),
 
-    upsertRecipe: (productId, ingredients) => apiClient.put(`/admin/products/${productId}/recipe`, { ingredients }),
+    upsertRecipe: (productId, ingredients) => apiClient.put(`/api/admin/materials/products/${productId}/recipe`, { ingredients }),
 };
