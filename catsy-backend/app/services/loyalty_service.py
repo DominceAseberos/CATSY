@@ -34,6 +34,19 @@ class LoyaltyService:
         
         return reward_res[0]
 
+    def redeem_reward(self, coupon_code: str, staff_id: str):
+        """Staff validates and redeems a coupon code in-store (FR S8/Phase 2.5).
+        - Looks up the reward by coupon_code
+        - Rejects if already redeemed
+        - Marks as redeemed with staff_id for audit trail
+        """
+        reward = self.repo.get_reward_by_code(coupon_code)
+        if not reward:
+            raise ValueError(f"Coupon code '{coupon_code}' not found.")
+        if reward.get("status") != "active":
+            raise ValueError(f"Coupon code '{coupon_code}' has already been redeemed or is invalid.")
+        return self.repo.mark_reward_redeemed(reward["id"], staff_id=staff_id)
+
     def credit_stamps(self, customer_id: str, count: int, staff_id: str):
         stamps_to_insert = [
             {"user_id": customer_id, "is_spent": False, "staff_id": staff_id}

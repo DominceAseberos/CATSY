@@ -90,4 +90,41 @@ class OrderUpdate(BaseModel):
     items: Optional[List[OrderItemCreate]] = None
 
 class OrderPaymentStatusUpdate(BaseModel):
-    payment_status: str # 'paid', 'voided', 'refunded'
+    """Used for legacy void/refund status updates."""
+    payment_status: str  # 'voided', 'refunded'
+
+class OrderPayRequest(BaseModel):
+    """Payload for POST /api/staff/orders/:id/pay (FR S5)."""
+    payment_method: str  # 'Cash' | 'GCash' | 'Maya'
+    amount_tendered: float
+
+class PaymentReceiptResponse(BaseModel):
+    """Response envelope returned after a successful payment (FR S5)."""
+    order_id: str
+    total: float
+    payment_method: str
+    amount_tendered: float
+    change_due: float
+
+
+# ── Customer Order History ────────────────────────────────────────────────────
+
+class CustomerOrderResponse(BaseModel):
+    """Compact order record for GET /api/customer/orders."""
+    id: str
+    order_type: Optional[str] = None
+    payment_status: Optional[str] = None
+    payment_method: Optional[str] = None
+    total_amount: Optional[float] = None
+    created_at: Optional[str] = None
+    order_items: Optional[List[dict]] = []
+
+    class Config:
+        from_attributes = True
+
+
+# ── Loyalty Redemption ────────────────────────────────────────────────────────
+
+class RewardRedeemRequest(BaseModel):
+    """Staff payload for POST /loyalty/staff/redeem — validates a coupon code."""
+    coupon_code: str

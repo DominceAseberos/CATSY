@@ -3,9 +3,12 @@ from app.repositories.base import IRepository
 from app.database import get_db
 
 class OrderRepository(IRepository):
-    def get_all(self, limit: int = 50, offset: int = 0) -> List[Any]:
+    def get_all(self, limit: int = 50, offset: int = 0, status: Optional[str] = None) -> List[Any]:
         db = get_db()
-        return db.table('orders').select("*, order_items(*)").range(offset, offset + limit - 1).order('created_at', desc=True).execute().data
+        query = db.table('orders').select("*, order_items(*)")
+        if status == "open":
+            query = query.eq('payment_status', 'pending')
+        return query.range(offset, offset + limit - 1).order('created_at', desc=True).execute().data
 
     def get_by_id(self, id: str) -> Optional[Any]:
         db = get_db()

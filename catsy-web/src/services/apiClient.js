@@ -1,5 +1,6 @@
 import { logger } from '../utils/logger';
 import { getAccessToken, clearSession } from '../utils/sessionManager';
+import { toast } from '../context/ToastContext';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -54,6 +55,17 @@ export const apiClient = {
                             status: 401,
                         }
                     }));
+                } else if (!options.skipGlobalToast) {
+                    const MESSAGE_MAP = {
+                        403: 'You do not have permission to perform this action.',
+                        404: 'The requested item could not be found. It may have been deleted.',
+                        500: 'Something went wrong on our end. Please try again in a moment.',
+                    };
+                    // 400 and 422 are handled by components.
+                    if (response.status !== 400 && response.status !== 422 && response.status !== 401) {
+                        const message = MESSAGE_MAP[response.status] ?? 'Could not connect. Please check your internet connection.';
+                        toast.error(message);
+                    }
                 }
 
                 throw new ApiError(data?.detail || response.statusText, response.status, data);

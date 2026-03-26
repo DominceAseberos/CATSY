@@ -4,6 +4,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.dependencies import get_loyalty_service
 from app.services.loyalty_service import LoyaltyService
+from app.schemas import RewardRedeemRequest
 from app.auth import get_current_user
 
 limiter = Limiter(key_func=get_remote_address)
@@ -53,5 +54,24 @@ def credit_stamps(request: Request, credit_data: StampCreditRequest, user=Depend
             count=credit_data.eligible_product_count,
             staff_id=str(user.id)
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/staff/redeem")
+@limiter.limit("30/minute")
+def redeem_reward(
+    request: Request,
+    redeem_data: RewardRedeemRequest,
+    user=Depends(get_current_user),
+    service: LoyaltyService = Depends(get_loyalty_service)
+):
+    """Staff endpoint — validate and mark a reward coupon as redeemed (FR S8).
+    Requires staff JWT. Returns error if code is invalid or already used.
+    """
+    try:
+        return service.redeem_reward(redeem_data.coupon_code, staff_id=str(user.id))
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

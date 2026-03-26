@@ -48,3 +48,18 @@ class LoyaltyRepository(IRepository):
     def insert_stamps(self, stamps_data: List[dict]):
         db = get_db()
         db.table('loyalty_stamps').insert(stamps_data).execute()
+
+    def get_reward_by_code(self, coupon_code: str):
+        """Look up a reward by its coupon code (for staff redemption)."""
+        db = get_db()
+        res = db.table('loyalty_rewards').select("*").eq('coupon_code', coupon_code).execute()
+        return res.data[0] if res.data else None
+
+    def mark_reward_redeemed(self, reward_id: str, staff_id: str):
+        """Mark a reward as redeemed — single-use enforcement."""
+        db = get_db()
+        res = db.table('loyalty_rewards').update({
+            "status": "redeemed",
+            "redeemed_by_staff_id": staff_id,
+        }).eq('id', reward_id).execute()
+        return res.data[0] if res.data else {"id": reward_id, "status": "redeemed"}

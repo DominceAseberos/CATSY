@@ -2,9 +2,10 @@
 from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from typing import Optional
 from app.dependencies import get_order_service
 from app.services.order_service import OrderService
-from app.schemas import OrderCreate, OrderUpdate, OrderPaymentStatusUpdate
+from app.schemas import OrderCreate, OrderUpdate, OrderPayRequest
 from app.auth import get_current_user
 
 limiter = Limiter(key_func=get_remote_address)
@@ -28,9 +29,23 @@ def modify_order(request: Request, order_id: str, order: OrderUpdate, user=Depen
 
 @router.post("/{order_id}/pay")
 @limiter.limit("20/minute")
-def pay_order(request: Request, order_id: str, user=Depends(get_current_user), service: OrderService = Depends(get_order_service)):
+def pay_order(
+    request: Request,
+    order_id: str,
+    pay_data: OrderPayRequest,
+    user=Depends(get_current_user),
+    service: OrderService = Depends(get_order_service)
+):
+    """Process payment — returns receipt with change_due for cash (FR S5)."""
     try:
-        return service.pay_order(order_id, user_id=str(user.id))
+        return service.pay_order(
+            order_id,
+            payment_method=pay_data.payment_method,
+            amount_tendered=pay_data.amount_tendered,
+            user_id=str(user.id)
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -56,10 +71,11 @@ def get_orders(
     request: Request,
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    status: Optional[str] = Query(None, description="Use 'open' to retrieve pay-later orders (FR S3/S5)"),
     user=Depends(get_current_user),
     service: OrderService = Depends(get_order_service)
 ):
     try:
-        return service.get_orders(limit=limit, offset=offset)
+        return service.get_orders(limit=limit, offset=offset, status=status)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

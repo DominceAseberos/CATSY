@@ -25,7 +25,7 @@ This document outlines all the features, architectures, and systems that have be
 *   **Dynamic Menu Explorer:** Product and Category viewers pulling real-time database inventories.
 *   **Loyalty & Stamp System:** 
     *   Visual representation of customer loyalty tiers.
-    *   System gracefully computes dynamic reward conversions (e.g., auto-issuing rewards at 10-stamp thresholds).
+    *   System gracefully computes dynamic reward conversions (e.g., auto-issuing rewards at 9-stamp thresholds).
 *   **Reservation & Booking Engine:**
     *   Smart timezone-aware calendar (`Asia/Manila` bound) that prevents timezone drift errors.
     *   "Same Day Closure" syncs with store settings to dynamically block unavailable periods.

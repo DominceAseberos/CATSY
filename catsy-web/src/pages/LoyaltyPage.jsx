@@ -5,7 +5,8 @@ import { Star, Gift, X, Loader, AlertTriangle, CheckCircle, Coffee } from 'lucid
 import MagneticButton from '../components/UI/MagneticButton';
 import { useLoyalty } from '../hooks/useLoyalty';
 import { useUser } from '../context/UserContext';
-import { productService } from '../services/productService';
+import { apiClient } from '../services/apiClient';
+
 
 const TOTAL_STAMPS = 9;
 
@@ -35,19 +36,21 @@ export default function LoyaltyPage() {
     const [expandedQr, setExpandedQr] = useState(null);
 
     useEffect(() => {
-        const fetchDrinks = async () => {
+        const fetchRewardItems = async () => {
             try {
-                const products = await productService.getAllProducts();
-                // Extract products flagged as Claimable Rewards
-                const availableRewards = products
-                    .filter(p => p.product_is_reward)
-                    .map(p => p.product_name);
-                setEligibleDrinks([...new Set(availableRewards)]);
+                // Spec-compliant: fetch from reward_items table (not product_is_reward flag)
+                const { data } = await apiClient.get('/api/rewards/active');
+                const names = (data || []).map(item =>
+                    item.products?.product_name ?? item.product_name ?? 'Free Drink'
+                );
+                setEligibleDrinks([...new Set(names)]);
             } catch (err) {
-                console.error("Failed to fetch claimable rewards", err);
+                console.error('Failed to fetch reward items', err);
+                // Graceful fallback
+                setEligibleDrinks(['Free Drink']);
             }
         };
-        fetchDrinks();
+        fetchRewardItems();
     }, []);
 
     // Animate stamps on mount / whenever count changes

@@ -109,3 +109,31 @@ def register_customer_reservation(
         return repo.create(data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@customer_router.delete("/reservations/{reservation_id}")
+@limiter.limit("10/minute")
+def cancel_customer_reservation(
+    request: Request,
+    reservation_id: str,
+    user=Depends(get_current_user),
+    repo: ReservationRepository = Depends(get_reservation_repository)
+):
+    """Cancel a reservation that belongs to the authenticated customer (FR C7).
+    Prevents customers from cancelling other users' reservations.
+    Only cancels if current email matches the reservation email.
+    """
+    try:
+        reservation = repo.get_by_id(reservation_id)
+        if not reservation:
+            raise HTTPException(status_code=404, detail="Reservation not found")
+        # Ownership check: email in reservation must match user email
+        user_email = getattr(user, 'email', None) or (user.user_metadata or {}).get("email")
+        if reservation.get("email") != user_email:
+            raise HTTPException(status_code=403, detail="You can only cancel your own reservations")
+        repo.update(reservation_id, {"status": "cancelled"}, user_id=str(user.id))
+        return {"id": reservation_id, "status": "cancelled"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
