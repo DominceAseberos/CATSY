@@ -27,17 +27,17 @@ Shared responsibility - Integration testing, API contracts, error handling, docu
 
 ## Overall Phase Timeline
 
-| **Phase**                               | **Focus Area**                                                |
-| --------------------------------------- | ------------------------------------------------------------- |
-| Phase 1 - Setup & Foundation            | Project scaffolding, DB schema, auth, dev environment         |
-| Phase 2 - Core Backend API              | All REST endpoints, business logic, offline sync prep         |
-| Phase 3 - Admin Web Panel               | Full admin UI: products, inventory, employees, CMS, reports   |
-| Phase 4 - Customer Web Portal           | Customer UI: menu, reservations, loyalty stamps, QR code      |
-| Phase 5 - UI/UX Polish & Error Handling | All button states, error messages, loading states, edge cases |
-| Phase 6 - Integration & Testing         | End-to-end testing, API validation, cross-browser, security   |
-| Phase 7 - Deployment & Handover         | Production setup, documentation, mobile prep handover         |
+| **Phase**                               | **Focus Area**                                                | **Status** |
+| --------------------------------------- | ------------------------------------------------------------- | ---------- |
+| Phase 1 - Setup & Foundation            | Project scaffolding, DB schema, auth, dev environment         | [x] Done   |
+| Phase 2 - Core Backend API              | All REST endpoints, business logic, offline sync prep         | [x] Done   |
+| Phase 3 - Admin Web Panel               | Full admin UI: products, inventory, employees, CMS, reports   | [x] Done   |
+| Phase 4 - Customer Web Portal           | Customer UI: menu, reservations, loyalty stamps, QR code      | [x] Done   |
+| Phase 5 - UI/UX Polish & Error Handling | All button states, error messages, loading states, edge cases | [x] Done   |
+| Phase 6 - Integration & Testing         | End-to-end testing, API validation, cross-browser, security   | [/] Active |
+| Phase 7 - Deployment & Handover         | Production setup, documentation, mobile prep handover         | [ ] Next   |
 
-**PHASE 1: SETUP & FOUNDATION Project scaffolding · Database schema · Authentication · Dev environment**
+**[x] PHASE 1: SETUP & FOUNDATION Project scaffolding · Database schema · Authentication · Dev environment**
 
 ## Goals for Phase 1
 
@@ -114,7 +114,7 @@ Error codes must be SCREAMING_SNAKE_CASE strings - the frontend maps these to us
 
 ✓ SQLite schema stub document created and saved to /docs/mobile-sqlite-schema.md
 
-**PHASE 2: CORE BACKEND API All REST endpoints · Business logic · Validation · Sync engine setup**
+**[x] PHASE 2: CORE BACKEND API All REST endpoints · Business logic · Validation · Sync engine setup**
 
 ## Goals for Phase 2
 
@@ -281,7 +281,7 @@ This endpoint must also be verified in Phase 6 security checklist.
 
 ✓ Seed data exists: at least 10 products, 3 categories, 1 admin, 1 staff, 1 customer
 
-**PHASE 3: ADMIN WEB PANEL Full admin UI: products · inventory · employees · CMS · reports · seat overview · APK download**
+**[x] PHASE 3: ADMIN WEB PANEL Full admin UI: products · inventory · employees · CMS · reports · seat overview · APK download**
 
 ## Goals for Phase 3
 
@@ -436,7 +436,7 @@ Only visible to admin - staff accounts do not see this section.
 
 ✓ **SOLID Backend Refactor:** Isolated DB logic into repositories for all Phase 3 domains.
 
-**PHASE 4: CUSTOMER WEB PORTAL Menu · Seat vacancy · Reservations · Loyalty stamps · QR code · Purchase history**
+**[x] PHASE 4: CUSTOMER WEB PORTAL Menu · Seat vacancy · Reservations · Loyalty stamps · QR code · Purchase history**
 
 ## Goals for Phase 4
 
@@ -548,7 +548,7 @@ Build the customer-facing web portal. Most features are public (no login needed)
 
 ✓ Offline stamp pending banner shows when stamps are queued
 
-**PHASE 5: UI/UX POLISH & ERROR HANDLING Button states · Error messages · Loading states · Toast system · Empty states · Offline indicators**
+**[x] PHASE 5: UI/UX POLISH & ERROR HANDLING Button states · Error messages · Loading states · Toast system · Empty states · Offline indicators**
 
 ## Goals for Phase 5
 
