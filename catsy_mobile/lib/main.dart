@@ -11,7 +11,7 @@ import 'sync/sync_engine.dart';
 Future<void> main() async {
   ErrorReportingService? globalErrorReporter;
 
-  runZonedGuarded(() async {
+  unawaited(runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     // ── Local database (Drift) ──────────────────────────────────────────
@@ -50,5 +50,5 @@ Future<void> main() async {
     } else {
       AppLogger.f('Unhandled root error before DI: $error', error: error, stackTrace: stackTrace);
     }
-  });
+  }));
 }

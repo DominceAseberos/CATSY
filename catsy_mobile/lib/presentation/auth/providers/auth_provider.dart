@@ -1,6 +1,8 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/network/connectivity_service.dart';
 import '../../../data/local/providers.dart';
+import '../../../data/local/secure_storage/secure_storage_service.dart';
 import '../../../data/repositories/auth_repository_impl.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
@@ -11,6 +13,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
     authDao: ref.watch(authDaoProvider),
     secureStorage: ref.watch(secureStorageServiceProvider),
     apiClient: ref.watch(apiClientProvider),
+    connectivity: ref.watch(connectivityServiceProvider),
   );
 });
 

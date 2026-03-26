@@ -1,4 +1,5 @@
-﻿import 'package:dartz/dartz.dart';
+import 'dart:async';
+import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import '../../core/error/failures.dart';
 import '../../core/network/api_client.dart';
@@ -101,7 +102,7 @@ class TableRepositoryImpl implements TableRepository {
 
       // 2. If online, push to remote (fire-and-forget — don't block local success)
       if (_apiClient != null) {
-        TableRemoteSource(_apiClient)
+        unawaited(TableRemoteSource(_apiClient)
             .createTable(
               TableDto(
                 id: table.id,
@@ -111,7 +112,7 @@ class TableRepositoryImpl implements TableRepository {
                 currentOrderId: table.currentOrderId,
               ),
             )
-            .catchError((e) => throw Exception('[TableRepo] Remote create failed: $e'));
+            .catchError((e) => throw Exception('[TableRepo] Remote create failed: $e')));
       }
 
       return const Right(null);
@@ -128,9 +129,9 @@ class TableRepositoryImpl implements TableRepository {
 
       // 2. If online, delete from remote too (fire-and-forget)
       if (_apiClient != null) {
-        TableRemoteSource(_apiClient)
+        unawaited(TableRemoteSource(_apiClient)
             .deleteTable(id)
-            .catchError((e) => throw Exception('[TableRepo] Remote delete failed: $e'));
+            .catchError((e) => throw Exception('[TableRepo] Remote delete failed: $e')));
       }
 
       return const Right(null);

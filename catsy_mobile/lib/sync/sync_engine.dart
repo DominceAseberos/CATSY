@@ -42,6 +42,7 @@ class SyncEngine {
   SecureStorageService get _storage => _ref.read(secureStorageServiceProvider);
   SyncStatusNotifier get _status => _ref.read(syncStatusProvider.notifier);
   IsSyncingNotifier get _legacySyncing => _ref.read(isSyncingProvider.notifier);
+  ConnectivityService get _connectivity => _ref.read(connectivityServiceProvider);
 
   SyncQueueManager get _queueManager => SyncQueueManager(
     dao: _db.syncQueueDao,
@@ -74,7 +75,7 @@ class SyncEngine {
   /// Runs a full paginated pull of all resources, then drains the queue so
   /// any optimistic mutations created offline reach the server.
   Future<void> onLogin() async {
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (!isOnline) {
       AppLogger.i('[SyncEngine] Login sync skipped — offline');
       return;
@@ -97,7 +98,7 @@ class SyncEngine {
   ///
   /// Pushes any remaining queued mutations so data is not lost.
   Future<void> onLogout() async {
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (!isOnline) {
       AppLogger.i('[SyncEngine] Logout sync skipped — offline');
       return;
@@ -117,7 +118,7 @@ class SyncEngine {
   /// 2. Schedules a periodic incremental sync every 5 minutes
   void start() {
     AppLogger.i('[SyncEngine] Starting…');
-    _connectivitySub = ConnectivityService().onConnectivityChanged.listen((
+    _connectivitySub = _connectivity.onConnectivityChanged.listen((
       isOnline,
     ) {
       if (isOnline) {
@@ -155,7 +156,7 @@ class SyncEngine {
   // ── Incremental sync (periodic) ────────────────────────────────────────
 
   Future<void> _incrementalSync() async {
-    final isOnline = await ConnectivityService().isConnected;
+    final isOnline = await _connectivity.isConnected;
     if (!isOnline) return;
     await _guardedSync(() async {
       _setSyncing(true);
