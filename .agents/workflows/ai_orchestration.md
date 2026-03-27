@@ -86,7 +86,7 @@ find /mnt/datadrive/Project/Catsy-Final/catsy-backend/app -type f -name "*.py" |
 | Reservation repository | `app/repositories/reservation_repo.py` | Phase 2 gaps |
 | Reports repository | `app/repositories/reports_repo.py` | Phase 3 incomplete |
 | Seats repository | `app/repositories/seats_repo.py` | Phase 3 incomplete |
-| Time slots repository | `app/repositories/time_slots_repo.py` | Phase 3 incomplete |
+| Settings repository | `app/repositories/settings_repo.py` | Phase 3 incomplete |
 | CMS repository | `app/repositories/cms_repo.py` | Phase 3 incomplete |
 | Materials repository | `app/repositories/materials_repo.py` | Phase 3 incomplete |
 | Central schemas | `app/schemas.py` | SOLID audit failure |
@@ -181,7 +181,7 @@ For each functional requirement in `catsy.md`, verify the corresponding code exi
 | CMS | FR A10 | `CmsPage.jsx` exists with banner/announcement/promo CRUD |
 | APK download | FR A11 | `ApkDownloadPage.jsx` behind admin-only guard |
 | Seat overview (read-only) | FR A-new | `SeatOverviewPage.jsx` read-only, no staff controls |
-| Manage time slots | FR A-new | `TimeSlotsPage.jsx` with default 5PM–12AM on first run |
+| Manage operating hours | FR A-new | `TimeSlotsPage.jsx` (repurposed for Operating Hours) with default 5PM–12AM on first run |
 
 ### Staff (FR S1–S8)
 

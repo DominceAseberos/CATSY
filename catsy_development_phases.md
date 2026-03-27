@@ -50,7 +50,7 @@ Before writing a single feature, the entire team must agree on architecture, set
 - Initialize the backend project (Node.js/Express or Laravel - team decides)
 - Set up PostgreSQL (or MySQL) database on local and dev server
 - Design and finalize the full database schema:
-  - Tables: users, employees, products, categories, inventory, orders, order_items, transactions, stamps, reservations, seats, time_slots, rewards, reward_codes, feedback, notifications, sync_logs, ml_results
+  - Tables: user_profiles, employees, products, categories, inventory, orders, order_items, transactions, stamps, reservations, seats, restaurant_settings, rewards, reward_codes, feedback, notifications, sync_logs, ml_results
   - transactions table must include: payment_method (Cash | GCash | Maya), amount_tendered, change_due columns - required for FR S5
   - ml_results table: id, type (forecast | restock | classify), product_id, result_json, generated_at, expires_at
   - Define all foreign keys, indexes, and soft delete columns
@@ -219,7 +219,7 @@ This endpoint requires staff JWT. Guest/customer tokens must be rejected (403).
 - GET /api/seats - current state of all seats (Available, Occupied, Reserved)
 - PUT /api/staff/seats/:id - toggle Available/Occupied
 - GET /api/seats/count - computed vacancy count for customer portal
-- Auto-shift: reserved seat auto-becomes Occupied when time slot begins (cron job or scheduled check)
+- Auto-shift: reserved seat auto-becomes Occupied when reserved time begins (cron job or scheduled check)
 
 ### 2.8 Admin Panel APIs
 
@@ -229,7 +229,7 @@ This endpoint requires staff JWT. Guest/customer tokens must be rejected (403).
 - GET /api/admin/reports/inventory - calls ML service for restock prediction; falls back to simple depletion if ML unavailable
 - GET /api/admin/reports/forecast/:product_id - calls ML service for 7-day sales forecast
 - GET/POST/PUT/DELETE /api/admin/cms - banners, announcements, promos
-- GET/PUT /api/admin/operating-hours - opening time + closing time only (replaces fixed time slots)
+- GET/PUT /api/admin/settings - opening time + closing time only (replaces fixed time slots)
 - GET /api/admin/rewards - list claimable reward items (linked to existing products)
 - POST/PUT/DELETE /api/admin/rewards - manage reward items (must reference existing product_id)
 - GET /api/admin/apk/download - returns APK file download (admin JWT only; 403 for all other roles)

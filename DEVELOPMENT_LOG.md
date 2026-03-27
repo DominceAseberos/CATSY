@@ -193,3 +193,64 @@ This session addressed critical UI/UX and security failures identified during ma
 - [x] Fixed `TC_CST_001`: Added red validation labels to the reservation form.
 - [x] Fixed `TC_UIX_003`: Implemented animated dots (`. .. ...`) for all major buttons.
 - [x] Cleaned `test_cases.md` (Removed stack traces and updated statuses to PASS).
+
+---
+
+## Session Date: 2026-03-27 (V2 Schema Synchronization & Specs)
+
+This session focused on aggressively updating the codebase and documentation to strictly align with the finalized V2 database schema, eliminating legacy table references and adding new feature fields to the Admin Panel.
+
+### 1. 🏗️ Database Schema & Router Alignment
+**Objective:** Replace deprecated tables and update models to support V2 features.
+
+- **Files Edited:**
+  - `catsy-backend/app/routers/customer.py` (Fixed query to use `user_profiles`)
+  - `catsy-backend/app/schemas.py` (Added complete response models for Users, Orders, Settings)
+  - `catsy-backend/app/repositories/settings_repo.py` (Aligned return types)
+  - `catsy-backend/app/main.py` (Unmounted deleted routers)
+- **Changes:**
+  - **Tables Updated:** Directed staff searches to the new `user_profiles` table, replacing references to `customers`. 
+  - **Cleanup:** Fully removed the obsolete `time_slots` router and repository to enforce the new Operating Hours system.
+
+### 2. ✨ Admin UI Feature Completeness
+**Objective:** Expose the new V2 data fields to staff via the Admin Dashboard.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/admin/components/AdminForm.jsx`
+  - `catsy-web/src/pages/admin/components/ProductItem.jsx`
+  - `catsy-web/src/components/Admin/AccountList.jsx`
+  - `catsy-web/src/utils/validationSchemas.js`
+- **Changes:**
+  - **Loyalty Display:** Added `qr_code` (UID) and `excess_stamps` to the Account list and creation forms.
+  - **Product Metadata:** Integrated the new `product_description` text area into the Product creation flow and display cards.
+  - **Zod Sync:** Updated frontend validation schemas to allow the new fields, preventing save blocks.
+
+### 3. 📜 Documentation & Workflow Calibration
+**Objective:** Ensure future AI sessions and manual QA testers operate on the correct V2 definitions.
+
+- **Files Edited:**
+  - `test_cases.md`
+  - `catsy_development_phases.md`
+  - `.agents/workflows/qa_runner.md` [NEW]
+  - `.agents/workflows/ai_orchestration.md`
+- **Changes:**
+  - **Specs Synchronized:** Purged references to `TimeSlotsPage` and `time_slots` tables from the formal checklists, directing QA processes strictly toward `OperatingHours` and `restaurant_settings`.
+  - **QA Workflow Pipeline:** Created the `/qa_runner` slash command workflow to standardize how unfinished test scenarios are presented to human testers.
+
+---
+
+### ✅ Summary of V2 Synchronization:
+- [x] Refactored backend repositories and routers onto the V2 schema.
+- [x] Implemented UI fields for `product_description`, `qr_code`, and `excess_stamps`.
+- [x] Re-architected time slots into dynamic Operating Hours.
+- [x] Updated all project documentation and test cases to match V2.
+- [x] Implemented an AI-assisted QA testing workflow.
+
+---
+
+## ⏭️ Next Steps: Phase 6 QA Execution
+
+With the V2 integration locked in, the system is fully prepared for final QA.
+1. Run the new **`/qa_runner`** workflow to systematically address the `pending` tests in `test_cases.md` (e.g., verifying `Operating Hours` configurations, Staff search queries, and Order paid/unpaid revenue filters).
+2. Fix any remaining functional gaps discovered during testing.
+3. Once all `test_cases.md` scenarios are marked `pass`, proceed to **Phase 7: Deployment & Mobile Handover**.
