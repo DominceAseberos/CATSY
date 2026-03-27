@@ -7,7 +7,7 @@ class OrderRepository(IRepository):
         db = get_db()
         query = db.table('orders').select("*, order_items(*)")
         if status == "open":
-            query = query.eq('payment_status', 'pending')
+            query = query.eq('payment_status', 'unpaid')
         return query.range(offset, offset + limit - 1).order('created_at', desc=True).execute().data
 
     def get_by_id(self, id: str) -> Optional[Any]:

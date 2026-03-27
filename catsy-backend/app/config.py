@@ -11,8 +11,7 @@ DEFAULT_SETTINGS = {
     "store_status": "open",
     "currency": "PHP",
     "is_open": True,
-    "opening_time": "08:00",
-    "closing_time": "22:00",
-    "available_tables": 0,
-    "total_tables": 0,
+    "opening_time": "17:00",
+    "closing_time": "00:00",
+    "total_seats": 10,
 }

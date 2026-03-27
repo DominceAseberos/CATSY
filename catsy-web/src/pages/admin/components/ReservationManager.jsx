@@ -17,10 +17,9 @@ export default function ReservationManager({ reservations, updateReservationStat
     useEffect(() => {
         if (settings) {
             setSettingsForm({
-                opening_time: settings.opening_time?.slice(0, 5) ?? '08:00',
-                closing_time: settings.closing_time?.slice(0, 5) ?? '22:00',
-                total_tables: settings.total_tables,
-                available_tables: settings.available_tables,
+                opening_time: settings.opening_time?.slice(0, 5) ?? '17:00',
+                closing_time: settings.closing_time?.slice(0, 5) ?? '00:00',
+                total_seats: settings.total_seats ?? 10,
             });
         }
     }, [settings]);
@@ -65,7 +64,6 @@ export default function ReservationManager({ reservations, updateReservationStat
         switch (status) {
             case 'pending': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
             case 'confirmed': return 'bg-green-500/20 text-green-500 border-green-500/30';
-            case 'completed': return 'bg-blue-500/20 text-blue-500 border-blue-500/30';
             case 'cancelled': return 'bg-red-500/20 text-red-500 border-red-500/30';
             default: return 'bg-neutral-800 text-neutral-400 border-neutral-700';
         }
@@ -73,7 +71,7 @@ export default function ReservationManager({ reservations, updateReservationStat
 
     const pendingReservations = (reservations || []).filter(r => r.status === 'pending');
     const upcomingReservations = (reservations || []).filter(r => r.status === 'confirmed');
-    const pastReservations = (reservations || []).filter(r => r.status === 'completed' || r.status === 'cancelled');
+    const pastReservations = (reservations || []).filter(r => r.status === 'cancelled');
 
     const renderReservationCard = (reservation, isCompact = false) => {
         return (
@@ -135,12 +133,6 @@ export default function ReservationManager({ reservations, updateReservationStat
 
                     {reservation.status === 'confirmed' && (
                         <>
-                            <button
-                                onClick={() => handleStatusChange(reservation.id, 'completed')}
-                                className="flex-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold py-2 px-3 rounded-xl transition-colors border border-blue-500/20 flex items-center justify-center gap-2 text-xs"
-                            >
-                                <Check size={16} className="text-blue-400" /> Complete
-                            </button>
                             <button
                                 onClick={() => handleStatusChange(reservation.id, 'cancelled')}
                                 className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold py-2 px-3 rounded-xl transition-colors border border-red-500/20 flex items-center justify-center gap-2 text-xs"
@@ -214,9 +206,9 @@ export default function ReservationManager({ reservations, updateReservationStat
                                 {/* Operational Stats Grid */}
                                 <div className="grid grid-cols-2 gap-4">
                                     {[
-                                        { label: 'Total Tables', value: settings.total_tables, icon: <BookOpen size={16} className="text-neutral-300" /> },
-                                        { label: 'Occupied', value: settings.total_tables - settings.available_tables, icon: <Hash size={16} className="text-amber-400" /> },
-                                        { label: 'Available', value: settings.available_tables, icon: <Table size={16} className="text-green-400" /> },
+                                        { label: 'Total Seats', value: settings.total_seats ?? '—', icon: <BookOpen size={16} className="text-neutral-300" /> },
+                                        { label: 'Booked', value: upcomingReservations.length, icon: <Hash size={16} className="text-amber-400" /> },
+                                        { label: 'Pending', value: pendingReservations.length, icon: <Table size={16} className="text-yellow-400" /> },
                                         { label: 'Floor Status', value: settings.is_open ? 'Active' : 'Offline', icon: <div className={`w-2 h-2 rounded-full ${settings.is_open ? 'bg-green-400' : 'bg-red-400'}`} /> },
                                     ].map(stat => (
                                         <div key={stat.label} className="bg-neutral-900/60 rounded-xl p-4 border border-neutral-800 shadow-inner">
@@ -254,8 +246,7 @@ export default function ReservationManager({ reservations, updateReservationStat
                                         {[
                                             { key: 'opening_time', label: 'Opening', type: 'time' },
                                             { key: 'closing_time', label: 'Closing', type: 'time' },
-                                            { key: 'total_tables', label: 'Capacity', type: 'number' },
-                                            { key: 'available_tables', label: 'Available', type: 'number' },
+                                            { key: 'total_seats', label: 'Seat Capacity', type: 'number' },
                                         ].map(field => (
                                             <div key={field.key}>
                                                 <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1 block">{field.label}</label>

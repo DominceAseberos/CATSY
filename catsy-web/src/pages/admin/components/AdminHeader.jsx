@@ -139,7 +139,7 @@ export default function AdminHeader({ setIsEditing, setSelectedUser, hasLowStock
                             onClick={() => { setIsEditing(false); setSelectedUser(null); }}
                             className={({ isActive }) => `px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-300 font-bold text-base ${isActive ? 'bg-neutral-700 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
                         >
-                            <Clock size={18} /> Time Slots
+                            <Clock size={18} /> Operating Hours
                         </NavLink>
                         <NavLink
                             to="/admin/reports"

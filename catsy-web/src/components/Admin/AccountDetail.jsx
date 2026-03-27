@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, UserCheck, User, Mail, Phone, Hash, Calendar, Clock, Lock, Trash2, Key, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Shield, UserCheck, User, Mail, Phone, Hash, Calendar, Clock, Lock, Trash2, Key, AlertTriangle, Eye, EyeOff, QrCode, Gift } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 import { logger } from '../../utils/logger';
 
@@ -101,6 +101,8 @@ function OverviewTab({ user }) {
         { icon: <Mail size={16} />, label: 'Email', value: user.email },
         { icon: <Phone size={16} />, label: 'Contact', value: user.contact || '—' },
         { icon: <Hash size={16} />, label: 'Account ID', value: user.account_id || '—', mono: true },
+        { icon: <QrCode size={16} />, label: 'QR Code UID', value: user.qr_code || '—', mono: true },
+        { icon: <Gift size={16} />, label: 'Excess Stamps', value: user.excess_stamps ?? 0 },
         { icon: <Calendar size={16} />, label: 'Joined', value: formatDateTime(user.created_at) },
         { icon: <Clock size={16} />, label: 'Last Login', value: formatDateTime(user.last_login) },
         { icon: <Clock size={16} />, label: 'Last Profile Update', value: formatDateTime(user.last_updated) },

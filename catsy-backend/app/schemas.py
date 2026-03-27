@@ -13,7 +13,6 @@ class CategoryResponse(BaseModel):
     name: str
     description: Optional[str] = None
     created_at: Optional[str] = None
-    linked_product_id: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -42,6 +41,8 @@ class ProductResponse(BaseModel):
     product_is_featured: bool = False
     product_is_available: bool = True
     product_is_reward: bool = False
+    product_description: Optional[str] = None
+    product_updated: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -82,7 +83,8 @@ class OrderItemCreate(BaseModel):
 
 class OrderCreate(BaseModel):
     order_type: str  # 'dine-in' or 'take-out'
-    payment_status: str  # 'paid' or 'pending'
+    payment_status: str  # 'unpaid' | 'paid' | 'voided' | 'refunded'
+    payment_timing: str  # 'pay_now' | 'pay_later'
     items: List[OrderItemCreate]
 
 class OrderUpdate(BaseModel):
@@ -129,12 +131,6 @@ class RewardRedeemRequest(BaseModel):
     """Staff payload for POST /loyalty/staff/redeem — validates a coupon code."""
     coupon_code: str
 
-
-# ── Phase 3: Time Slots ───────────────────────────────────────────────────────
-
-class TimeSlotCreate(BaseModel):
-    """Admin payload for POST /api/admin/time-slots."""
-    time: str
 
 
 # ── Phase 3: CMS ──────────────────────────────────────────────────────────────

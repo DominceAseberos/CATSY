@@ -71,7 +71,7 @@ def get_orders(
     request: Request,
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
-    status: Optional[str] = Query(None, description="Use 'open' to retrieve pay-later orders (FR S3/S5)"),
+    status: Optional[str] = Query(None, description="Use 'open' to retrieve unpaid orders (FR S3/S5)"),
     user=Depends(get_current_user),
     service: OrderService = Depends(get_order_service)
 ):
