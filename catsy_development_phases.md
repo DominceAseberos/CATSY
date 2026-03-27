@@ -4,22 +4,23 @@ POS & Inventory Management System
 
 _for Cutsy Coffee_
 
-**DEVELOPER TEAM - DEVELOPMENT PHASES GUIDE Web (Customer Portal + Admin Panel) & Backend API - Focus Track**
+**DEVELOPER TEAM - DEVELOPMENT PHASES GUIDE Web (Customer Portal + Admin Panel) & Backend API + ML Service - Focus Track**
 
-Version 1.1 (Updated) | BS Computer Science - CS17/L Software Engineering | UM Tagum College
+Version 1.2 (Updated) | BS Computer Science - CS17/L Software Engineering | UM Tagum College
 
-# Overview: Why Web + Backend First?
+# Overview: Development Strategy
 
-This guide covers the phased development plan for CUTshier when the team prioritizes the Web platforms (Customer Portal + Admin Web Panel) and the Backend API before starting on the Mobile POS app. This is the recommended approach because:
+CUTshier is built in three layers: Web (Customer Portal + Admin Panel), Backend API, and a Machine Learning service. This guide covers all phases from setup to deployment and mobile handover.
 
-- The Backend API is the core foundation - both the web and mobile depend on it.
-- The Admin Panel lets the owner configure products, inventory, and time slots before any other feature is usable.
-- The Customer Portal is web-only and has zero dependency on mobile - it can ship independently.
-- Building web + backend first lets the team validate all business logic before the Android app is built.
+- Backend API - the core foundation all platforms depend on
+- Admin Panel - must be configured first before any other user can do anything
+- Customer Portal - web-only, ships independently of mobile
+- ML Service - Python microservice, called by backend, results shown in Admin Reports
+- Mobile App - built last, handed off after web + backend + ML are live
 
 Team Structure (Recommended Split)
 
-Backend Developer - API, database, authentication, business logic, sync engine
+Backend Developer - API, database, authentication, business logic, sync engine, ML service integration
 
 Frontend Developer (Web) - Customer portal, Admin panel, UI/UX, component states
 
@@ -27,15 +28,16 @@ Shared responsibility - Integration testing, API contracts, error handling, docu
 
 ## Overall Phase Timeline
 
-| **Phase**                               | **Focus Area**                                                | **Status** |
-| --------------------------------------- | ------------------------------------------------------------- | ---------- |
-| Phase 1 - Setup & Foundation            | Project scaffolding, DB schema, auth, dev environment         | [x] Done   |
-| Phase 2 - Core Backend API              | All REST endpoints, business logic, offline sync prep         | [x] Done   |
-| Phase 3 - Admin Web Panel               | Full admin UI: products, inventory, employees, CMS, reports   | [x] Done   |
-| Phase 4 - Customer Web Portal           | Customer UI: menu, reservations, loyalty stamps, QR code      | [x] Done   |
-| Phase 5 - UI/UX Polish & Error Handling | All button states, error messages, loading states, edge cases | [x] Done   |
-| Phase 6 - Integration & Testing         | End-to-end testing, API validation, cross-browser, security   | [/] Active |
-| Phase 7 - Deployment & Handover         | Production setup, documentation, mobile prep handover         | [ ] Next   |
+| **Phase**                       | **Focus Area**                                                           | **Status**   |
+| ------------------------------- | ------------------------------------------------------------------------ | ------------ |
+| Phase 1 - Setup & Foundation    | Project scaffolding, DB schema, auth, dev environment                    | [x] Done     |
+| Phase 2 - Core Backend API      | All REST endpoints, business logic, offline sync prep                    | [x] Done     |
+| Phase 2.5 - ML Service          | Python Flask ML microservice: forecasting, classification, restock       | [ ] New      |
+| Phase 3 - Admin Web Panel       | Full admin UI: products, inventory, employees, CMS, reports + ML results | [x] Done     |
+| Phase 4 - Customer Web Portal   | Customer UI: menu, reservations, loyalty stamps, QR code                 | [x] Done     |
+| Phase 5 - UI/UX Polish          | All button states, error messages, loading states, edge cases            | [x] Done     |
+| Phase 6 - Integration & Testing | End-to-end testing, API validation, cross-browser, security, ML tests    | [/] Active   |
+| Phase 7 - Deployment & Handover | Production setup, documentation, mobile prep handover                    | [ ] Next     |
 
 **[x] PHASE 1: SETUP & FOUNDATION Project scaffolding · Database schema · Authentication · Dev environment**
 
@@ -48,9 +50,10 @@ Before writing a single feature, the entire team must agree on architecture, set
 - Initialize the backend project (Node.js/Express or Laravel - team decides)
 - Set up PostgreSQL (or MySQL) database on local and dev server
 - Design and finalize the full database schema:
-- Tables: users, employees, products, categories, inventory, orders, order_items, transactions, stamps, reservations, seats, time_slots, rewards, reward_codes, feedback, notifications, sync_logs
-- transactions table must include: payment_method (Cash | GCash | Maya), amount_tendered, change_due columns - required for FR S5
-- Define all foreign keys, indexes, and soft delete columns
+  - Tables: users, employees, products, categories, inventory, orders, order_items, transactions, stamps, reservations, seats, time_slots, rewards, reward_codes, feedback, notifications, sync_logs, ml_results
+  - transactions table must include: payment_method (Cash | GCash | Maya), amount_tendered, change_due columns - required for FR S5
+  - ml_results table: id, type (forecast | restock | classify), product_id, result_json, generated_at, expires_at
+  - Define all foreign keys, indexes, and soft delete columns
 - Set up migration scripts (e.g., Sequelize, Knex, or Eloquent)
 - Configure .env files for dev/staging/production
 - Set up JWT authentication module (separate tokens for admin web vs. customer web vs. mobile)
@@ -74,7 +77,7 @@ This does not need to be built yet - just documented for Phase 7 handover.
 - Initialize frontend project (React + Vite or Next.js - team decides)
 - Set up two separate apps or route groups: /admin and /portal (customer)
 - Install and configure Tailwind CSS or chosen design system
-- Create reusable component library stubs: Button, Input, Modal, Toast, Badge, Table, Card
+- Create reusable component library stubs: Button, Input, Modal, Toast, Badge, Table, Card, SkeletonLoader
 - Set up Axios or Fetch wrapper for all API calls with global error interceptor
 - Set up React Router with protected routes (role-based guards)
 - Create placeholder pages for all major screens - no logic yet, just route shells
@@ -84,7 +87,7 @@ This does not need to be built yet - just documented for Phase 7 handover.
 - Agree on API contract format: RESTful JSON, consistent response envelope
 - Define standard API response format (see box below)
 - Set up Postman collection for all planned endpoints
-- Agree on error code conventions
+- Agree on error code conventions (SCREAMING_SNAKE_CASE)
 
 Standard API Response Envelope - Agree on This First
 
@@ -102,7 +105,7 @@ Error codes must be SCREAMING_SNAKE_CASE strings - the frontend maps these to us
 
 ✓ Git repo initialized, all developers can clone and run locally
 
-✓ Database migrations run successfully on local (including payment_method, amount_tendered, change_due columns)
+✓ Database migrations run successfully on local (including payment_method, amount_tendered, change_due columns, ml_results table)
 
 ✓ JWT auth returns a valid token on POST /api/auth/login
 
@@ -185,7 +188,7 @@ For GCash/Maya: amount_tendered = total, change_due = 0.
 ### 2.5 Loyalty Stamp API
 
 - GET /api/customer/stamps - get current stamp count, visual grid state (0-9 filled), and excess queued count
-- GET /api/staff/members?search= - search customer accounts by name or email for member list lookup on handheld device
+- GET /api/staff/members?search= - search customer accounts by name or email for member list lookup on handheld device; returns max 10 results; staff JWT only
 - POST /api/staff/stamps/credit - credit stamps to account (after QR scan or member list selection); body: { customer_id, order_id }
 - POST /api/customer/rewards/generate - generate reward QR code + unique text code (single-use); requires all 9 stamps filled
 - POST /api/staff/rewards/redeem - validate and redeem reward code, deduct 9 stamps, carry excess to next cycle
@@ -203,9 +206,9 @@ This endpoint requires staff JWT. Guest/customer tokens must be rejected (403).
 
 ### 2.6 Reservation API
 
-- GET /api/reservations/slots - public endpoint: available time slots with seat count
+- GET /api/reservations/slots - public endpoint: opening time, closing time, current seat vacancy
 - POST /api/reservations - create reservation (logged-in or guest with name/contact)
-- GET /api/staff/reservations - list all pending/approved reservations
+- GET /api/staff/reservations - list all pending/approved reservations, sorted by time, with overlap flag
 - PUT /api/staff/reservations/:id - approve or decline
 - DELETE /api/reservations/:id - customer cancels their own reservation
 - POST /api/staff/seats/:id/free - mark no-show seat as free
@@ -215,17 +218,18 @@ This endpoint requires staff JWT. Guest/customer tokens must be rejected (403).
 
 - GET /api/seats - current state of all seats (Available, Occupied, Reserved)
 - PUT /api/staff/seats/:id - toggle Available/Occupied
+- GET /api/seats/count - computed vacancy count for customer portal
 - Auto-shift: reserved seat auto-becomes Occupied when time slot begins (cron job or scheduled check)
-- Seat vacancy count: computed field returned on GET /api/seats/count - used by customer portal
 
 ### 2.8 Admin Panel APIs
 
 - GET/PUT /api/admin/employees - manage staff accounts
 - GET /api/admin/reports/sales - daily/monthly sales reports (filterable by date, payment_method)
-- GET /api/admin/reports/products - best-selling and slow-moving products
-- GET /api/admin/reports/inventory - depletion analysis and restock predictions
+- GET /api/admin/reports/products - calls ML service for classification; falls back to simple rank if ML unavailable
+- GET /api/admin/reports/inventory - calls ML service for restock prediction; falls back to simple depletion if ML unavailable
+- GET /api/admin/reports/forecast/:product_id - calls ML service for 7-day sales forecast
 - GET/POST/PUT/DELETE /api/admin/cms - banners, announcements, promos
-- GET/POST/PUT/DELETE /api/admin/time-slots - reservation operating hours config
+- GET/PUT /api/admin/operating-hours - opening time + closing time only (replaces fixed time slots)
 - GET /api/admin/rewards - list claimable reward items (linked to existing products)
 - POST/PUT/DELETE /api/admin/rewards - manage reward items (must reference existing product_id)
 - GET /api/admin/apk/download - returns APK file download (admin JWT only; 403 for all other roles)
@@ -242,7 +246,7 @@ This endpoint must also be verified in Phase 6 security checklist.
 
 - GET /api/notifications - fetch unread notifications for current user role
 - PUT /api/notifications/:id/read - mark as read
-- Internal triggers: low-stock, reservation approval/decline/cancel, refund, sync complete, no-show warning
+- Internal triggers: low-stock, reservation approval/decline/cancel, refund, sync complete, no-show warning, ML restock alert
 
 ### 2.10 Feedback API
 
@@ -273,30 +277,198 @@ This endpoint must also be verified in Phase 6 security checklist.
 
 ✓ GET /api/admin/apk/download returns 403 for staff and customer tokens
 
+✓ GET /api/admin/operating-hours returns opening and closing time
+
 ✓ Inventory auto-deduct works when an order is placed
 
 ✓ Inventory auto-restore works on void and on refund
 
 ✓ Postman collection is fully up to date and shareable with frontend dev
 
-✓ Seed data exists: at least 10 products, 3 categories, 1 admin, 1 staff, 1 customer
+✓ Seed data exists: at least 10 products, 3 categories, 1 admin, 1 staff, 1 customer, operating hours set
 
-**[x] PHASE 3: ADMIN WEB PANEL Full admin UI: products · inventory · employees · CMS · reports · seat overview · APK download**
+**[ ] PHASE 2.5: ML SERVICE SETUP Python Flask microservice · Sales forecasting · Product classification · Restock prediction**
+
+## Goals for Phase 2.5
+
+Build a separate Python Flask microservice that handles all machine learning logic. The main backend calls this service when the admin views the Reports page. Results are cached for 24 hours so the model does not re-run on every page load.
+
+This directly implements FR A5 (Product Sales Analysis) and FR A6 (Inventory Analysis) from the SRS.
+
+**Why a Separate Python Service?**
+
+Machine learning libraries (Prophet, scikit-learn, pandas) are Python-native - no good equivalents in Node/Laravel.
+
+Keeping ML isolated means a bug in the ML service never crashes the main API.
+
+The ML model can be retrained or updated without touching the backend or frontend.
+
+Results are served as simple JSON - the backend treats ML data like any other data source.
+
+### 2.5.1 Architecture
+
+How the ML service connects to everything:
+
+| **Layer**                   | **Role**                                                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| PostgreSQL Database         | ML service reads order history and inventory data directly from the same database as the main backend                                |
+| Python Flask ML Service     | Runs Prophet forecasting, K-Means classification, and moving average restock prediction. Exposes 4 internal endpoints.               |
+| Main Backend (Node/Laravel) | Calls the ML service when admin opens Reports. Caches results in ml_results table for 24 hours. Returns combined data to frontend.   |
+| Admin Web Panel             | Displays ML results in the Reports page - forecast chart, best/slow mover labels, restock warnings. No direct connection to ML.      |
+| Mobile App                  | Does NOT connect to ML service - ML is admin-only.                                                                                   |
+
+### 2.5.2 Setup & Installation
+
+- Create a separate folder in the project: /ml-service
+- Install Python dependencies:
+  - pip install flask prophet scikit-learn pandas numpy psycopg2-binary
+- Folder structure:
+  - /ml-service/app.py - Flask entry point, all routes
+  - /ml-service/db.py - database connection helper
+  - /ml-service/forecast.py - Prophet sales forecasting
+  - /ml-service/classify.py - K-Means product classification
+  - /ml-service/restock.py - moving average restock prediction
+  - /ml-service/requirements.txt - all pip dependencies
+- ML service runs on port 5001 (main backend on port 3000 or 8000)
+- Both services connect to the same PostgreSQL database using the same .env credentials
+
+### 2.5.3 Feature 1 - Sales Forecasting (FR A5)
+
+Predicts how many units of a product will sell in the next 7 days based on historical order data.
+
+- Algorithm: Facebook Prophet - handles weekly patterns (busier weekends) automatically
+- Input: daily sales totals per product from order_items joined with orders table
+- Output: predicted units sold for the next 7 days with confidence range
+- Minimum data required: 14 days of sales history - show 'Not enough data yet' if less
+
+**What Admin Sees - Forecast**
+
+Product: Caramel Latte
+
+Last 7 days avg: 18 cups/day
+
+Next 7 days forecast: \[chart showing predicted daily sales\]
+
+Predicted total next week: ~126 cups
+
+If stock is low: Warning badge - 'Current stock may not meet forecasted demand'
+
+### 2.5.4 Feature 2 - Product Classification (FR A5)
+
+Automatically labels each product as Best Seller, Average, or Slow Mover based on the last 30 days of sales.
+
+- Algorithm: K-Means clustering with 3 clusters (n_clusters=3)
+- Input: total units sold per product in the last 30 days
+- Output: each product labeled as Best Seller / Average / Slow Mover
+- Minimum data required: at least 30 days and 5 orders - otherwise use simple rank sorting
+
+**What Admin Sees - Product Classification**
+
+Best Sellers: Iced Americano (200 sold), Caramel Latte (180 sold), Chocolate Cake (120 sold)
+
+Average Movers: Matcha Latte (75 sold), Cheese Bread (60 sold)
+
+Slow Movers: Hot Chamomile (12 sold), Lemon Tart (8 sold)
+
+Labels shown as colored badges on the Product Analysis table in admin reports.
+
+### 2.5.5 Feature 3 - Restock Prediction (FR A6)
+
+Predicts how many days until each inventory item runs out based on current stock and average daily consumption rate.
+
+- Algorithm: Moving Average - average daily consumption over last 7 days
+- Formula: days_remaining = current_stock / avg_daily_consumption
+- If days_remaining < 3 → trigger low-stock notification to admin
+- If days_remaining < 7 → show orange warning badge in inventory table
+- Input: inventory table (current stock) + order_items (daily consumption history)
+- Output: estimated days remaining per product + restock urgency label
+
+**What Admin Sees - Restock Prediction**
+
+| Ingredient    | Current Stock | Avg Daily Use  | Est. Days Left | Status              |
+| ------------- | ------------- | -------------- | -------------- | ------------------- |
+| Caramel Syrup | 2 bottles     | 0.6 bottles    | 3 days         | RESTOCK NOW (red)   |
+| Coffee Beans  | 5 kg          | 0.35 kg        | 14 days        | OK (green)          |
+| Milk          | 8 liters      | 1.1 liters     | 7 days         | Restock Soon (orange) |
+
+Notification sent to admin when any item drops below 3 days remaining.
+
+### 2.5.6 ML API Endpoints (Internal Only)
+
+These endpoints are called by the main backend only - never directly by the frontend or mobile app.
+
+| **Endpoint**                 | **Description**                                                                                                   |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| GET /ml/forecast/:product_id | Returns 7-day forecast for one product. If < 14 days data: returns { status: 'insufficient_data' }               |
+| GET /ml/classify             | Returns all products with Best Seller / Average / Slow Mover labels. If < 30 days: returns simple rank order.    |
+| GET /ml/restock              | Returns all inventory items with days_remaining, avg_daily_use, and urgency label.                               |
+| GET /ml/health               | Health check - returns { status: 'ok' }. Main backend calls this on startup to verify ML service is running.     |
+
+### 2.5.7 Caching - 24-Hour Results
+
+- When admin opens Reports, backend checks ml_results table first
+- If cached result exists and expires_at > now → return cached result immediately (no ML run)
+- If no cache or expired → call ML service, store result in ml_results table with expires_at = now + 24 hours
+- This means ML runs at most once per day - not on every admin click
+- Force refresh button in admin Reports page - clears cache and reruns ML immediately
+
+### 2.5.8 Cold Start - Not Enough Data
+
+| **Data Available** | **What Admin Sees**                                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| 0 orders           | 'No sales data yet. ML predictions will appear after the first sales are recorded.'      |
+| 1-13 days of data  | Restock prediction works. Forecast shows: 'Need 14 days of data for forecasting.'        |
+| 14-29 days of data | Forecast + restock work. Classification shows: 'Need 30 days for product classification.'|
+| 30+ days of data   | All three ML features fully active.                                                      |
+
+### 2.5.9 Fallback - If ML Service is Down
+
+- Main backend always checks /ml/health before calling ML endpoints
+- If ML service is unreachable → backend falls back to simple database queries:
+  - Classification fallback: rank products by total sold in last 30 days - no K-Means
+  - Restock fallback: show current stock vs minimum threshold - no consumption prediction
+  - Forecast fallback: show last 7 days average - no Prophet prediction
+- Admin sees a yellow info banner: 'ML predictions temporarily unavailable. Showing basic data.'
+- This ensures the Reports page never breaks even if the ML service crashes
+
+**Deliverables to finish before next phase**
+
+✓ /ml-service folder created with all Python files and requirements.txt
+
+✓ GET /ml/health returns { status: 'ok' }
+
+✓ GET /ml/classify returns product labels (test with seed data)
+
+✓ GET /ml/restock returns days_remaining for all inventory items
+
+✓ GET /ml/forecast/:product_id returns 7-day forecast (use seed data with 14+ days)
+
+✓ insufficient_data response works when < 14 days of sales
+
+✓ Main backend caches ML results in ml_results table for 24 hours
+
+✓ Fallback works when ML service is stopped - reports page still loads
+
+✓ Low-stock notification triggers when days_remaining < 3
+
+✓ Force refresh button in admin panel clears cache and re-calls ML service
+
+**[x] PHASE 3: ADMIN WEB PANEL Full admin UI: products · inventory · employees · CMS · reports with ML · APK download**
 
 ## Goals for Phase 3
 
-Build the complete Admin Web Panel. The admin is the first real user of the system - they configure products, inventory, and time slots before customers or staff can do anything. The frontend developer should connect to the live backend from Phase 2.
+Build the complete Admin Web Panel. The admin is the first real user of the system - they configure products, inventory, and operating hours before customers or staff can do anything. Connect to the live backend from Phase 2 and ML service from Phase 2.5.
 
 ### 3.1 Admin Login Page
 
-| **Screen Element** | **Details**                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------------------- |
-| Route              | /admin/login                                                                                                  |
-| Fields             | Email, Password                                                                                               |
-| Login Button       | Disabled while fields are empty; shows spinner on submit                                                      |
-| Error Handling     | Wrong credentials → red toast: 'Incorrect email or password.'                                                 |
-| Redirect           | On success → /admin/dashboard                                                                                 |
-| Guard              | If already logged in, redirect to dashboard; staff login on this page returns 'You do not have admin access.' |
+| **Screen Element** | **Details**                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| Route              | /admin/login                                                                                     |
+| Fields             | Email, Password                                                                                  |
+| Login Button       | Disabled while fields are empty; shows spinner on submit                                         |
+| Error Handling     | Wrong credentials → red toast: 'Incorrect email or password.'                                    |
+| Redirect           | On success → /admin/dashboard                                                                    |
+| Guard              | If already logged in, redirect to dashboard; staff login returns 'You do not have admin access.' |
 
 ### 3.2 Dashboard
 
@@ -306,11 +478,10 @@ Build the complete Admin Web Panel. The admin is the first real user of the syst
 
 ### 3.3 Product Management
 
-- Table listing all products with: Name, Category, Price, Availability toggle, Stamp Eligible toggle
+- Table listing all products with: Name, Category, Price, Availability toggle, Stamp Eligible toggle, Reward Item toggle
 - Add Product button → opens modal/drawer with form
 - Edit / Delete actions per row
-- Stamp Eligible toggle - inline toggle switch per product row
-- Reward Items section - separate list of claimable reward items with add/edit/delete
+- Reward Item toggle - inline per product row; replaces separate reward items section
 
 **\[ADDED\] Reward items must be product pickers, not free-text (FR A3)**
 
@@ -333,72 +504,75 @@ Display: product name, image thumbnail, and category in the reward items list.
 
 ### 3.4 Inventory Management
 
-- Table: Product name, Current Stock, Minimum Threshold, Last Updated, Adjust button
-- Highlight rows in red when stock is at or below minimum threshold
+- Table: Product name, Current Stock, Min Threshold, Est. Days Remaining (from ML), Last Updated, Adjust button
+- Rows highlighted red when stock is at or below minimum threshold
+- Rows highlighted orange when ML predicts < 7 days remaining
 - Adjustment modal: reason dropdown (Restock, Damaged, Incorrect Count), quantity field, notes
 
-| **State**       | **Button / Label**   | **What Shows / Behavior**                                                                                    |
-| --------------- | -------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Idle            | Adjust Stock         | Button active. Reason and quantity required.                                                                 |
-| Saving          | Saving... (disabled) | Spinner. Inputs locked.                                                                                      |
-| Success         | Adjust Stock         | Green toast: 'Inventory updated.' Table row refreshes with new value.                                        |
-| Low Stock Alert | - (auto)             | Row highlighted red. Orange badge 'LOW' in stock column. Notification sent to admin.                         |
-| Zero Stock      | - (auto)             | Row highlighted dark red. Badge 'OUT OF STOCK'. Product automatically marked unavailable on customer portal. |
+| **State**             | **Button / Label**   | **What Shows / Behavior**                                                                        |
+| --------------------- | -------------------- | ------------------------------------------------------------------------------------------------ |
+| Idle                  | Adjust Stock         | Button active. Reason and quantity required.                                                     |
+| Saving                | Saving... (disabled) | Spinner. Inputs locked.                                                                          |
+| Success               | Adjust Stock         | Green toast: 'Inventory updated.' Table row refreshes with new value.                            |
+| Low Stock (threshold) | - (auto)             | Row highlighted red. Orange badge 'LOW'. Notification sent to admin.                             |
+| Restock Soon (ML)     | - (auto)             | Row highlighted orange. Badge 'RESTOCK SOON - ~N days left'. Based on ML prediction.            |
+| Zero Stock            | - (auto)             | Row highlighted dark red. Badge 'OUT OF STOCK'. Product auto-marked unavailable on portal.       |
+| ML Unavailable        | - (auto)             | Yellow info banner: 'Restock predictions temporarily unavailable. Showing basic data.'           |
 
 ### 3.5 Employee Management
 
-- List of staff accounts with name, role, status (Active/Inactive)
+- List of staff accounts with name, email, status (Active/Inactive)
 - Create Employee - generates credentials for mobile POS login
 - Deactivate / Reactivate toggle per employee
 
-| **State**       | **Button / Label**  | **What Shows / Behavior**                                                                                                                           |
-| --------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Create Employee | Create Account      | Form: Name, Email, Role. On success: green toast 'Account created. Credentials sent.' If email exists: 'An account with this email already exists.' |
-| Deactivate      | Deactivate (orange) | Confirm dialog: 'This will prevent the employee from logging in.' On confirm: status changes to Inactive, row grays out.                            |
-| Reactivate      | Reactivate (green)  | No confirmation needed. Status changes to Active immediately.                                                                                       |
+| **State**       | **Button / Label**  | **What Shows / Behavior**                                                                                                    |
+| --------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Create Employee | Create Account      | Form: Name, Email. On success: green toast 'Account created.' If email exists: 'An account with this email already exists.' |
+| Deactivate      | Deactivate (orange) | Confirm dialog: 'This will prevent the employee from logging in.' On confirm: status → Inactive, row grays out.              |
+| Reactivate      | Reactivate (green)  | No confirmation needed. Status changes to Active immediately.                                                                |
 
 ### 3.6 Reservation Management (Admin - Read Only)
 
-- Calendar or list view of all reservations: date, time slot, customer name, guests, status
-- Admin can view only - no approve/decline actions (staff do that in the mobile app)
+- List view: date, time, customer name, guest count, status - sorted by time
+- Grouped by date, ordered earliest to latest
+- Overlap flag: if two reservations are within the same hour, show orange badge 'Multiple reservations at this time'
+- Admin view only - no approve/decline (staff do that on mobile app)
 - Filter by date range and status
 
 ### 3.7 Seat Overview (Admin - Read Only)
 
-- Visual grid showing all seats with color coding: Green = Available, Red = Occupied, Blue = Reserved
-- Reserved seats show tooltip: customer name (or "Guest"), time slot, guest count
+- Total seat count display: Available / Occupied / Reserved as numbers
+- Visual grid showing seat states: Green = Available, Red = Occupied, Blue = Reserved
+- Reserved seats show tooltip: customer name (or 'Guest'), time, guest count
 - Note displayed: 'Seat state is managed by staff on the mobile app.'
 
-### 3.8 Time Slot Configuration
+### 3.8 Operating Hours Configuration
 
-- List of configured time slots (e.g., 5:00 PM, 6:00 PM... 11:00 PM)
-- Add / Remove time slot buttons
-- Warning when removing a time slot that has pending reservations
+- Two fields only: Opening Time and Closing Time
+- Default on first run: 5:00 PM to 12:00 AM - pre-populated with banner
+- Changes reflect immediately on customer reservation page
+- Warning if a pending reservation exists outside new hours when admin edits
 
-**\[ADDED\] Default time slots on first run (FR A - Time Slots)**
+### 3.9 Reports & Analytics (with ML)
 
-On first login, the time slot configuration page must be pre-populated with the default operating hours.
-
-Default slots: 5:00 PM, 6:00 PM, 7:00 PM, 8:00 PM, 9:00 PM, 10:00 PM, 11:00 PM, 12:00 AM.
-
-Show a banner: 'These are the default operating hours. Edit or remove slots as needed.'
-
-Admin must be able to modify before any reservations go live.
-
-### 3.9 Reports & Analytics
-
-- Sales Report: date range picker, chart (bar/line), table with daily totals, export to PDF/CSV
-- Sales report table must include payment method breakdown (Cash, GCash, Maya totals per day)
-- Product Analysis: best-selling table, least-selling table, predicted demand for next 7/30 days
-- Inventory Analysis: depletion rate per product, projected out-of-stock dates
-- Feedback Viewer: star rating averages per product, recent reviews list
+- Sales Report: date range picker, chart (bar/line), table with daily totals and payment method breakdown (Cash / GCash / Maya)
+- Product Analysis - ML powered:
+  - Best Seller / Average / Slow Mover badges per product (from ML classification)
+  - 7-day sales forecast chart per product (from ML Prophet)
+  - If insufficient data: 'Not enough data yet. Check back after 30 days of sales.'
+- Inventory Analysis - ML powered:
+  - Estimated days remaining per item (from ML moving average)
+  - Restock urgency labels: OK / Restock Soon / Restock Now
+  - If ML unavailable: fallback to current stock vs minimum threshold display
+- Feedback Viewer: star rating list, customer name, comment, date - flat list, no analysis tools
+- Force Refresh button - clears ML cache and reruns predictions immediately
 
 ### 3.10 CMS - Content Management
 
-- Banners: upload image + caption, toggle active/inactive, preview
-- Announcements: rich text editor for short announcements shown on customer portal
-- Promos: title, description, image, start/end date
-- All CMS changes reflect immediately on the customer portal
+- Single hero image upload for the landing page banner
+- Announcements section - text only, toggle active/inactive
+- Promos - title, description, start/end date
+- All changes reflect immediately on customer portal
 
 ### 3.11 APK Download
 
@@ -418,15 +592,21 @@ Only visible to admin - staff accounts do not see this section.
 
 ✓ Admin can log in and access all sections
 
-✓ Product CRUD works end-to-end including stamp eligibility toggle
+✓ Product CRUD works end-to-end including stamp eligible and reward item toggles
 
-✓ Reward items section uses product picker - not free-text form
+✓ Inventory table shows ML-predicted days remaining
 
-✓ Inventory adjustments persist and low-stock alerts trigger correctly
+✓ Reports page shows ML classification badges and forecast chart
 
-✓ Reports load real data including payment method breakdown
+✓ 'Not enough data' message shows correctly for new installs
 
-✓ Time slot config page pre-populated with default 5PM-12AM slots on first run
+✓ ML unavailable fallback banner shows when ML service is stopped
+
+✓ Operating hours config: two-field form, pre-populated defaults on first run
+
+✓ Reservation list sorted by time with overlap flag
+
+✓ Force Refresh button clears cache and reruns ML
 
 ✓ APK download section visible and functional for admin only
 
@@ -477,20 +657,20 @@ Build the customer-facing web portal. Most features are public (no login needed)
 ### 4.4 Reservation Flow
 
 - Step 1: Select Date (today or tomorrow only - max 1 day in advance)
-- Step 2: Select Time Slot - only show slots with available seats
+- Step 2: Select Time - time picker within operating hours (e.g., 5:00 PM to 12:00 AM)
 - Step 3: Enter Guest Count (1-10) and Name/Contact (for guest users)
 - Step 4: Review and Confirm
 - Step 5: Confirmation screen - reservation pending staff approval
 
-| **State**          | **Button / Label**               | **What Shows / Behavior**                                                                         |
-| ------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------- |
-| No Slots Available | - (no slots shown)               | Message: 'No available time slots for this date. Please try another date.' Reserve button hidden. |
-| Slot Full          | - (slot grayed out)              | Grayed time slot chip with label '(Full)'. Cannot be selected.                                    |
-| Submitting         | Confirm Reservation (disabled)   | Spinner. Cannot double-submit.                                                                    |
-| Success            | -                                | Confirmation screen: 'Reservation submitted! You will be notified once staff approves.'           |
-| Approved           | -                                | Notification: 'Your reservation for \[date\] at \[time\] has been approved!'                      |
-| Declined           | -                                | Notification: 'Sorry, your reservation could not be approved. Please try another slot.'           |
-| Cancellation       | Cancel Reservation (red outline) | Confirm dialog: 'Are you sure you want to cancel?' On confirm: 'Reservation cancelled.'           |
+| **State**          | **Button / Label**               | **What Shows / Behavior**                                                                    |
+| ------------------ | -------------------------------- | -------------------------------------------------------------------------------------------- |
+| No Seats Available | - (Reserve hidden)               | Message: 'No seats available for this date. Please check back later.' Reserve button hidden. |
+| Time Outside Hours | - (time blocked)                 | Times outside operating hours are grayed and unselectable in the time picker.                |
+| Submitting         | Confirm Reservation (disabled)   | Spinner. Cannot double-submit.                                                               |
+| Success            | -                                | Confirmation: 'Reservation submitted! You will be notified once staff approves.'             |
+| Approved           | -                                | Notification: 'Your reservation at \[time\] has been approved!'                              |
+| Declined           | -                                | Notification: 'Sorry, your reservation could not be approved. Please try another time.'      |
+| Cancellation       | Cancel Reservation (red outline) | Confirm dialog: 'Cancel your reservation?' On confirm: 'Reservation cancelled.'              |
 
 ### 4.5 Customer Dashboard (Logged In)
 
@@ -498,7 +678,7 @@ Build the customer-facing web portal. Most features are public (no login needed)
 - Overflow counter - shows 'You have \[N\] stamps queued for your next card'
 - Claim Reward button - active only when all 9 slots are filled
 - QR Code display + download button
-- Purchase history table with order date, items, total, feedback button
+- Purchase history table with order date, items, total, payment method, feedback button
 
 | **State**             | **Button / Label**            | **What Shows / Behavior**                                                                                   |
 | --------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -534,6 +714,8 @@ Build the customer-facing web portal. Most features are public (no login needed)
 
 ✓ Reservation flow works end-to-end including guest and logged-in paths
 
+✓ Time picker respects operating hours from admin config
+
 ✓ 3×3 stamp grid renders correctly with X/O states and overflow counter
 
 ✓ Claim reward flow opens reward list modal and generates unique QR + text code
@@ -564,10 +746,10 @@ Apply these rules to EVERY button across the entire system:
 | Hover                        | Slightly darker shade. Smooth 150ms transition. Cursor remains pointer.                       |
 | Loading / Submitting         | Button disabled. Spinner replaces or precedes text. Opacity 0.8. Cursor: not-allowed.         |
 | Disabled (waiting for input) | Gray fill OR low opacity (0.5). Cursor: not-allowed. No hover effect. Tooltip if helpful.     |
-| Success (brief)              | Button briefly turns green with checkmark ✓ for 1.5 seconds, then resets.                     |
+| Success (brief)              | Button briefly turns green with checkmark ✓ for 1.5 seconds, then resets.                    |
 | Error (persistent)           | Button returns to default. Error shown separately (toast or inline).                          |
 
-### 5.2 Additional UI States - Added
+### 5.2 Additional UI States
 
 **\[ADDED\] Order type selector UI state (FR S3)**
 
@@ -615,14 +797,22 @@ Action button in notification: 'Free Seat' - triggers PUT /api/staff/seats/:id w
 
 Applies to the staff mobile app notification panel.
 
+**\[ADDED\] ML Loading State**
+
+When ML results are being fetched: skeleton chart placeholder with 'Loading predictions...' label.
+
+**\[ADDED\] ML Force Refresh**
+
+Button in Reports: 'Refresh Predictions' - shows spinner while ML reruns, then updates charts.
+
 ### 5.3 Toast Notification System
 
-| **Toast Type**      | **When to Use**                                                                        |
-| ------------------- | -------------------------------------------------------------------------------------- |
-| Success (green, ✓)  | Form saved, account created, payment processed, reservation confirmed, stamp credited. |
-| Error (red, ✗)      | API errors, failed saves, invalid actions (e.g., trying to claim with < 9 stamps).     |
-| Warning (orange, ⚠) | Low stock alerts, offline stamp pending, no-show notification, pay-later order open.   |
-| Info (blue, ℹ)      | Neutral status: 'Sync complete', 'Reservation pending approval'.                       |
+| **Toast Type**      | **When to Use**                                                                                             |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Success (green, ✓)  | Form saved, account created, payment processed, reservation confirmed, stamp credited, ML refresh complete. |
+| Error (red, ✗)      | API errors, failed saves, invalid actions (e.g., trying to claim with < 9 stamps).                         |
+| Warning (orange, ⚠) | Low stock alerts, offline stamp pending, no-show notification, pay-later order open, ML restock alert.      |
+| Info (blue, ℹ)      | Sync complete, reservation pending approval, ML predictions unavailable (fallback active).                  |
 
 ### 5.4 Form Validation Rules
 
@@ -634,6 +824,7 @@ Applies to the staff mobile app notification panel.
 - Guest count out of range → 'Number of guests must be between 1 and 10.'
 - Stock quantity negative → 'Quantity cannot be negative.'
 - Cash tendered less than total → 'Amount tendered must be equal to or greater than the total.'
+- Reservation time outside operating hours → 'Please select a time within operating hours.'
 - Show errors inline below each field in red. Never show all errors in a single red box at the top.
 
 ### 5.5 Loading States - Every Page and List
@@ -641,6 +832,7 @@ Applies to the staff mobile app notification panel.
 - Initial page load → show skeleton loader (gray animated blocks matching the layout)
 - Table data loading → show skeleton rows (3-5 rows of gray animated lines)
 - Charts loading → placeholder card with spinning animation
+- ML predictions loading → skeleton chart with 'Loading predictions...'
 - QR code loading → gray placeholder square with spinner in center
 - Never show blank white space - always show a loading indicator
 
@@ -652,6 +844,7 @@ Applies to the staff mobile app notification panel.
 - Notifications, none → 'You are all caught up!'
 - Reservation list, none → 'No reservations for this date.'
 - Open orders list, none → 'No open pay-later orders right now.'
+- ML data - no history → 'Not enough sales data yet. Predictions will appear after 14+ days of sales.'
 - Every empty state should have: illustration/icon, short message, optional CTA button if action is available.
 
 ### 5.7 Offline Indicator (Web Portal)
@@ -663,17 +856,18 @@ Applies to the staff mobile app notification panel.
 
 ### 5.8 Confirmation Dialogs - When to Use Them
 
-| **Action**                                   | **Needs Confirm Dialog?**                                                |
-| -------------------------------------------- | ------------------------------------------------------------------------ |
-| Delete a product                             | YES - 'This will remove the product permanently.'                        |
-| Deactivate an employee                       | YES - 'This will prevent the employee from logging in.'                  |
-| Cancel a reservation (customer)              | YES - 'Are you sure you want to cancel?'                                 |
-| Claim a reward (customer)                    | YES - 'Confirm reward selection. This action cannot be undone.'          |
-| Remove a time slot with pending reservations | YES - Show warning: 'There are \[N\] pending reservations in this slot.' |
-| Adjust inventory                             | NO - Just a form modal, no extra confirm needed                          |
-| Toggle stamp eligibility                     | NO - Instant toggle is fine, can be toggled back                         |
-| Mark order as paid                           | NO - Direct action, no confirm needed                                    |
-| Free a no-show seat                          | NO - Action comes from notification, single tap is fine                  |
+| **Action**                                       | **Needs Confirm Dialog?**                                                             |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| Delete a product                                 | YES - 'This will remove the product permanently.'                                     |
+| Deactivate an employee                           | YES - 'This will prevent the employee from logging in.'                               |
+| Cancel a reservation (customer)                  | YES - 'Are you sure you want to cancel?'                                              |
+| Claim a reward (customer)                        | YES - 'Confirm reward selection. This action cannot be undone.'                       |
+| Change operating hours with pending reservations | YES - 'There are \[N\] pending reservations. Changing hours may affect them.'         |
+| Adjust inventory                                 | NO - Just a form modal, no extra confirm needed                                       |
+| Toggle stamp eligibility / reward item           | NO - Instant toggle is fine, can be toggled back                                      |
+| Mark order as paid                               | NO - Direct action, no confirm needed                                                 |
+| Free a no-show seat                              | NO - Action comes from notification, single tap is fine                               |
+| Force refresh ML predictions                     | NO - Just runs, shows spinner                                                         |
 
 ### 5.9 Network / API Error Handling
 
@@ -686,78 +880,101 @@ Applies to the staff mobile app notification panel.
 | 409 Conflict              | Inline error relevant to the conflict (e.g., duplicate email, full reservation slot). |
 | 422 Unprocessable         | Show inline field errors from the API response.                                       |
 | 500 Server Error          | Toast: 'Something went wrong on our end. Please try again in a moment.'               |
+| ML Service Down           | Info banner: 'ML predictions temporarily unavailable. Showing basic data.'            |
 | Network Timeout / Offline | Toast: 'Could not connect. Please check your internet connection.'                    |
 
-**PHASE 6: INTEGRATION & TESTING End-to-end tests · API validation · Cross-browser · Security audit · Performance**
+**[/] PHASE 6: INTEGRATION & TESTING End-to-end tests · ML tests · Security audit · Cross-browser · Performance**
 
 ## Goals for Phase 6
 
-No feature is done until it is tested end-to-end. This phase covers all integration testing before deployment.
+No feature is done until it is tested end-to-end. This phase covers all integration testing including ML scenarios before deployment.
 
 ### 6.1 Integration Test Scenarios - Web + Backend
 
-| **Scenario**                                         | **What to Verify**                                                                 |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Admin logs in and creates a product                  | Product appears on customer portal menu immediately                                |
-| Admin marks product as stamp-eligible                | Stamp eligible flag visible in staff API response                                  |
-| Admin configures a reward item (product picker)      | Reward appears in customer claim flow modal                                        |
-| Admin adds and removes a time slot                   | Slot appears/disappears on reservation page; warning shown if pending reservations |
-| Admin downloads APK                                  | APK file downloads successfully; staff token returns 403                           |
-| Customer creates account and logs in                 | JWT returned, /api/auth/me returns correct profile                                 |
-| Customer makes a reservation as guest                | Staff sees reservation with guest name, no account linked                          |
-| Staff approves reservation                           | Customer portal shows 'Approved' status, seat count updates                        |
-| Staff marks no-show                                  | Seat freed, seat count updates on customer portal, no-show notification cleared    |
-| Staff creates pay-later order                        | Order appears in GET /api/staff/orders?status=open; inventory deducted immediately |
-| Staff retrieves open order and collects cash payment | change_due computed correctly; receipt issued; order removed from open list        |
-| Staff collects GCash payment                         | payment_method=GCash stored; change_due=0; receipt issued                          |
-| Customer earns stamps (exactly 9)                    | All 9 slots fill, no excess, claim button activates                                |
-| Customer earns 12 stamps (overflow)                  | All 9 slots fill, excess=3 queued, claim button activates                          |
-| Customer claims reward with 3 excess                 | Card resets, fills with 3 stamps, reward code marked used                          |
-| Customer earns 14 stamps (overflow carry test)       | 9 slots fill, excess=5 queued → claim → card resets → fills with 5 stamps          |
-| Admin processes refund on stamped order              | Stamps deducted from customer, inventory restored, refund logged                   |
-| Admin deletes product with pending orders            | Correct error returned, product not deleted                                        |
+| **Scenario**                                  | **What to Verify**                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------- |
+| Admin logs in and creates a product           | Product appears on customer portal immediately                      |
+| Admin marks product as reward item            | Reward appears in customer claim modal                              |
+| Admin updates operating hours                 | Customer reservation time picker reflects new hours immediately     |
+| Admin downloads APK                           | File downloads; staff token returns 403                             |
+| Customer makes a reservation with time picker | Staff sees reservation with correct time; no fixed slot required    |
+| Two reservations at similar time              | Staff reservation list shows overlap flag on both                   |
+| Staff approves reservation                    | Customer notified; seat count updates on portal                     |
+| Staff marks no-show                           | Seat freed; count updates; no-show notification cleared             |
+| Staff creates pay-later order                 | Order in GET /api/staff/orders?status=open; inventory deducted      |
+| Staff collects cash payment                   | change_due computed; receipt issued; order off open list            |
+| Staff collects GCash payment                  | payment_method=GCash stored; change_due=0; receipt issued           |
+| Customer earns exactly 9 stamps               | All 9 slots fill; no excess; claim button activates                 |
+| Customer earns 12 stamps                      | 9 slots fill; 3 queued; claim button active                         |
+| Customer claims with 3 excess                 | Card resets; fills with 3 stamps; reward code marked used           |
+| Customer earns 14 stamps (overflow carry)     | 9 slots fill; 5 queued → claim → card resets → fills with 5 stamps  |
+| Admin views reports - ML active               | Best seller badges show; forecast chart renders; restock days shown |
+| Admin views reports - < 14 days data          | 'Not enough data yet' message shown correctly                       |
+| ML service stopped during report load         | Fallback data shown; info banner displayed; no crash                |
+| Admin clicks Force Refresh                    | ML cache cleared; new predictions fetched; charts update            |
+| Admin refunds stamped order                   | Stamps deducted; inventory restored; refund logged                  |
+| Admin deletes product with pending orders     | Error returned; product not deleted                                 |
 
-### 6.2 Security Checklist
+### 6.2 ML-Specific Test Cases
+
+| **ML Test**                       | **Expected Result**                                                          |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| 0 days of sales data              | All three ML endpoints return { status: 'insufficient_data' }                |
+| 13 days of data                   | Forecast returns insufficient_data; restock and classify return basic results|
+| 14 days of data                   | Forecast returns 7-day prediction; all features active                       |
+| 30 days of data                   | K-Means classification returns 3 labeled groups                              |
+| Product with 0 sales in 30 days   | Correctly classified as Slow Mover                                           |
+| Inventory item consumed > stock   | days_remaining = 0; Restock Now label; notification triggered                |
+| ML result cached - second request | Result returns from ml_results table; no ML service call made                |
+| Cache expired (24hrs passed)      | ML service called again; fresh result returned and cached                    |
+| Force Refresh clicked             | Cache cleared; ML called immediately; updated result stored                  |
+| ML service unreachable            | Fallback data returned; info banner shown; no 500 error                      |
+
+### 6.3 Security Checklist
 
 - Admin routes reject customer and staff tokens (403)
 - Customer routes reject admin and staff tokens
 - All inputs sanitized - no SQL injection, no XSS through product names or CMS content
 - Reward codes are truly single-use - second redemption attempt returns error
-- Passwords are hashed (bcrypt) - never stored or returned in plain text
+- Passwords hashed (bcrypt) - never stored or returned in plain text
 - JWT expiry enforced - expired tokens return 401
 - GET /api/admin/apk/download returns 403 for staff and customer tokens
 - GET /api/staff/members?search= returns 403 for customer and guest tokens
+- ML service endpoints unreachable from public internet - internal only
 - Pay endpoint rejects amount_tendered < total for cash payments
 
-### 6.3 Cross-Browser Testing
+### 6.4 Cross-Browser Testing
 
 - Chrome (latest), Firefox (latest), Safari (latest), Edge
 - Mobile browser: Chrome on Android, Safari on iOS (for customer portal)
 - Test at: 1920px (desktop), 1280px (laptop), 768px (tablet), 390px (mobile)
 
-**PHASE 7: DEPLOYMENT & HANDOVER TO MOBILE DEV Production setup · Documentation · Mobile prep · Handover checklist**
+**[ ] PHASE 7: DEPLOYMENT & HANDOVER TO MOBILE DEV Production setup · Documentation · SQLite schema · Mobile API handover**
 
 ### 7.1 Deployment Checklist
 
 - Backend deployed to production server (VPS or cloud)
+- ML service deployed alongside backend (same server, port 5001)
 - Database migrations run on production
 - Environment variables set for production (never commit .env to Git)
 - HTTPS enabled - all endpoints over SSL
 - Customer portal and Admin panel deployed to web hosting
 - Admin account created for the café owner
-- Seed data added: products, categories, initial inventory, default time slots (5PM-12AM)
+- Seed data: products, categories, initial inventory, operating hours (5PM-12AM)
+- ML service health check passes: GET /ml/health returns { status: 'ok' }
 
 ### 7.2 Documentation for Mobile Developer
 
 - Full Postman collection exported and shared
 - API endpoint list with sample request/response for every endpoint
-- Authentication flow documented: how to get a staff JWT, token format, expiry
-- Offline sync API: document which endpoints the mobile app calls on reconnect
-- Stamp credit endpoint: document exact request body, QR code format, offline queue behavior
-- Order creation endpoint: document all required fields for dine-in/take-out and pay-now/pay-later
-- Payment endpoint: document payment_method values, amount_tendered field, change_due response
-- Open orders endpoint: document GET /api/staff/orders?status=open and response shape
-- Member search endpoint: document GET /api/staff/members?search= and response shape
+- Authentication flow: how to get a staff JWT, token format, expiry
+- Offline sync: which endpoints mobile calls on reconnect
+- Stamp credit endpoint: request body, QR format, offline queue behavior
+- Order creation: all required fields for dine-in/take-out and pay-now/pay-later
+- Payment endpoint: payment_method values, amount_tendered, change_due response
+- Open orders endpoint: GET /api/staff/orders?status=open and response shape
+- Member search endpoint: GET /api/staff/members?search= and response shape
+- Operating hours endpoint: GET /api/admin/operating-hours - mobile uses this to validate reservation times
 
 **\[ADDED\] SQLite local schema for mobile developer (NFR 8)**
 
@@ -775,13 +992,13 @@ Provide /docs/mobile-sqlite-schema.md with the following local tables:
 
 Conflict resolution rule (server always wins):
 
-\- On reconnect, local data is pushed to server first.
+1\. On reconnect, push local data to server first.
 
-\- If server rejects or returns a newer version, local record is overwritten.
+2\. If server rejects or has a newer version, overwrite the local record.
 
-\- Conflict is logged to sync_logs with conflict=true for admin review.
+3\. Log conflict to sync_logs with conflict=true for admin review.
 
-\- Never merge - always replace with server version.
+4\. Never merge - always replace with server version.
 
 ### 7.3 Handover Note to Mobile Developer
 
@@ -794,23 +1011,27 @@ The mobile POS app (Android APK) will need the following backend features that a
 - GET /api/staff/members?search= - search customer accounts for member list lookup
 - POST /api/staff/rewards/redeem - redeem reward code (requires internet)
 - PUT /api/staff/seats/:id - toggle seat state (requires internet for live sync)
-- GET /api/staff/reservations - list reservations (requires internet)
+- GET /api/staff/reservations - list reservations sorted by time with overlap flag
 - PUT /api/staff/reservations/:id - approve/decline (requires internet)
 - POST /api/staff/orders/:id/refund - process refund (requires internet)
+- GET /api/admin/operating-hours - get opening/closing time for reservation validation
+
+**ML service is NOT needed by the mobile app - ML results are admin web panel only.**
 
 The mobile developer should use the same JWT auth system. Staff tokens are scoped to /api/staff/\* routes only.
 
 # Quick Reference: Phase Summary
 
-| **Phase**                    | **Who Does What + Key Output**                                                                                                                                                                                                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase 1 - Setup & Foundation | Backend: DB schema (with payment_method, change_due columns), migrations, JWT auth, SQLite schema stub Frontend: Project init, route shells, component stubs, API wrapper Output: Runnable project, login returns JWT, all routes exist                                                 |
-| Phase 2 - Core Backend API   | Backend: ALL endpoints for auth, products, inventory, orders (with pay-later + cash change), stamps (with member search), reservations, CMS, reports, APK download Frontend: Postman testing only, mock data for early UI work Output: Full API works in Postman, seeded with test data |
-| Phase 3 - Admin Panel        | Frontend: All admin UI screens including APK download section, product picker for rewards, default time slots Backend: Fix any API issues found during integration Output: Admin can log in, manage products/inventory/employees, download APK, view reports                            |
-| Phase 4 - Customer Portal    | Frontend: All customer UI screens including map embed, reward list modal, pay-method in history Backend: Fix any API issues found during integration Output: Customer can reserve, earn stamps, claim rewards, view history                                                             |
-| Phase 5 - UI/UX Polish       | Frontend: All button states, toasts, loading skeletons, empty states, error handling, new UI states (order type, pay timing, cash change, no-show notification) Both: Review and fix all edge cases Output: Every action has feedback, no blank states, offline indicator works         |
-| Phase 6 - Testing            | Both: Integration tests (including overflow carry-over test + APK + cash change + pay-later), security audit, cross-browser Output: All scenarios pass, no security holes, works on mobile browsers                                                                                     |
-| Phase 7 - Deployment         | Both: Deploy to production, write mobile dev handover docs including SQLite schema and conflict resolution rules Output: System live, API fully documented for mobile developer                                                                                                         |
+| **Phase**                  | **Who Does What + Key Output**                                                                                                                                                                                                                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase 1 Setup & Foundation | Backend: DB schema (payment columns + ml_results table), migrations, JWT auth, SQLite schema stub. Frontend: Project init, route shells, component stubs, API wrapper. Output: Runnable project, login returns JWT, all routes exist                                                          |
+| Phase 2 Core Backend API   | Backend: ALL endpoints - auth, products, inventory, orders (pay-later + cash change), stamps (member search), reservations, CMS, reports, APK download, operating hours. Frontend: Postman testing only, mock data. Output: Full API works in Postman, seeded with test data                 |
+| Phase 2.5 ML Service (NEW) | Backend: Python Flask ML microservice with Prophet forecasting, K-Means classification, moving average restock prediction, 24hr caching, fallback handling. Output: /ml/health passes, all 3 ML endpoints return correct results, cache and fallback both work                               |
+| Phase 3 Admin Panel        | Frontend: All admin UI including ML results in reports, restock predictions in inventory, operating hours config, overlap flag in reservations, APK download. Backend: Fix API issues, ML integration. Output: Admin can configure system and view ML-powered reports                        |
+| Phase 4 Customer Portal    | Frontend: All customer UI - time picker respects operating hours, reward list from product toggles, payment method in history. Output: Customer can reserve, earn stamps, claim rewards, view history                                                                                        |
+| Phase 5 UI/UX Polish       | Frontend: All button states, toasts, loading skeletons, empty states, ML loading state, ML unavailable banner, force refresh button. Output: Every action has feedback, ML states handled gracefully                                                                                         |
+| Phase 6 Testing            | Both: Integration tests including ML scenarios, cold start tests, cache tests, fallback tests, security audit, cross-browser. Output: All scenarios pass including full ML test suite                                                                                                        |
+| Phase 7 Deployment         | Both: Deploy backend + ML service to production, write mobile handover docs with SQLite schema and conflict rules. Output: System live, ML running, API documented for mobile developer                                                                                                      |
 
 **Golden Rules for the Developer Team**
 
@@ -831,5 +1052,9 @@ Test cases: exactly 9, overflow with carry-over, claim and reset, stamp on just-
 7\. Store payment_method on every transaction - reports and history depend on it.
 
 8\. Document the SQLite schema and conflict resolution rule for the mobile developer before handover.
+
+9\. ML service must always have a fallback - reports page must never break if ML is down.
+
+10\. ML needs data - show 'Not enough data yet' gracefully for new installs.
 
 _- End of Document -_
