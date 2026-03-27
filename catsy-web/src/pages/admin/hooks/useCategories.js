@@ -1,27 +1,27 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminService } from '../../../services/adminService';
+import { productService } from '../../../services/productService';
 
 export function useCategories(enabled = true) {
     const queryClient = useQueryClient();
 
     const query = useQuery({
         queryKey: ['admin', 'categories'],
-        queryFn: () => adminService.getCategories(),
+        queryFn: () => productService.getAllCategories(),
         enabled,
     });
 
     const createMutation = useMutation({
-        mutationFn: (newCategory) => adminService.createCategory(newCategory),
+        mutationFn: (newCategory) => productService.createCategory(newCategory),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] })
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }) => adminService.updateCategory(id, data),
+        mutationFn: ({ id, data }) => productService.updateCategory(id, data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] })
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => adminService.deleteCategory(id),
+        mutationFn: (id) => productService.deleteCategory(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] })
     });
 

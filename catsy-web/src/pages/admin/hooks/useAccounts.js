@@ -1,22 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminService } from '../../../services/adminService';
+import { userService } from '../../../services/userService';
 
 export function useAccounts(enabled = true) {
     const queryClient = useQueryClient();
 
     const query = useQuery({
         queryKey: ['admin', 'users'],
-        queryFn: () => adminService.getUsers(),
+        queryFn: () => userService.getUsers(),
         enabled,
     });
 
     const createMutation = useMutation({
-        mutationFn: (newUser) => adminService.createUser(newUser),
+        mutationFn: (newUser) => userService.createUser(newUser),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => adminService.deleteUser(id),
+        mutationFn: (id) => userService.deleteUser(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
     });
 

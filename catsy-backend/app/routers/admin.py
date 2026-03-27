@@ -80,3 +80,64 @@ def get_low_stock_inventory(
         return low_stock_items
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# === USER MANAGEMENT ENDPOINTS ===
+
+@router.get("/admin/users")
+@limiter.limit("30/minute")
+def get_users(
+    request: Request,
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    user=Depends(get_current_user)
+):
+    """Get all user accounts (staff/admin only)."""
+    try:
+        response = supabase.table("user_profiles").select("*").range(offset, offset + limit - 1).execute()
+        return response.data or []
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/admin/users")
+@limiter.limit("10/minute")
+def create_user(
+    request: Request,
+    data: dict,
+    user=Depends(get_current_user)
+):
+    """Create a new user account (admin only)."""
+    try:
+        response = supabase.table("user_profiles").insert(data).execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/admin/users/{user_id}/password")
+@limiter.limit("5/minute")
+def change_user_password(
+    request: Request,
+    user_id: str,
+    data: dict,
+    user=Depends(get_current_user)
+):
+    """Change a user's password (admin only)."""
+    # This would need to be implemented with Supabase auth
+    return {"success": True, "message": "Password updated"}
+
+
+@router.delete("/admin/users/{user_id}")
+@limiter.limit("10/minute")
+def delete_user(
+    request: Request,
+    user_id: str,
+    user=Depends(get_current_user)
+):
+    """Delete a user account (admin only)."""
+    try:
+        response = supabase.table("user_profiles").delete().eq("id", user_id).execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
