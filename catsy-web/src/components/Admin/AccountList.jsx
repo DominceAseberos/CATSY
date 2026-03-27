@@ -93,6 +93,8 @@ export default function AccountList({ users, isLoading, onSelectUser, onCreate }
                                     <div className="flex flex-wrap gap-x-6 gap-y-1 text-base text-neutral-400">
                                         <span>{user.email}</span>
                                         {user.contact && <span>• {user.contact}</span>}
+                                        {user.qr_code && <span className="text-neutral-500 font-mono text-xs">• ID: {user.qr_code.slice(0, 8)}...</span>}
+                                        <span className="text-amber-500 font-bold ml-auto">{user.excess_stamps || 0} Stamps</span>
                                     </div>
                                 </div>
                                 <span className="text-neutral-600 group-hover:text-neutral-400 transition-colors text-lg">→</span>

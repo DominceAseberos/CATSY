@@ -19,6 +19,7 @@ export const productSchema = z.object({
     product_is_featured: z.boolean().default(false),
     product_is_eligible: z.boolean().default(true),
     product_is_reward: z.boolean().default(false),
+    product_description: z.string().max(1000, "Description is too long").optional().nullable(),
 });
 
 // 2. Category / Reward Schema
@@ -60,6 +61,8 @@ export const accountSchema = z.object({
         .regex(/[!@#$%^&*(),.?":{}|<>]/, "Must contain a special character")
         .optional()
         .or(z.literal('')), // Optional for editing, required for new
+    qr_code: z.string().max(50, "QR Code is too long").optional().nullable(),
+    excess_stamps: z.number().int().min(0).default(0),
 }).refine((data) => {
     // Custom refinement can be added here if needed
     return true;

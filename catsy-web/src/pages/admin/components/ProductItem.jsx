@@ -5,7 +5,8 @@ export default function ProductItem({ p, openEdit, handleDelete }) {
         <div className="bg-neutral-800 p-6 rounded-2xl flex justify-between items-center border border-neutral-700/50 hover:border-neutral-600 transition-colors group">
             <div>
                 <h4 className="font-bold text-xl group-hover:text-brand-accent transition-colors">{p.product_name}</h4>
-                <div className="flex flex-wrap gap-3 text-base text-neutral-400 mt-2">
+                {p.product_description && <p className="text-sm text-neutral-500 mt-1 mb-2 line-clamp-1">{p.product_description}</p>}
+                <div className="flex flex-wrap gap-3 text-base text-neutral-400">
                     <span className="text-green-400 font-mono font-bold">₱{p.product_price}</span>
                     <span className="opacity-44">•</span>
                     {!p.product_is_available && <span className="text-red-400 bg-red-900/30 px-3 py-1 rounded text-xs items-center flex font-bold uppercase tracking-widest">Unavailable</span>}

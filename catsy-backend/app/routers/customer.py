@@ -61,16 +61,16 @@ def search_members(
     """
     try:
         db = get_db()
-        # Query the customers table (populated by auth_service lazy-create)
-        query = db.table('customers').select(
-            "id, full_name, email, qr_id, stamp_count"
+        # Query user_profiles (V2 schema replacement for 'customers')
+        query = db.table('user_profiles').select(
+            "id, first_name, last_name, email, qr_code, excess_stamps"
         )
         if search:
-            # Supabase PostgREST: use ilike for case-insensitive match on name or email
+            # Check first_name, last_name, or email
             query = query.or_(
-                f"full_name.ilike.%{search}%,email.ilike.%{search}%"
+                f"first_name.ilike.%{search}%,last_name.ilike.%{search}%,email.ilike.%{search}%"
             )
-        result = query.order('full_name').range(offset, offset + limit - 1).execute()
+        result = query.order('last_name').range(offset, offset + limit - 1).execute()
         return result.data or []
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

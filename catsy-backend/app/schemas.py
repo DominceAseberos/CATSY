@@ -114,12 +114,69 @@ class PaymentReceiptResponse(BaseModel):
 class CustomerOrderResponse(BaseModel):
     """Compact order record for GET /api/customer/orders."""
     id: str
-    order_type: Optional[str] = None
-    payment_status: Optional[str] = None
+    order_type: Optional[str] = 'dine-in'
+    payment_status: Optional[str] = 'unpaid'
     payment_method: Optional[str] = None
-    total_amount: Optional[float] = None
+    total_amount: Optional[float] = 0
     created_at: Optional[str] = None
     order_items: Optional[List[dict]] = []
+
+    class Config:
+        from_attributes = True
+
+class OrderResponse(BaseModel):
+    """Full order record for staff/admin views (V2)."""
+    id: str
+    customer_id: Optional[str] = None
+    status: str
+    payment_status: str
+    total_amount: float
+    payment_method: Optional[str] = None
+    amount_tendered: Optional[float] = None
+    change_due: Optional[float] = None
+    receipt_number: Optional[str] = None
+    order_type: str
+    payment_timing: str
+    stamps_credited: bool = False
+    refunded_at: Optional[str] = None
+    refund_reason: Optional[str] = None
+    created_at: str
+    updated_at: str
+    order_items: Optional[List[dict]] = []
+
+    class Config:
+        from_attributes = True
+
+# ── User Profiles ─────────────────────────────────────────────────────────────
+
+class UserProfileResponse(BaseModel):
+    """V2 User Profile data."""
+    id: str
+    email: str
+    role: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    contact: Optional[str] = None
+    account_id: Optional[str] = None
+    is_active: bool = True
+    qr_code: Optional[str] = None
+    excess_stamps: int = 0
+    created_at: Optional[str] = None
+    last_login: Optional[str] = None
+    last_updated: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+# ── Settings ──────────────────────────────────────────────────────────────────
+
+class SettingsResponse(BaseModel):
+    """V2 Restaurant Settings."""
+    is_open: bool
+    opening_time: str
+    closing_time: str
+    total_seats: int
+    updated_at: Optional[str] = None
 
     class Config:
         from_attributes = True

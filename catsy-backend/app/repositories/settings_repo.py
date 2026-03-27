@@ -6,7 +6,8 @@ from app.utils.audit_logger import AuditLogger
 class SettingsRepository(IRepository):
     def get_all(self, limit: int = 1, offset: int = 0) -> List[Any]:
         db = get_db()
-        return db.table('restaurant_settings').select("is_open, opening_time, closing_time, total_seats").range(offset, offset + limit - 1).execute().data
+        response = db.table('restaurant_settings').select("*").limit(1).execute()
+        return response.data[0] if response.data else {}
 
     def get_by_id(self, id: str) -> Optional[Any]:
         db = get_db()

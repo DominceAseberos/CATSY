@@ -118,6 +118,16 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                 />
                                 {errors.product_name && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.product_name.message}</p>}
                             </div>
+                            <div>
+                                <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Description</label>
+                                <textarea
+                                    {...register('product_description')}
+                                    className={`w-full bg-neutral-900 border ${errors.product_description ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans resize-none`}
+                                    rows={3}
+                                    placeholder="Brief product description..."
+                                />
+                                {errors.product_description && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.product_description.message}</p>}
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Price (₱)</label>
@@ -302,6 +312,25 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                     className={`w-full bg-neutral-900 border ${errors.email ? 'border-red-500' : 'border-neutral-700'} rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans`}
                                 />
                                 {errors.email && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.email.message}</p>}
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">QR Code UID <span className="text-neutral-600">(Read-only/Advanced)</span></label>
+                                    <input
+                                        type="text"
+                                        {...register('qr_code')}
+                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans font-mono"
+                                        placeholder="Auto-generated if empty"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Excess Stamps</label>
+                                    <input
+                                        type="number"
+                                        {...register('excess_stamps', { valueAsNumber: true })}
+                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
+                                    />
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>

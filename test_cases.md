@@ -5,6 +5,7 @@ This document provides a structured set of test cases to verify the functionalit
 ---
 
 ## 🔐 0. Authentication & Security (Cross-Platform)
+*Last Updated: 2026-03-27*
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -16,6 +17,7 @@ This document provides a structured set of test cases to verify the functionalit
 ---
 
 ## 🛒 1. Customer Web Portal
+*Last Updated: 2026-03-27*
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -28,6 +30,7 @@ This document provides a structured set of test cases to verify the functionalit
 ---
 
 ## 🏗️ 2. Core Architecture (SOLID & Backend)
+*Last Updated: 2026-03-27*
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -38,46 +41,65 @@ This document provides a structured set of test cases to verify the functionalit
 ---
 
 ## 📊 3. Admin Dashboard & Reports
-## Verified with Seed Data (2026-03-26)
+*Last Updated: 2026-03-27*
+
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC_DSH_001** | Dashboard | Stat Cards | 1. Open Admin Dashboard.<br>2. Compare Sales count with Order history. | Today's Sales and Orders totals match accurately. | | |
 | **TC_DSH_002** | Dashboard | Low Stock Alert | 1. Set a material stock below its threshold.<br>2. Refresh Dashboard. | Material appears in the "Low Stock Alerts" list. | | |
+| **TC_DSH_003** | Dashboard | Unpaid Filter | 1. Verify Revenue calculations only consider 'paid' and 'unpaid' constraints correctly. | Open orders correctly filter using `payment_status == 'unpaid'`. | Backend repo updated. | pending |
 | **TC_RPT_001** | Reports | Date Filtering | 1. Go to Reports.<br>2. Select a custom date range. | Data table refreshes with only relevant dates. | | |
 | **TC_RPT_002** | Reports | Payment Method | 1. View Sales Report breakdown. | Columns for Cash, GCash, and Maya show separate totals. | | |
 
 ---
 
 ## ☕ 4. Products & Inventory
-## Verified with Seed Data (2026-03-26)
+*Last Updated: 2026-03-27*
+
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC_INV_001** | Inventory | Stock Update | 1. Click "Adjust" on a material.<br>2. Select "Restock" and add 50 units. | Current Stock value increases exactly by 50. | | |
 | **TC_PRD_001** | Products | Reward Picker | 1. Edit a Reward product.<br>2. Use the product search dropdown. | Only existing products from the database are selectable. | | |
 | **TC_PRD_002** | Products | Stamp Toggle | 1. Toggle "Stamp Eligible" on a product. | Flag updates instantly in the database/UI. | | |
+| **TC_PRD_003** | Products | Description Field | 1. Edit product and set Product Description.<br>2. Save and view list. | Description is clamped in the list view and saved correctly to `product_description`. | UI component added. | pending |
 
 ---
 
-## 📅 5. Reservations & Seats (Admin View)
-## Verified with Seed Data (2026-03-26)
+## 📅 5. Reservations & Operating Hours (Admin View)
+*Last Updated: 2026-03-27*
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **TC_SET_001** | Seats | Live Seat Map | 1. Create a reservation for "Table 1".<br>2. Refresh Admin Seat Map. | "Table 1" turns Blue (Reserved) with customer name. |on customer there is now selecting for table when reservation, incorrect test case, the reservation does not link to the table , but it correclty shows on admin view when there reservation request and shows correct details,| incorrect test case  |
-| **TC_SLT_001** | Time Slots | Initialization | 1. First time opening the Slots page. | Page is pre-populated with default 5PM-12AM slots. |Initialization logic verified. Time slots populated on first-run. | pass |
-| **TC_SLT_002** | Time Slots | Conflict Check | 1. Attempt to delete a slot with pending bookings. | System shows a confirmation dialog with warning. |Resolved ToastProvider crash in AdminPanel. Conflict check modal displays correctly. | pass |
- ---
+| **TC_SET_001** | Seats | Capacity Check | 1. Edit total_seats in Settings.<br>2. Verify Admin Seat Overview | Overview scales based on total_seats setting correctly. |on customer there is now selecting for table when reservation, incorrect test case, the reservation does not link to the table , but it correclty shows on admin view when there reservation request and shows correct details,| incorrect test case [Updates applied to map seat logic] |
+| **TC_OPR_001** | Operating Hours | Time Update | 1. Open Operating Hours tab.<br>2. Update open/close times and capacity. | Updates sync to `restaurant_settings` and update `total_seats` vs tables. | Obsolete Time Slots logic removed, Operating Hours implemented. | pending |
+
 ---
 
+## 👥 6. Accounts Management
+*Last Updated: 2026-03-27*
+
+| Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC_ACC_001** | Accounts | QR Code View | 1. Select a Customer account in Admin Panel. | Admin can view the `qr_code` UID in the account detail. | Fields added to UI/Backend. | pending |
+| **TC_ACC_002** | Accounts | Excess Stamps | 1. Edit a Customer account.<br>2. Modify Excess Stamps. | UI successfully accepts value and modifies `excess_stamps` in `user_profiles`. | Fields added to form schema. | pending |
+| **TC_ACC_003** | Accounts | Staff Search | 1. Use the Staff loyalty interface. | Searches across `first_name`, `last_name`, and `email` correctly querying `user_profiles`. | Backend endpoint mapped to V2. | pending |
+
+---
+
+## 📱 7. CMS & Customer Feedback
+*Last Updated: 2026-03-27*
+
+| Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC_CMS_001** | CMS | Banner Creation | 1. Create a new banner in Admin CMS.<br>2. Set to `Active`. | Banner appears immediately on the Customer Portal hero. |Resolved ToastProvider crash. CMS items load and save correctly. | pass |
 | **TC_FBC_001** | Feedback | Admin Analytics | 1. Submit feedback as a customer.<br>2. Open Admin Reports > Feedback. | Review appears with star rating and customer comment. | | |
 
 ---
 
-## 📑 7. Global User Interface (UIX)
+## 📑 8. Global User Interface (UIX)
+*Last Updated: 2026-03-27*
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC_UIX_001** | Global | Toast Feedback | 1. Cause a 500 error (e.g. invalid operation). | A red Toast appears at the bottom right immediately. |havent yet tried on admin view |pending |
-
 | **TC_UIX_002** | Global | Loading State | 1. Refresh any data-heavy admin page. | Skeleton loaders show instead of blank white space. |correctly shows skeletopn |pass |
