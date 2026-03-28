@@ -44,9 +44,9 @@ import io
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.auth import get_current_user
-from app.dependencies import get_user_repository
+from app.dependencies import get_user_repository, get_audit_repository
 from app.repositories.users_repo import UserRepository
-from app.database import get_db
+from app.repositories.audit_repo import AuditRepository
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -63,21 +63,13 @@ def get_audit_logs(
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     user=Depends(get_current_user),
+    repo: AuditRepository = Depends(get_audit_repository),
 ):
-    """Admin: Return paginated audit log entries, newest first.
-
-    TODO: Move DB query into AuditRepository.get_logs() to comply with SRP.
-    """
+    """Admin: Return paginated audit log entries, newest first."""
     try:
-        db = get_db()
-        return (
-            db.table("audit_logs")
-            .select("*")
-            .order("created_at", desc=True)
-            .range(offset, offset + limit - 1)
-            .execute()
-            .data
-        )
+        return repo.get_logs(limit=limit, offset=offset)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

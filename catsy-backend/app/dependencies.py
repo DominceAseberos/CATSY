@@ -9,7 +9,11 @@ from app.repositories.categories_repo import CategoryRepository
 from app.repositories.users_repo import UserRepository
 from app.repositories.settings_repo import SettingsRepository
 from app.repositories.customer_repo import CustomerRepository
+
 from app.repositories.auth_repo import AuthRepository
+from app.repositories.audit_repo import AuditRepository
+def get_audit_repository() -> AuditRepository:
+    return AuditRepository()
 
 from app.services.order_service import OrderService
 from app.services.loyalty_service import LoyaltyService
