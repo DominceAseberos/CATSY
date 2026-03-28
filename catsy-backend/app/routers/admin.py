@@ -39,6 +39,7 @@ TODO:
     - users_router PATCH password: Implement Supabase Admin API call
 """
 from fastapi import APIRouter, HTTPException, Request, Depends, Query
+from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 import io
 from slowapi import Limiter
@@ -130,20 +131,28 @@ def create_user(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+class PasswordChangeRequest(BaseModel):
+    new_password: str
+
 @users_router.patch("/admin/users/{user_id}/password")
 @limiter.limit("5/minute")
 def change_user_password(
     request: Request,
     user_id: str,
-    data: dict,
+    data: PasswordChangeRequest,
     user=Depends(get_current_user),
 ):
-    """Admin: Update a user's password via Supabase Admin API.
-
-    TODO: Implement actual Supabase Admin API call. Currently returns a stub response.
-    """
-    # TODO: Implement Supabase Admin API call here
-    return {"success": True, "message": "Password updated"}
+    """Admin: Update a user password via the Supabase Auth Admin API."""
+    try:
+        db = get_db()
+        db.auth.admin.update_user_by_id(
+            user_id,
+            {"password": data.new_password}
+        )
+        return {"success": True, "message": "Password updated"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @users_router.delete("/admin/users/{user_id}")
