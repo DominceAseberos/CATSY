@@ -181,27 +181,23 @@ def download_pos_apk(
     request: Request,
     user=Depends(get_current_user),
 ):
-    """Admin: Stream the Catsy POS APK file for download.
-
-    Restricted to users with role='admin' in user_metadata or app_metadata.
-    TODO: Replace dummy bytes with real Supabase Storage download in production.
-    """
+    """Admin: Stream the Catsy POS APK from Supabase Storage."""
     role = None
     if hasattr(user, "user_metadata"):
         role = (user.user_metadata or {}).get("role")
     if not role and hasattr(user, "app_metadata"):
         role = (user.app_metadata or {}).get("role")
-
     if role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required.")
 
     try:
-        # TODO: Replace with Supabase Storage download before production release
-        dummy_content = b"CatsyPOS_v1.0.0_placeholder"
+        db = get_db()
+        # "apk-releases" is the bucket name; update to match your Supabase Storage bucket
+        file_bytes: bytes = db.storage.from_("apk-releases").download("catsy-pos.apk")
         return StreamingResponse(
-            io.BytesIO(dummy_content),
+            io.BytesIO(file_bytes),
             media_type="application/vnd.android.package-archive",
             headers={"Content-Disposition": "attachment; filename=catsy-pos.apk"},
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"APK download failed: {str(e)}")
