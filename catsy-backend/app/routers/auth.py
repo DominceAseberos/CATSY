@@ -17,34 +17,13 @@ Responsibilities:
     - Returns authentication tokens and user profiles
 """
 from fastapi import APIRouter, HTTPException, Request, Depends
-from pydantic import BaseModel
+from app.schemas import LoginRequest, SignupRequest
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.services.auth_service import AuthService
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(tags=["Auth"])
-
-
-# ── Schemas (move to schemas.py when splitting that file) ─────────────────────
-"""
-Schemas (temporary):
-LoginRequest and SignupRequest are defined here for now. Move to schemas.py when splitting that file.
-"""
-
-class LoginRequest(BaseModel):
-    username: str = None
-    email: str = None
-    password: str
-
-
-class SignupRequest(BaseModel):
-    email: str
-    password: str
-    username: str = ""
-    firstName: str = ""
-    lastName: str = ""
-    phone: str = ""
 
 
 # ── Dependency ────────────────────────────────────────────────────────────────

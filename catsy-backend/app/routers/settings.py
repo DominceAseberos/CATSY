@@ -1,7 +1,7 @@
 """Settings router — read and update restaurant configuration."""
 from fastapi import APIRouter, HTTPException, Request, Depends
 from app.dependencies import get_settings_repository
-from app.repositories.settings_repo import SettingsRepository
+from app.repositories.settings_repo import SettingsRepository, SETTINGS_ROW_ID
 from app.config import DEFAULT_SETTINGS
 from app.auth import get_current_user
 
@@ -22,6 +22,6 @@ def get_settings(repo: SettingsRepository = Depends(get_settings_repository)):
 def update_settings(settings_data: dict, user=Depends(get_current_user), repo: SettingsRepository = Depends(get_settings_repository)):
     """Update system settings — staff only."""
     try:
-        return repo.update("1", settings_data, user_id=str(user.id))
+        return repo.update(str(SETTINGS_ROW_ID), settings_data, user_id=str(user.id))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

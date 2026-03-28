@@ -26,6 +26,8 @@ What it does:
     - PATCH /admin/users/{id}/password    — Updates a user password (stub — see TODO)
     - DELETE /admin/users/{id}            — Deletes a user profile
     - GET  /admin/apk/download            — Streams the POS APK file (admin role only)
+        - Currently returns HTTP 503 if the APK is not yet available (placeholder logic).
+        - To enable real APK download, uncomment the Supabase Storage logic in the endpoint.
 
 What it does NOT do:
     - Does not contain business logic — routing and auth enforcement only
@@ -35,7 +37,7 @@ What it does NOT do:
 TODO:
     - audit_router: Move DB query into a dedicated AuditRepository.get_logs() method
     - inventory_router: Move low-stock filter into MaterialsRepository.get_low_stock()
-    - apk_router: Replace dummy bytes with real Supabase Storage download
+    - apk_router: Enable Supabase Storage download when APK is available
     - users_router PATCH password: Implement Supabase Admin API call
 """
 from fastapi import APIRouter, HTTPException, Request, Depends, Query

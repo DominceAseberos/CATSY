@@ -1,3 +1,20 @@
+# ── Auth ─────────────────────────────────────────────────────────────────────
+
+from typing import Optional
+from pydantic import BaseModel
+
+class LoginRequest(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: str
+
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+    username: str = ""
+    firstName: str = ""
+    lastName: str = ""
+    phone: str = ""
 """
 Pydantic DTOs — field names match the actual Supabase column names.
 Use `alias` when the API response key differs from the DB column.

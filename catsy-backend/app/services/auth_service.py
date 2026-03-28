@@ -40,7 +40,9 @@ class AuthService:
     """
 
     def __init__(self, auth_repo: Optional[AuthRepository] = None):
-        self.repo = auth_repo or AuthRepository()
+        # Explicit default: safe for production.
+        # Test callers should always pass a mock instead of relying on this default.
+        self.repo = auth_repo if auth_repo is not None else AuthRepository()
 
     def _resolve_role(self, user_id: str, meta: dict, app_meta: dict) -> str:
         """Resolve the user's role from metadata or DB row.
