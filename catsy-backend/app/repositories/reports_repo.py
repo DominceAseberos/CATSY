@@ -29,10 +29,15 @@ What it does NOT do:
 """
 from datetime import date
 from typing import List, Optional
+
+from app.repositories.base import IReadRepository
 from app.database import get_db
 
 
-class ReportsRepository:
+class ReportsRepository(IReadRepository):
+        def get_by_id(self, id: str):
+            """Not implemented: ReportsRepository does not support get_by_id."""
+            raise NotImplementedError("ReportsRepository does not support get_by_id.")
     """Data-access and aggregation layer for admin analytics.
 
     All business logic (grouping, summing, sorting) lives here.
