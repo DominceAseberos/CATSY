@@ -1,17 +1,19 @@
 """
-auth_repo.py — fixed version.
+AuthRepository
+==============
 
-Changes:
-  1. AuthRepository now only touches Supabase Auth API (sign_in, sign_up).
-  2. Customer table persistence (get_user_by_id, create_customer) moved to
-     CustomerRepository where it belongs — those methods operate on the
-     'customers' table, not the Auth API.
-  3. get_user_profile (user_profiles table) moved to UserRepository.
+Purpose:
+    Provides a data-access layer for Supabase Auth API operations (sign in, sign up).
+    Does not interact with application database tables directly.
 
-Migration note:
-  AuthService imports AuthRepository for Auth API calls.
-  AuthService imports CustomerRepository for customer row operations.
-  No behaviour change — just correct separation.
+Usage:
+    - Use sign_in_with_password() for authentication
+    - Use sign_up() for user registration
+
+Responsibilities:
+    - Encapsulates all Supabase Auth API calls
+    - Keeps authentication logic separate from customer/user table operations
+    - Used by AuthService for all authentication flows
 """
 from typing import Any
 from app.database import get_db

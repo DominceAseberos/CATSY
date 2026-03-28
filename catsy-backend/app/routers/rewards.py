@@ -1,12 +1,19 @@
-"""Admin Rewards router — CRUD for reward_items table.
-Replaces the product_is_reward flag approach (spec violation fix, Phase 2->3 bridge).
+"""
+Rewards Routers
+==============
 
-Endpoints:
-  GET    /api/admin/rewards         — List all reward items (with product info)
-  POST   /api/admin/rewards         — Add a product as a reward item
-  PATCH  /api/admin/rewards/:id     — Toggle is_active flag
-  DELETE /api/admin/rewards/:id     — Remove a product from reward items
-  GET    /api/rewards/active        — Public: list active rewards for loyalty claim picker
+Purpose:
+    Provides endpoints for managing reward items (admin) and listing active rewards (public).
+    Handles CRUD operations for the reward_items table and exposes public endpoints for loyalty claims.
+
+Usage:
+    - /api/admin/rewards: Admin CRUD for reward items
+    - /api/rewards/active: Public endpoint for listing active rewards
+
+Responsibilities:
+    - Segregates admin and public reward endpoints
+    - Integrates with RewardItemsRepository for all data operations
+    - Ensures only authorized users can modify rewards
 """
 from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from slowapi import Limiter

@@ -1,11 +1,20 @@
 """
-LoyaltyRepository — fixed version.
+LoyaltyRepository
+=================
 
-Changes:
-  1. No longer inherits IRepository — loyalty needs none of the five base
-     methods (get_all, get_by_id, create, update, delete all returned None/[]).
-  2. Only the methods that are actually implemented are kept.
-     This is the Interface Segregation fix — depend only on what you use.
+Purpose:
+    Provides a data-access layer for loyalty stamps and rewards.
+    Handles all persistence operations for loyalty-related tables.
+
+Usage:
+    - Use get_loyalty_status() to retrieve a user's current loyalty status
+    - Use create_reward() to add a new reward
+    - Use mark_stamps_spent() to mark stamps as spent for a reward
+
+Responsibilities:
+    - Encapsulates all Supabase interactions for loyalty features
+    - Keeps business logic out of routers and services
+    - Ensures interface segregation: only implements needed methods
 """
 from typing import List, Any
 from app.database import get_db
