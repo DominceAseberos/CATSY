@@ -190,14 +190,20 @@ def download_pos_apk(
     if role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required.")
 
-    try:
-        db = get_db()
-        # "apk-releases" is the bucket name; update to match your Supabase Storage bucket
-        file_bytes: bytes = db.storage.from_("apk-releases").download("catsy-pos.apk")
-        return StreamingResponse(
-            io.BytesIO(file_bytes),
-            media_type="application/vnd.android.package-archive",
-            headers={"Content-Disposition": "attachment; filename=catsy-pos.apk"},
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"APK download failed: {str(e)}")
+    # ── APK not yet available ─────────────────────────────────────────────
+    raise HTTPException(
+        status_code=503,
+        detail="APK not yet available. Check back later."
+    )
+
+    # ── Uncomment when APK is uploaded to Supabase Storage ────────────────
+    # try:
+    #     db = get_db()
+    #     file_bytes: bytes = db.storage.from_("apk-releases").download("catsy-pos.apk")
+    #     return StreamingResponse(
+    #         io.BytesIO(file_bytes),
+    #         media_type="application/vnd.android.package-archive",
+    #         headers={"Content-Disposition": "attachment; filename=catsy-pos.apk"},
+    #     )
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"APK download failed: {str(e)}")
