@@ -44,9 +44,10 @@ import io
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.auth import get_current_user
-from app.dependencies import get_user_repository, get_audit_repository
+from app.dependencies import get_user_repository, get_audit_repository, get_materials_repository
 from app.repositories.users_repo import UserRepository
 from app.repositories.audit_repo import AuditRepository
+from app.repositories.materials_repo import MaterialsRepository
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -84,18 +85,11 @@ inventory_router = APIRouter(tags=["Inventory"])
 def get_low_stock_inventory(
     request: Request,
     user=Depends(get_current_user),
+    repo: MaterialsRepository = Depends(get_materials_repository),
 ):
-    """Admin: Return materials where current stock is at or below reorder level.
-
-    TODO: Move filter logic into MaterialsRepository.get_low_stock() to comply with SRP.
-    """
+    """Admin: Return materials where current stock is at or below reorder level."""
     try:
-        db = get_db()
-        materials = db.table("raw_materials_inventory").select("*").execute().data or []
-        return [
-            m for m in materials
-            if float(m.get("material_stock", 0)) <= float(m.get("material_reorder_level", 0))
-        ]
+        return repo.get_low_stock()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

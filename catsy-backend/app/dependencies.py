@@ -1,3 +1,6 @@
+from app.repositories.materials_repo import MaterialsRepository
+def get_materials_repository() -> MaterialsRepository:
+    return MaterialsRepository()
 from typing import Generator
 from fastapi import Request
 

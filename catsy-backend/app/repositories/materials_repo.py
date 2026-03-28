@@ -23,6 +23,20 @@ from app.database import get_db
 from app.utils.audit_logger import AuditLogger
 
 class MaterialsRepository(IRepository):
+
+        def get_low_stock(self) -> List[Any]:
+            """Return materials where stock is at or below reorder level.
+            Uses a Supabase RPC or a Python-side filter on the full list.
+            Pure DB-side: uses lte filter on material_stock against material_reorder_level.
+            Because Supabase PostgREST can't compare two columns directly without RPC,
+            we fetch all and filter in-memory — but this lives in the repo, not the router.
+            """
+            db = get_db()
+            materials = db.table("raw_materials_inventory").select("*").execute().data or []
+            return [
+                m for m in materials
+                if float(m.get("material_stock", 0)) <= float(m.get("material_reorder_level", 0))
+            ]
     def get_all(self, limit: int = 100, offset: int = 0) -> List[Any]:
         db = get_db()
         response = db.table('raw_materials_inventory').select("*").range(offset, offset + limit - 1).execute()
