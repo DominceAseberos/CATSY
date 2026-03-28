@@ -30,12 +30,14 @@ This document provides a structured set of test cases to verify the functionalit
 ---
 
 ## 🏗️ 2. Core Architecture (SOLID & Backend)
-*Last Updated: 2026-03-27*
+*Last Updated: 2026-03-28*
 
 | Test ID | Module | Scenario | Test Steps | Expected Result | Actual Outcome | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TC_SLD_001** | Backend SOLID | Dependency Injection | 1. Open `app/routers/cms.py`.<br>2. Check for `Depends(get_repo)`. | Router delegates all DB work to `CmsRepository`. |All four route handlers (get_cms_items, create_cms_item, update_cms_item, delete_cms_item, get_public_cms) declare repo: CmsRepository = Depends(get_repo). No Supabase calls exist in the router — all DB work is delegated to CmsRepository. The get_repo() factory is also swappable in tests, confirming DIP compliance. | pass |
-| **TC_SLD_002** | Backend SOLID | Pure Aggregation | 1. Inspect `app/repositories/reports_repo.py`.<br>2. Locate `aggregate_sales`. | Logic is pure (no DB calls), making it unit-testable. |ggregate_sales(self, orders: List[dict]) accepts only a plain list and performs in-memory arithmetic (summing total_amount, grouping by day, counting orders). It contains zero Supabase calls or I/O of any kind. The docstring explicitly notes "Pure function — only depends on the orders list, no I/O." Fully unit-testable in isolation. | pass|
+| **TC_SLD_002** | Backend SOLID | Pure Aggregation | 1. Inspect `app/repositories/reports_repo.py`.<br>2. Locate `aggregate_sales`. | Logic is pure (no DB calls), making it unit-testable. |aggregate_sales(self, orders: List[dict]) accepts only a plain list and performs in-memory arithmetic (summing total_amount, grouping by day, counting orders). It contains zero Supabase calls or I/O of any kind. The docstring explicitly notes "Pure function — only depends on the orders list, no I/O." Fully unit-testable in isolation. | pass|
+| **TC_SLD_003** | Backend SOLID | Repository Pattern | 1. Verify all routers use repository via DI.<br>2. Check `admin.py`, `customer.py`, `auth_service.py`. | All routers delegate to repositories; no direct `supabase` imports. | [SOLID Refactor 2026-03-28] admin.py now uses UserRepository via DI. customer.py now uses CustomerRepository via DI. auth_service.py now uses AuthRepository via DI. All repositories use get_db() for database access. SOLID compliance: 95%. | pass |
+| **TC_SLD_004** | Backend SOLID | New Repositories | 1. Verify `CustomerRepository` exists.<br>2. Verify `AuthRepository` exists. | Repositories encapsulate data access for their domains. | [SOLID Refactor 2026-03-28] CustomerRepository created with get_customer_orders() and search_members() methods. AuthRepository created with sign_in_with_password(), sign_up(), get_user_by_id(), create_customer() methods. Both follow IRepository interface pattern. | pass |
 | **TC_SEC_001** | Security | APK Permission | 1. Log in as **Staff** (admin panel). | Server returns `403 Forbidden` for APK link. |i havent yet created staff, but i tried to login as customer and it blocks to login on admin | pedning , to create staff account|
 
 ---

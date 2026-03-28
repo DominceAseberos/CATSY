@@ -6,6 +6,8 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.database import supabase
 from app.auth import get_current_user
+from app.dependencies import get_user_repository
+from app.repositories.users_repo import UserRepository
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(tags=["Admin"])
@@ -90,12 +92,12 @@ def get_users(
     request: Request,
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: UserRepository = Depends(get_user_repository)
 ):
     """Get all user accounts (staff/admin only)."""
     try:
-        response = supabase.table("user_profiles").select("*").range(offset, offset + limit - 1).execute()
-        return response.data or []
+        return repo.get_all(limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -105,12 +107,12 @@ def get_users(
 def create_user(
     request: Request,
     data: dict,
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: UserRepository = Depends(get_user_repository)
 ):
     """Create a new user account (admin only)."""
     try:
-        response = supabase.table("user_profiles").insert(data).execute()
-        return response.data
+        return repo.create(data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -133,11 +135,11 @@ def change_user_password(
 def delete_user(
     request: Request,
     user_id: str,
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: UserRepository = Depends(get_user_repository)
 ):
     """Delete a user account (admin only)."""
     try:
-        response = supabase.table("user_profiles").delete().eq("id", user_id).execute()
-        return response.data
+        return repo.delete(user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

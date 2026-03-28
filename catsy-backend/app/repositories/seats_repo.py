@@ -13,7 +13,7 @@ of explicit FK), modify or add a method here without touching the router.
 """
 from datetime import date
 from typing import List
-from app.database import supabase
+from app.database import get_db
 
 
 class SeatsRepository:
@@ -27,13 +27,15 @@ class SeatsRepository:
 
     def get_all_tables(self) -> List[dict]:
         """Return all registered cafe tables."""
-        res = supabase.table("cafe_tables").select("*").execute()
+        db = get_db()
+        res = db.table("cafe_tables").select("*").execute()
         return res.data or []
 
     def get_todays_reservations(self) -> List[dict]:
         """Return confirmed/pending reservations for today only."""
+        db = get_db()
         today = date.today().isoformat()
-        res = supabase.table("reservations")\
+        res = db.table("reservations")\
             .select("*")\
             .in_("status", ["confirmed", "pending"])\
             .gte("reservation_time", f"{today}T00:00:00")\

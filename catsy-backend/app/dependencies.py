@@ -8,6 +8,8 @@ from app.repositories.products_repo import ProductRepository
 from app.repositories.categories_repo import CategoryRepository
 from app.repositories.users_repo import UserRepository
 from app.repositories.settings_repo import SettingsRepository
+from app.repositories.customer_repo import CustomerRepository
+from app.repositories.auth_repo import AuthRepository
 
 from app.services.order_service import OrderService
 from app.services.loyalty_service import LoyaltyService
@@ -33,6 +35,12 @@ def get_user_repository() -> UserRepository:
 
 def get_settings_repository() -> SettingsRepository:
     return SettingsRepository()
+
+def get_customer_repository() -> CustomerRepository:
+    return CustomerRepository()
+
+def get_auth_repository() -> AuthRepository:
+    return AuthRepository()
 
 # Services
 def get_order_service() -> OrderService:

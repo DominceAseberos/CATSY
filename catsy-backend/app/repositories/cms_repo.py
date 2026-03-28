@@ -9,7 +9,7 @@ Open/Closed: To add filtering by `type` or `start_date/end_date`, add a
 new method here — routers and the public API surface remain unchanged.
 """
 from typing import List, Optional, Dict, Any
-from app.database import supabase
+from app.database import get_db
 
 
 class CmsRepository:
@@ -23,7 +23,8 @@ class CmsRepository:
 
     def get_all(self) -> List[dict]:
         """Return all CMS entries (admin view), newest first."""
-        res = supabase.table("cms_content")\
+        db = get_db()
+        res = db.table("cms_content")\
             .select("*")\
             .order("created_at", desc=True)\
             .execute()
@@ -31,7 +32,8 @@ class CmsRepository:
 
     def get_active(self) -> List[dict]:
         """Return only active CMS entries for the public customer portal."""
-        res = supabase.table("cms_content")\
+        db = get_db()
+        res = db.table("cms_content")\
             .select("*")\
             .eq("is_active", True)\
             .order("created_at", desc=True)\
@@ -40,7 +42,8 @@ class CmsRepository:
 
     def get_by_id(self, item_id: str) -> Optional[dict]:
         """Fetch a single CMS entry by primary key."""
-        res = supabase.table("cms_content")\
+        db = get_db()
+        res = db.table("cms_content")\
             .select("*")\
             .eq("id", item_id)\
             .execute()
@@ -50,12 +53,14 @@ class CmsRepository:
 
     def create(self, data: Dict[str, Any]) -> dict:
         """Insert a new CMS entry. `data` is the validated Pydantic dict."""
-        res = supabase.table("cms_content").insert(data).execute()
+        db = get_db()
+        res = db.table("cms_content").insert(data).execute()
         return res.data[0]
 
     def update(self, item_id: str, data: Dict[str, Any]) -> Optional[dict]:
         """Partial update — only set fields that are provided (non-None)."""
-        res = supabase.table("cms_content")\
+        db = get_db()
+        res = db.table("cms_content")\
             .update(data)\
             .eq("id", item_id)\
             .execute()
@@ -63,5 +68,6 @@ class CmsRepository:
 
     def delete(self, item_id: str) -> bool:
         """Hard-delete a CMS entry. Returns True on success."""
-        supabase.table("cms_content").delete().eq("id", item_id).execute()
+        db = get_db()
+        db.table("cms_content").delete().eq("id", item_id).execute()
         return True

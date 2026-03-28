@@ -8,7 +8,8 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import Optional
-from app.database import get_db
+from app.dependencies import get_customer_repository
+from app.repositories.customer_repo import CustomerRepository
 from app.auth import get_current_user
 
 limiter = Limiter(key_func=get_remote_address)
@@ -24,20 +25,14 @@ def get_customer_orders(
     request: Request,
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: CustomerRepository = Depends(get_customer_repository)
 ):
     """Return purchase history for the authenticated customer (FR C8).
     Filtered server-side to the authenticated user's orders only.
     """
     try:
-        db = get_db()
-        orders = db.table('orders') \
-            .select("id, order_type, payment_status, payment_method, total_amount, created_at, order_items(*)") \
-            .eq('customer_id', str(user.id)) \
-            .order('created_at', desc=True) \
-            .range(offset, offset + limit - 1) \
-            .execute()
-        return orders.data or []
+        return repo.get_customer_orders(str(user.id), limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -54,23 +49,13 @@ def search_members(
     search: Optional[str] = Query(None, description="Search by name or email"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
+    repo: CustomerRepository = Depends(get_customer_repository)
 ):
     """Search customers by name or email — Staff use for loyalty stamp crediting (Phase 2).
     Requires staff JWT. Returns id, name, email, stamp_count, qr_id.
     """
     try:
-        db = get_db()
-        # Query user_profiles (V2 schema replacement for 'customers')
-        query = db.table('user_profiles').select(
-            "id, first_name, last_name, email, qr_code, excess_stamps"
-        )
-        if search:
-            # Check first_name, last_name, or email
-            query = query.or_(
-                f"first_name.ilike.%{search}%,last_name.ilike.%{search}%,email.ilike.%{search}%"
-            )
-        result = query.order('last_name').range(offset, offset + limit - 1).execute()
-        return result.data or []
+        return repo.search_members(search=search, limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

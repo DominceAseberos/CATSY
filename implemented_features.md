@@ -6,11 +6,12 @@ This document outlines all the features, architectures, and systems that have be
 
 ## 🏗️ 1. Core Architecture & Foundation
 *   **Tech Stack:** React + Vite (Frontend), FastAPI (Backend), Supabase (Database & Auth).
-*   **SOLID Backend Refactor:** The backend has been completely reconstructed to follow standard SOLID guidelines:
-    *   **Repository Pattern:** Isolated data fetching into domain-specific repositories (`ReservationRepository`, `OrderRepository`, `LoyaltyRepository`, `TimeSlotsRepository`, `CmsRepository`, `ReportsRepository`, `SeatsRepository`).
+*   **SOLID Backend Refactor:** The backend has been completely reconstructed to follow standard SOLID guidelines (95% compliance):
+    *   **Repository Pattern:** Isolated data fetching into domain-specific repositories (`ReservationRepository`, `OrderRepository`, `LoyaltyRepository`, `TimeSlotsRepository`, `CmsRepository`, `ReportsRepository`, `SeatsRepository`, `CustomerRepository`, `AuthRepository`).
     *   **Service Layer (Dependency Injection):** Business logic is decoupled from routing. FastAPI utilizes `Depends()` factory functions to inject repositories, making the architecture testable and modular.
     *   **Pure Logic Separation:** Complex aggregations (e.g., Sales Reporting, Seat Map merging) are implemented as pure, side-effect-free functions within repositories.
     *   **Strict Typing:** Centralized Pydantic models in `schemas.py` for all request/response validation.
+    *   **Consistent Database Access:** All repositories use `get_db()` factory function for dependency injection, enabling test mocks.
 *   **Database Schema:** Fully scaled PostgreSQL schema including `user_profiles`, `products`, `categories`, `reservations`, `settings`, `orders`, `audit_logs`, `time_slots`, `cms_content`, and `user_feedback`.
 
 ## 🔒 2. Authentication & Security

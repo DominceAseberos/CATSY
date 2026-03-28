@@ -1,15 +1,25 @@
 """
-AuthService — encapsulates all Supabase Auth interactions.
+AuthService — encapsulates all authentication business logic.
 Keeps route handlers thin (SRP).
+Uses AuthRepository for data access (DIP).
 """
-from app.database import supabase
+from typing import Optional
+from app.repositories.auth_repo import AuthRepository
 
 
 class AuthService:
+    """Service layer for authentication operations.
+    
+    Uses dependency injection to receive AuthRepository,
+    following the Dependency Inversion Principle.
+    """
+    
+    def __init__(self, auth_repo: Optional[AuthRepository] = None):
+        self.repo = auth_repo or AuthRepository()
 
-    @staticmethod
-    def admin_login(email: str, password: str) -> dict:
-        response = supabase.auth.sign_in_with_password({"email": email, "password": password})
+    def _admin_login_impl(self, email: str, password: str) -> dict:
+        """Instance method implementation for admin login."""
+        response = self.repo.sign_in_with_password(email, password)
         
         user_dict = response.user.model_dump() if hasattr(response.user, 'model_dump') else response.user.__dict__
         meta = user_dict.get("user_metadata", {})
@@ -18,14 +28,10 @@ class AuthService:
         role = meta.get("role") or app_meta.get("role")
         
         if not role:
-            try:
-                user_res = supabase.table("customers").select("*").eq("id", response.user.id).execute()
-                if user_res.data:
-                    row = user_res.data[0]
-                    role = row.get("role")
-                    user_dict.update(row)
-            except Exception:
-                pass
+            user_row = self.repo.get_user_by_id(response.user.id)
+            if user_row:
+                role = user_row.get("role")
+                user_dict.update(user_row)
                 
         if not role:
             role = "admin" if "admin" in email.lower() or "staff" in email.lower() else "admin"
@@ -39,9 +45,9 @@ class AuthService:
             "refresh_token": response.session.refresh_token,
         }
 
-    @staticmethod
-    def customer_login(email: str, password: str) -> dict:
-        response = supabase.auth.sign_in_with_password({"email": email, "password": password})
+    def _customer_login_impl(self, email: str, password: str) -> dict:
+        """Instance method implementation for customer login."""
+        response = self.repo.sign_in_with_password(email, password)
         
         user_dict = response.user.model_dump() if hasattr(response.user, 'model_dump') else response.user.__dict__
         meta = user_dict.get("user_metadata", {})
@@ -50,28 +56,23 @@ class AuthService:
         role = meta.get("role") or app_meta.get("role")
         
         if not role:
-            try:
-                user_res = supabase.table("customers").select("*").eq("id", response.user.id).execute()
-                if user_res.data:
-                    row = user_res.data[0]
-                    role = row.get("role")
-                    user_dict.update(row)
-                else:
-                    # [LAZY-CREATE] If row is missing but user exists, try to recreate it from metadata
-                    print(f"DEBUG: Customers row missing for {response.user.id}, attempting lazy create.")
-                    supabase.table("customers").insert({
-                        "id": response.user.id,
-                        "email": email,
-                        "username": meta.get("username", email.split('@')[0]),
-                        "first_name": meta.get("first_name", ""),
-                        "last_name": meta.get("last_name", ""),
-                        "phone": meta.get("phone", ""),
-                        "role": "customer"
-                    }).execute()
-                    role = "customer"
-            except Exception as e:
-                print(f"DEBUG: Customer DB lookup/lazy-create failed: {e}")
-                pass
+            user_row = self.repo.get_user_by_id(response.user.id)
+            if user_row:
+                role = user_row.get("role")
+                user_dict.update(user_row)
+            else:
+                # [LAZY-CREATE] If row is missing but user exists, try to recreate it from metadata
+                print(f"DEBUG: Customers row missing for {response.user.id}, attempting lazy create.")
+                self.repo.create_customer(
+                    user_id=response.user.id,
+                    email=email,
+                    username=meta.get("username", email.split('@')[0]),
+                    first_name=meta.get("first_name", ""),
+                    last_name=meta.get("last_name", ""),
+                    phone=meta.get("phone", ""),
+                    role="customer"
+                )
+                role = "customer"
         
         # [SOLID: Robustness] Flatten user_metadata into top-level user_dict 
         # so frontend mapUserData can find fields if DB row is missing.
@@ -97,35 +98,45 @@ class AuthService:
             "access_token": response.session.access_token,
         }
 
-    @staticmethod
-    def customer_signup(email: str, password: str, username: str = "", first_name: str = "", last_name: str = "", phone: str = "") -> dict:
-        response = supabase.auth.sign_up({
-            "email": email,
-            "password": password,
-            "options": {
-                "data": {
-                    "username": username,
-                    "first_name": first_name,
-                    "last_name": last_name,
-                    "phone": phone,
-                }
-            }
-        })
+    def _customer_signup_impl(self, email: str, password: str, username: str = "", 
+                               first_name: str = "", last_name: str = "", phone: str = "") -> dict:
+        """Instance method implementation for customer signup."""
+        user_data = {
+            "username": username,
+            "first_name": first_name,
+            "last_name": last_name,
+            "phone": phone,
+        }
+        
+        response = self.repo.sign_up(email, password, user_data)
         
         # Explicitly create the database row if the application has no trigger
         if response.user:
-            try:
-                supabase.table("customers").insert({
-                    "id": response.user.id,
-                    "email": email,
-                    "username": username,
-                    "first_name": first_name,
-                    "last_name": last_name,
-                    "phone": phone,
-                    "role": "customer"
-                }).execute()
-            except Exception as e:
-                print(f"DEBUG: Customer DB Insert failed: {e}")
-                pass
+            self.repo.create_customer(
+                user_id=response.user.id,
+                email=email,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                phone=phone,
+                role="customer"
+            )
 
         return {"user": response.user, "status": "Confirm email if enabled"}
+
+    # Static methods for backward compatibility with existing routers
+    @staticmethod
+    def admin_login(email: str, password: str) -> dict:
+        service = AuthService()
+        return service._admin_login_impl(email, password)
+
+    @staticmethod
+    def customer_login(email: str, password: str) -> dict:
+        service = AuthService()
+        return service._customer_login_impl(email, password)
+
+    @staticmethod
+    def customer_signup(email: str, password: str, username: str = "", 
+                        first_name: str = "", last_name: str = "", phone: str = "") -> dict:
+        service = AuthService()
+        return service._customer_signup_impl(email, password, username, first_name, last_name, phone)

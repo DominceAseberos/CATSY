@@ -1,5 +1,11 @@
-from fastapi import Header, HTTPException, Depends
-from app.database import supabase
+"""
+Authentication dependency for FastAPI endpoints.
+
+Provides JWT validation via Supabase Auth.
+"""
+from fastapi import Header, HTTPException
+from app.database import get_db
+
 
 def get_current_user(authorization: str = Header(None)):
     """
@@ -12,7 +18,8 @@ def get_current_user(authorization: str = Header(None)):
     token = authorization.split(" ")[1]
     
     try:
-        user_res = supabase.auth.get_user(token)
+        db = get_db()
+        user_res = db.auth.get_user(token)
         if not user_res.user:
             raise Exception("Invalid token")
         return user_res.user

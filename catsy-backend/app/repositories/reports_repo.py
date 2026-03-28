@@ -13,7 +13,7 @@ This router will NEVER contain date arithmetic or aggregation again.
 """
 from datetime import date
 from typing import List, Optional
-from app.database import supabase
+from app.database import get_db
 
 
 class ReportsRepository:
@@ -41,7 +41,8 @@ class ReportsRepository:
         Returns:
             List of raw order dicts from Supabase.
         """
-        query = supabase.table("orders").select("*").eq("status", "served")
+        db = get_db()
+        query = db.table("orders").select("*").eq("status", "served")
         if period == "today":
             today = date.today().isoformat()
             query = query.gte("created_at", f"{today}T00:00:00").lte("created_at", f"{today}T23:59:59")
@@ -86,7 +87,8 @@ class ReportsRepository:
 
     def get_feedback(self, limit: int = 50) -> List[dict]:
         """Return paginated feedback entries, newest first."""
-        res = supabase.table("user_feedback")\
+        db = get_db()
+        res = db.table("user_feedback")\
             .select("*")\
             .order("created_at", desc=True)\
             .limit(limit)\
