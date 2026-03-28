@@ -1,5 +1,20 @@
-"""Reward Items repository — manages the reward_items table.
-This replaces the product_is_reward boolean flag on the products table (spec violation fix).
+"""
+Reward Items Repository
+======================
+
+What:
+    Manages the reward_items table, supporting loyalty reward management.
+
+How:
+    Implements a repository class to handle all Supabase queries for reward items, including active filtering and product association.
+
+When:
+    Used by admin endpoints for reward management and by public endpoints for listing available rewards.
+
+What it does:
+    - Retrieves all or only active reward items
+    - Creates, updates, deletes, and toggles reward items
+    - Associates rewards with products for loyalty claims
 """
 from typing import List, Optional, Any
 from app.repositories.base import IRepository

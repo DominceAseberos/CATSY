@@ -1,19 +1,20 @@
 """
-SettingsRepository
-=================
+Settings Repository
+==================
 
-Purpose:
+What:
     Provides a repository interface for the restaurant_settings singleton table.
-    Exposes only get() and update() methods, as the table has exactly one row.
 
-Usage:
-    - Use get() to retrieve current settings
-    - Use update() to modify settings
+How:
+    Implements a SingletonRepository base class, exposing only get and update methods, and integrates with audit logging.
 
-Responsibilities:
-    - Ensures only valid operations are exposed for singleton tables
-    - Integrates with AuditLogger for update tracking
-    - Hides Supabase details from business logic
+When:
+    Used by endpoints or services that need to read or update global restaurant settings.
+
+What it does:
+    - Retrieves the current settings row
+    - Updates settings with audit tracking
+    - Ensures only valid operations for singleton tables
 """
 from abc import ABC, abstractmethod
 from typing import Any, Optional

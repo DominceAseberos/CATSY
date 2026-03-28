@@ -1,3 +1,21 @@
+    """
+    User Repository
+    ===============
+
+    What:
+        Handles all database operations for user profiles.
+
+    How:
+        Implements a repository class to abstract Supabase queries for user profile CRUD and lookups.
+
+    When:
+        Used by endpoints or services that need to manage or retrieve user profile data.
+
+    What it does:
+        - Retrieves, creates, updates, and deletes user profiles
+        - Looks up users by ID or email
+        - Centralizes user data access for maintainability
+    """
     def get_profile(self, user_id: str) -> Optional[dict]:
         db = get_db()
         res = db.table("user_profiles").select("*").eq("id", user_id).execute()

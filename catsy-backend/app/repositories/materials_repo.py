@@ -1,3 +1,22 @@
+"""
+Materials Repository
+===================
+
+What:
+    Manages inventory data for raw materials and product recipes.
+
+How:
+    Implements a repository class with methods for CRUD operations on the `raw_materials_inventory` table and related recipe management.
+
+When:
+    Used by admin endpoints for inventory management, recipe editing, and material usage checks.
+
+What it does:
+    - Retrieves, creates, updates, and deletes materials
+    - Checks if materials are in use in recipes
+    - Manages product recipes and ingredient lists
+    - Integrates with audit logging for traceability
+"""
 from typing import List, Optional, Any
 from app.repositories.base import IRepository
 from app.database import get_db

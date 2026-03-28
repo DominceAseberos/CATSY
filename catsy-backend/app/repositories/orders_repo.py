@@ -1,3 +1,22 @@
+"""
+Order Repository
+================
+
+What:
+    Provides data access for order records and related order items.
+
+How:
+    Follows the repository pattern to encapsulate all Supabase queries for orders, keeping business logic and routing separate.
+
+When:
+    Used by order-related services and routers for any order CRUD or item management operations.
+
+What it does:
+    - Retrieves all or specific orders, with optional status filtering
+    - Creates, updates, and deletes orders
+    - Manages order items as part of order creation
+    - Ensures all order data access is centralized and consistent
+"""
 from typing import List, Optional, Any
 from app.repositories.base import IRepository
 from app.database import get_db

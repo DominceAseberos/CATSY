@@ -18,14 +18,23 @@
         except Exception:
             return False
 """
-Customer Repository.
+Customer Repository
+==================
 
-Responsibility: ALL persistence operations for customer-specific data.
-  - Fetching customer orders
-  - Searching members for loyalty stamp crediting
+What:
+    Handles all persistence operations for customer-specific data, such as orders and member searches.
 
-Open/Closed: New customer-related queries can be added as new methods
-without modifying existing ones or the router.
+How:
+    Uses a repository pattern to abstract database access, keeping Supabase logic separate from API routing.
+
+When:
+    Invoked by routers or services whenever customer data (orders, member search, creation) is needed.
+
+What it does:
+    - Fetches customer orders and purchase history
+    - Searches members for loyalty or staff features
+    - Creates new customer records
+    - Provides a single point for customer data access and extension
 """
 from typing import List, Optional
 from app.database import get_db

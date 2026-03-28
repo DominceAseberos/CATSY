@@ -1,3 +1,21 @@
+"""
+Reservation Repository
+=====================
+
+What:
+    Manages all reservation data, including creation, updates, and deletion.
+
+How:
+    Implements a repository class to encapsulate Supabase queries for the `reservations` table, with audit logging for changes.
+
+When:
+    Used by staff and customer endpoints for booking, updating, or canceling reservations.
+
+What it does:
+    - Retrieves, creates, updates, and deletes reservations
+    - Logs reservation changes for audit purposes
+    - Provides a consistent interface for reservation data access
+"""
 from typing import List, Optional, Any
 from app.repositories.base import IRepository
 from app.database import get_db

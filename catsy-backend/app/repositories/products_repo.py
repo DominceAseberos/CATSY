@@ -1,3 +1,22 @@
+"""
+Product Repository
+==================
+
+What:
+    Handles all database operations for products, including category association and stock management.
+
+How:
+    Uses a repository class to abstract Supabase queries, supporting CRUD and inventory operations.
+
+When:
+    Invoked by admin endpoints or services for product management, stock deduction, and product lookups.
+
+What it does:
+    - Retrieves, creates, updates, and deletes products
+    - Associates products with categories
+    - Deducts or restores stock based on product activity
+    - Provides a single interface for product data access
+"""
 from typing import List, Optional, Any
 from app.repositories.base import IRepository
 from app.database import get_db

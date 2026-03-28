@@ -1,12 +1,21 @@
 """
-CMS Repository (Phase 3).
+CMS Repository
+==============
 
-Responsibility: ALL persistence operations for the `cms_content` table.
-  - Reading all entries (admin) and active entries (public)
-  - Creating, updating, and deleting CMS items
+What:
+    Manages all persistence operations for the `cms_content` table, including reading, creating, updating, and deleting CMS items.
 
-Open/Closed: To add filtering by `type` or `start_date/end_date`, add a
-new method here — routers and the public API surface remain unchanged.
+How:
+    Implements a repository pattern to isolate Supabase database interactions from HTTP routing logic. Provides methods for both admin and public content access.
+
+When:
+    Used whenever CMS content needs to be managed or retrieved, such as for admin dashboards or public customer portals.
+
+What it does:
+    - Retrieves all or only active CMS entries
+    - Fetches entries by ID
+    - Creates, updates, and deletes CMS items
+    - Centralizes all CMS data access logic for maintainability
 """
 from typing import List, Optional, Dict, Any
 from app.database import get_db

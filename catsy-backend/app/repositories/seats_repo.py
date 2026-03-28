@@ -1,15 +1,20 @@
 """
-Seats Repository (Phase 3).
+Seats Repository
+===============
 
-Responsibility: ALL persistence and seat-status mapping for the cafe tables
-and reservations domains.
-  - Fetching all cafe tables
-  - Fetching today's active reservations
-  - Producing the enriched seat-map response (table + reservation overlay)
+What:
+    Provides data access and aggregation for cafe tables and seat reservations.
 
-Open/Closed: To add new seat statuses (e.g. 'cleaning', 'maintenance'),
-or change the reservation matching strategy (e.g. by time window instead
-of explicit FK), modify or add a method here without touching the router.
+How:
+    Merges data from `cafe_tables` and `reservations` to produce enriched seat maps, using repository methods for all database access.
+
+When:
+    Used by endpoints that display seat maps, table lists, or today's reservations.
+
+What it does:
+    - Retrieves all tables and today's reservations
+    - Builds seat maps combining table and reservation data
+    - Supports extension for new seat statuses or reservation logic
 """
 from datetime import date
 from typing import List
