@@ -11,6 +11,7 @@ Responsibilities of this file (and ONLY these):
 All business logic lives in app/routers/ and app/services/.
 """
 import asyncio
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -35,9 +36,16 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
+# --- CORS config: set ALLOWED_ORIGINS in your .env file ---
+# Example: ALLOWED_ORIGINS=http://localhost:5173,https://yourapp.com
+_raw = os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173")
+ALLOWED_ORIGINS = [o.strip() for o in _raw.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # Replace with specific domains in production
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
