@@ -1,15 +1,31 @@
 """
-Reports Repository (Phase 3).
+Reports Repository
+==================
 
-Responsibility: ALL data retrieval and aggregation for the reports domain.
-  - Fetching paid orders with optional date filtering
-  - Aggregating totals by payment method
-  - Grouping by day for the breakdown table
-  - Fetching customer feedback records
+What:
+    Provides all data retrieval and aggregation logic for the admin
+    reports domain, including sales summaries and customer feedback.
 
-Open/Closed: New report types (e.g. product-level breakdown, staff
-performance) can be added as new methods without modifying existing ones.
-This router will NEVER contain date arithmetic or aggregation again.
+How:
+    Uses direct Supabase queries for fetching raw order and feedback data,
+    then performs pure in-memory aggregation (totals, grouping, sorting)
+    without any additional I/O, making aggregation logic easily testable.
+
+When:
+    Called exclusively by the reports router when an admin requests
+    a sales report or feedback listing. Not used by any other service.
+
+What it does:
+    - Fetches paid (completed) orders with optional date range filtering
+    - Aggregates order totals by payment method (Cash, GCash, Maya)
+    - Groups daily sales into a breakdown table sorted newest-first
+    - Returns paginated customer feedback entries newest-first
+
+What it does NOT do:
+    - Does not handle HTTP requests or responses — that is the router's job
+    - Does not perform date arithmetic outside of ISO string construction
+    - Does not write or mutate any data — purely read and aggregate
+    - Does not interact with any table other than orders and user_feedback
 """
 from datetime import date
 from typing import List, Optional
@@ -31,18 +47,21 @@ class ReportsRepository:
         from_date: Optional[str] = None,
         to_date: Optional[str] = None,
     ) -> List[dict]:
-        """Fetch paid orders, optionally scoped to a date range.
+        """Fetch completed orders, optionally scoped to a date range.
+
+        Filters on status='completed' to match the value set by OrderService
+        when an order is successfully paid.
 
         Args:
             period: 'today' shorthand, or None to use explicit from/to dates.
-            from_date: ISO date string (YYYY-MM-DD).
-            to_date: ISO date string (YYYY-MM-DD).
+            from_date: ISO date string (YYYY-MM-DD). Requires to_date.
+            to_date: ISO date string (YYYY-MM-DD). Requires from_date.
 
         Returns:
             List of raw order dicts from Supabase.
         """
         db = get_db()
-        query = db.table("orders").select("*").eq("status", "served")
+        query = db.table("orders").select("*").eq("status", "completed")
         if period == "today":
             today = date.today().isoformat()
             query = query.gte("created_at", f"{today}T00:00:00").lte("created_at", f"{today}T23:59:59")
@@ -51,11 +70,17 @@ class ReportsRepository:
         return query.execute().data or []
 
     def aggregate_sales(self, orders: List[dict]) -> dict:
-        """
-        Compute total, per-payment-method breakdown, daily rows, and order count.
+        """Compute total, per-payment-method breakdown, daily rows, and order count.
 
-        Pure function — only depends on the orders list, no I/O.
-        This makes it trivially testable in isolation.
+        Pure function — depends only on the orders list, no I/O.
+        This makes it trivially unit-testable in isolation.
+
+        Args:
+            orders: List of raw order dicts from get_paid_orders().
+
+        Returns:
+            Dict with total, cash, gcash, maya, daily breakdown list,
+            and total_orders count.
         """
         total = sum(o.get("total_amount", 0) for o in orders)
         cash  = sum(o.get("total_amount", 0) for o in orders if o.get("payment_method") == "Cash")
@@ -70,7 +95,7 @@ class ReportsRepository:
             daily[day]["total"]       += o.get("total_amount", 0)
             daily[day]["order_count"] += 1
             pm = o.get("payment_method")
-            if pm == "Cash":  daily[day]["cash"]  += o.get("total_amount", 0)
+            if pm == "Cash":    daily[day]["cash"]  += o.get("total_amount", 0)
             elif pm == "GCash": daily[day]["gcash"] += o.get("total_amount", 0)
             elif pm == "Maya":  daily[day]["maya"]  += o.get("total_amount", 0)
 
@@ -86,7 +111,14 @@ class ReportsRepository:
     # ── Feedback ─────────────────────────────────────────────────────────────
 
     def get_feedback(self, limit: int = 50) -> List[dict]:
-        """Return paginated feedback entries, newest first."""
+        """Return paginated customer feedback entries, newest first.
+
+        Args:
+            limit: Maximum number of feedback entries to return.
+
+        Returns:
+            List of feedback dicts from the user_feedback table.
+        """
         db = get_db()
         res = db.table("user_feedback")\
             .select("*")\
