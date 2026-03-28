@@ -19,7 +19,8 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 # Domain routers — each owns its own slice of the API surface
-from app.routers import auth, products, categories, loyalty, reservations, settings, admin, orders, customer, rewards, cms, reports, seats, materials
+from app.routers import auth, products, categories, loyalty, reservations, settings, orders, customer, rewards, cms, reports, seats, materials
+from app.routers.admin import audit_router, inventory_router, users_router, apk_router
 
 # --- App setup ---------------------------------------------------------------
 
@@ -50,7 +51,10 @@ app.include_router(loyalty.router)
 app.include_router(reservations.router)
 app.include_router(reservations.customer_router)
 app.include_router(settings.router)
-app.include_router(admin.router)
+app.include_router(audit_router)
+app.include_router(inventory_router)
+app.include_router(users_router)
+app.include_router(apk_router)
 app.include_router(orders.router)
 app.include_router(customer.customer_router)  # GET /api/customer/orders
 app.include_router(customer.staff_router)     # GET /api/staff/members?search=
