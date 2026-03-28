@@ -110,9 +110,74 @@ def create_user(
     user=Depends(get_current_user),
     repo: UserRepository = Depends(get_user_repository)
 ):
-    """Create a new user account (admin only)."""
+    """Create a new user account (admin only).
+    
+    Creates user in Supabase Auth first, then creates the user_profiles record.
+    Password is NOT stored in user_profiles - it's managed by Supabase Auth.
+    """
     try:
-        return repo.create(data)
+        # Make a copy to avoid modifying the original
+        data = dict(data)
+        
+        # Extract password - not stored in user_profiles
+        password = data.pop("password", None)
+        email = data.get("email", "").strip().lower()
+        
+        if not email:
+            raise HTTPException(status_code=400, detail="Email is required")
+        if not password:
+            raise HTTPException(status_code=400, detail="Password is required")
+        
+        # Check if user already exists in user_profiles by email
+        existing = repo.get_by_email(email)
+        if existing:
+            raise HTTPException(status_code=400, detail=f"User with email '{email}' already exists in profiles")
+        
+        # Create user in Supabase Auth using admin API (for admin-created users)
+        # This bypasses email confirmation and gives better error handling
+        try:
+            auth_response = supabase.auth.admin.create_user({
+                "email": email,
+                "password": password,
+                "email_confirm": True,  # Auto-confirm email for admin-created users
+                "user_metadata": {
+                    "role": data.get("role", "customer"),
+                    "first_name": data.get("first_name", ""),
+                    "last_name": data.get("last_name", "")
+                }
+            })
+        except Exception as auth_error:
+            error_msg = str(auth_error)
+            if "already registered" in error_msg.lower() or "already exists" in error_msg.lower() or "duplicate" in error_msg.lower():
+                raise HTTPException(status_code=400, detail=f"Email '{email}' is already registered")
+            raise HTTPException(status_code=500, detail=f"Auth creation failed: {error_msg}")
+        
+        if not auth_response.user:
+            raise HTTPException(status_code=500, detail="Failed to create auth user - no user returned")
+        
+        # Prepare profile data - remove password and excess_stamps (system-managed)
+        profile_data = {k: v for k, v in data.items() if k not in ["password", "excess_stamps"]}
+        profile_data["id"] = auth_response.user.id
+        profile_data["email"] = email  # Ensure email is normalized
+        
+        # Handle optional fields - convert empty strings to None
+        for field in ["contact", "qr_code"]:
+            if field in profile_data and profile_data[field] == "":
+                profile_data[field] = None
+        
+        # Create user_profiles record
+        try:
+            result = repo.create(profile_data)
+            return result
+        except Exception as profile_error:
+            error_msg = str(profile_error)
+            if "duplicate key" in error_msg.lower():
+                # Profile already exists for this user
+                raise HTTPException(status_code=400, detail=f"User profile already exists for '{email}'")
+            raise HTTPException(status_code=500, detail=f"Profile creation failed: {error_msg}")
+            
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

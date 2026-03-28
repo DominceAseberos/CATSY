@@ -12,6 +12,12 @@ class UserRepository(IRepository):
         response = db.table('user_profiles').select("*").eq('id', id).execute()
         return response.data[0] if response.data else None
 
+    def get_by_email(self, email: str) -> Optional[Any]:
+        """Fetch a user by email address."""
+        db = get_db()
+        response = db.table('user_profiles').select("*").eq('email', email).execute()
+        return response.data[0] if response.data else None
+
     def create(self, data: dict, user_id: Optional[str] = None) -> Any:
         db = get_db()
         response = db.table('user_profiles').insert(data).execute()

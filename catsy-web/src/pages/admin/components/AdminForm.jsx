@@ -313,24 +313,14 @@ export default function AdminForm({ activeTab, isEditing, setIsEditing, currentI
                                 />
                                 {errors.email && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.email.message}</p>}
                             </div>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">QR Code UID <span className="text-neutral-600">(Read-only/Advanced)</span></label>
-                                    <input
-                                        type="text"
-                                        {...register('qr_code')}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans font-mono"
-                                        placeholder="Auto-generated if empty"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">Excess Stamps</label>
-                                    <input
-                                        type="number"
-                                        {...register('excess_stamps', { valueAsNumber: true })}
-                                        className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans"
-                                    />
-                                </div>
+                            <div>
+                                <label className="block text-lg font-bold text-neutral-400 mb-3 uppercase tracking-wider font-sans">QR Code UID <span className="text-neutral-600">(Optional - Auto-generated if empty)</span></label>
+                                <input
+                                    type="text"
+                                    {...register('qr_code')}
+                                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-4 text-xl focus:outline-none focus:border-green-500 transition-colors font-sans font-mono"
+                                    placeholder="Auto-generated if empty"
+                                />
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
