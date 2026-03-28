@@ -44,8 +44,9 @@ def get_auth_repository() -> AuthRepository:
 
 # Services
 def get_order_service() -> OrderService:
-    repo = get_order_repository()
-    return OrderService(order_repo=repo)
+    order_repo = get_order_repository()
+    product_repo = get_product_repository()
+    return OrderService(order_repo=order_repo, product_repo=product_repo)
 
 def get_loyalty_service() -> LoyaltyService:
     repo = get_loyalty_repository()

@@ -81,8 +81,3 @@ class LoyaltyRepository:
             .execute()
         )
         return res.data[0] if res.data else {"id": reward_id, "status": "redeemed"}
-        res = db.table('loyalty_rewards').update({
-            "status": "redeemed",
-            "redeemed_by_staff_id": staff_id,
-        }).eq('id', reward_id).execute()
-        return res.data[0] if res.data else {"id": reward_id, "status": "redeemed"}
