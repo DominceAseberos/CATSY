@@ -62,7 +62,10 @@ app.include_router(cms.admin_router)
 app.include_router(cms.public_router)
 app.include_router(reports.router)
 app.include_router(seats.router)
+
+# Register both the main materials router and the new recipe router
 app.include_router(materials.router)
+app.include_router(materials.recipe_router)
 
 # --- Utility endpoints -------------------------------------------------------
 

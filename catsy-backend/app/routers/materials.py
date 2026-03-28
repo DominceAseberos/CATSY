@@ -92,7 +92,11 @@ def check_material_in_use(
 
 # --- Product Recipes ---
 
-@router.get("/products/{product_id}/recipe")
+
+# --- Product Recipes: moved to separate router to avoid route conflicts ---
+recipe_router = APIRouter(prefix="/api/admin/recipes", tags=["Product Recipes"])
+
+@recipe_router.get("/products/{product_id}/recipe")
 @limiter.limit("30/minute")
 def get_product_recipe(
     request: Request,
@@ -106,7 +110,7 @@ def get_product_recipe(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/products/{product_id}/recipe")
+@recipe_router.put("/products/{product_id}/recipe")
 @limiter.limit("10/minute")
 def update_product_recipe(
     request: Request,
