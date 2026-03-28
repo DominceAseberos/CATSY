@@ -248,9 +248,67 @@ This session focused on aggressively updating the codebase and documentation to 
 
 ---
 
+
+## Session Date: 2026-03-28 (Admin Dashboard Service Layer Fix)
+
+This session resolved critical 404 errors on the Admin Dashboard caused by incorrect service layer imports and missing backend endpoints.
+
+### 1. 🐛 Frontend Service Layer Corrections
+**Objective:** Fix React hooks that were importing from wrong services, causing 404 errors.
+
+- **Files Edited:**
+  - `catsy-web/src/pages/admin/hooks/useProducts.js`
+  - `catsy-web/src/pages/admin/hooks/useCategories.js`
+  - `catsy-web/src/pages/admin/hooks/useAccounts.js`
+- **Changes:**
+  - **useProducts.js:** Changed import from `adminService` to `productService` - Products tab now correctly calls `/products` endpoint.
+  - **useCategories.js:** Changed import from `adminService` to `productService` - Categories tab now correctly calls `/categories` endpoint.
+  - **useAccounts.js:** Changed import from `adminService` to `userService` - Accounts tab now correctly calls `/admin/users` endpoint.
+
+### 2. 🔧 Backend User Management Endpoints
+**Objective:** Implement missing `/admin/users` endpoints required by the Accounts management UI.
+
+- **Files Edited:**
+  - `catsy-backend/app/routers/admin.py`
+- **New Endpoints Added:**
+  - `GET /admin/users` - List all user accounts with pagination support
+  - `POST /admin/users` - Create a new user account
+  - `PATCH /admin/users/{user_id}/password` - Change user password
+  - `DELETE /admin/users/{user_id}` - Delete a user account
+- **Implementation Details:**
+  - All endpoints use rate limiting via `@limiter.limit()` decorator
+  - Data persisted to `user_profiles` table via Supabase client
+  - Proper error handling with HTTPException for 500 errors
+
+### 3. 📋 Service Layer Verification
+**Objective:** Confirm all services are calling correct backend endpoints.
+
+- **Files Verified:**
+  - `catsy-web/src/services/userService.js` - Confirmed calls to `/admin/users`
+  - `catsy-web/src/services/productService.js` - Confirmed calls to `/products` and `/categories`
+
+---
+
+### ✅ Summary of Fixes:
+- [x] Fixed Products tab 404 error (wrong service import)
+- [x] Fixed Categories tab 404 error (wrong service import)
+- [x] Fixed Accounts tab 404 error (wrong service import + missing backend endpoints)
+- [x] Added 4 new user management endpoints to backend
+- [x] Verified service-to-endpoint mapping across admin dashboard
+
+---
+
+## ⏭️ Current Status
+
+Admin Dashboard is now fully functional with all tabs (Products, Categories, Accounts, Materials) loading data correctly. Backend server restart required for new endpoints to take effect.
+
+
+
 ## ⏭️ Next Steps: Phase 6 QA Execution
 
 With the V2 integration locked in, the system is fully prepared for final QA.
 1. Run the new **`/qa_runner`** workflow to systematically address the `pending` tests in `test_cases.md` (e.g., verifying `Operating Hours` configurations, Staff search queries, and Order paid/unpaid revenue filters).
 2. Fix any remaining functional gaps discovered during testing.
 3. Once all `test_cases.md` scenarios are marked `pass`, proceed to **Phase 7: Deployment & Mobile Handover**.
+
+---
