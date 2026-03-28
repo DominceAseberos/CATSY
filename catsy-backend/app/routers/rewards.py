@@ -35,6 +35,10 @@ class RewardItemToggle(BaseModel):
 
 
 # ── Admin endpoints (require auth) ────────────────────────────────────────────
+"""
+Admin endpoints (require auth):
+CRUD operations for reward_items table, only accessible to admins.
+"""
 
 @admin_router.get("")
 @limiter.limit("60/minute")
@@ -102,6 +106,10 @@ def remove_reward_item(
 
 
 # ── Public endpoint (no auth required — used by loyalty claim picker) ─────────
+"""
+Public endpoint (no auth required):
+Returns active reward items for the loyalty claim picker.
+"""
 
 @public_router.get("/active")
 @limiter.limit("60/minute")

@@ -1,9 +1,21 @@
 """
-admin.py — fixed version.
+Admin Routers
+=============
 
-The original file mixed four unrelated domains in one router.
-Each is now a separate router mounted in main.py individually.
-No endpoint paths change — only the file organisation.
+Purpose:
+    Provides separate routers for admin-only endpoints: audit logs, inventory, user management, and APK download.
+    Each router is mounted individually in main.py for modularity and clarity.
+
+Usage:
+    - /admin/audit-logs: Retrieve audit logs
+    - /admin/inventory/low-stock: Get low-stock inventory
+    - /admin/users: Manage users (CRUD)
+    - /admin/apk/download: Download POS APK (admin only)
+
+Responsibilities:
+    - Segregates admin API surface into logical routers
+    - Ensures only authorized users can access admin endpoints
+    - Handles audit, inventory, user, and APK management
 """
 from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from fastapi.responses import StreamingResponse
@@ -19,6 +31,10 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 # ── 1. Audit logs ─────────────────────────────────────────────────────────────
+"""
+Section 1: Audit logs
+Handles endpoints for retrieving audit logs from the database.
+"""
 
 audit_router = APIRouter(tags=["Audit"])
 
@@ -46,6 +62,10 @@ def get_audit_logs(
 
 
 # ── 2. Inventory / low-stock ──────────────────────────────────────────────────
+"""
+Section 2: Inventory / low-stock
+Endpoints for inventory management, especially low-stock queries.
+"""
 
 inventory_router = APIRouter(tags=["Inventory"])
 
@@ -74,6 +94,10 @@ def get_low_stock_inventory(
 
 
 # ── 3. User management ────────────────────────────────────────────────────────
+"""
+Section 3: User management
+Endpoints for user management operations.
+"""
 
 users_router = APIRouter(tags=["User Management"])
 
@@ -115,7 +139,7 @@ def change_user_password(
     data: dict,
     user=Depends(get_current_user),
 ):
-    # Supabase Admin API call goes here
+    # TODO: Implement Supabase Admin API call here
     return {"success": True, "message": "Password updated"}
 
 
@@ -133,7 +157,10 @@ def delete_user(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ── 4. APK download ───────────────────────────────────────────────────────────
+"""
+Section 4: APK download
+Endpoints for downloading APKs and related admin operations.
+"""
 
 apk_router = APIRouter(tags=["APK"])
 
@@ -144,7 +171,7 @@ def download_pos_apk(
     request: Request,
     user=Depends(get_current_user),
 ):
-    # Role resolution consistent with rest of codebase: user_metadata first
+    # Role resolution is consistent with the rest of the codebase: user_metadata is checked first
     role = None
     if hasattr(user, "user_metadata"):
         role = (user.user_metadata or {}).get("role")
@@ -155,7 +182,7 @@ def download_pos_apk(
         raise HTTPException(status_code=403, detail="Admin access required.")
 
     try:
-        # Replace dummy bytes with Supabase Storage download in production
+        # TODO: Replace dummy bytes with Supabase Storage download in production
         dummy_content = b"CatsyPOS_v1.0.0_placeholder"
         return StreamingResponse(
             io.BytesIO(dummy_content),

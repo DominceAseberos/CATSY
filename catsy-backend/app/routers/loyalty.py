@@ -1,11 +1,19 @@
 """
-Loyalty router — fixed version.
+Loyalty Router
+==============
 
-Changes:
-  1. /loyalty/claim now uses a typed Pydantic request body instead of
-     await request.json() — FastAPI validation is restored.
-  2. StampCreditRequest and ClaimRequest moved to schemas (shown inline
-     here for clarity — move to schemas.py in your split).
+Purpose:
+    Provides endpoints for loyalty stamp status and reward claiming.
+    Handles business logic for customer loyalty, including stamp crediting and reward redemption.
+
+Usage:
+    - GET /loyalty/status: Get current loyalty status for a user
+    - POST /loyalty/claim: Claim a reward using unspent stamps
+
+Responsibilities:
+    - Validates and processes loyalty reward claims
+    - Returns loyalty status and available rewards
+    - Integrates with LoyaltyService for business logic
 """
 from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
@@ -21,6 +29,10 @@ router = APIRouter(prefix="/loyalty", tags=["Loyalty"])
 
 
 # ── Schemas (move to schemas.py) ──────────────────────────────────────────────
+"""
+Schemas (temporary):
+StampCreditRequest and ClaimRequest are defined here for now. Move to schemas.py when splitting that file.
+"""
 
 class StampCreditRequest(BaseModel):
     customer_id: str
@@ -32,6 +44,10 @@ class ClaimRequest(BaseModel):          # <-- replaces await request.json()
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
+"""
+Routes:
+Endpoints for loyalty status and reward claiming.
+"""
 
 @router.get("/status")
 @limiter.limit("10/minute")
@@ -51,6 +67,7 @@ def get_loyalty_status(
 def claim_loyalty_reward(
     request: Request,
     body: ClaimRequest,                 # <-- typed, validated by FastAPI
+        body: ClaimRequest,  # Typed and validated by FastAPI
     user=Depends(get_current_user),
     service: LoyaltyService = Depends(get_loyalty_service),
 ):

@@ -1,13 +1,19 @@
 """
-AuthService — fixed version.
+AuthService
+===========
 
-Changes:
-  1. Removed all three static wrapper methods (admin_login, customer_login,
-     customer_signup). Routers now instantiate the service normally via Depends().
-  2. Removed dangerous 'admin in email.lower()' role fallback — unknown role
-     now correctly defaults to 'customer'.
-  3. Extracted _resolve_role() and _flatten_metadata() as small private helpers
-     so _customer_login_impl no longer does five things at once.
+Purpose:
+    Encapsulates authentication and user profile logic for both admin and customer flows.
+    Handles login, signup, and user metadata resolution.
+
+Usage:
+    Instantiate with an AuthRepository dependency (or use default).
+    Use methods for admin_login, customer_login, and related authentication flows.
+
+Responsibilities:
+    - Validates credentials and resolves user roles
+    - Merges user metadata from multiple sources
+    - Provides a clean interface for routers to perform authentication
 """
 from typing import Optional
 from app.repositories.auth_repo import AuthRepository
@@ -18,7 +24,10 @@ class AuthService:
     def __init__(self, auth_repo: Optional[AuthRepository] = None):
         self.repo = auth_repo or AuthRepository()
 
-    # ── Private helpers ───────────────────────────────────────────────────────
+    """
+    Private helpers:
+    Internal methods for role resolution and metadata flattening.
+    """
 
     def _resolve_role(self, user_id: str, meta: dict, app_meta: dict) -> str:
         """
@@ -44,7 +53,10 @@ class AuthService:
                     user_dict[k] = v
         return user_dict
 
-    # ── Public methods ────────────────────────────────────────────────────────
+    """
+    Public methods:
+    Exposed service methods for authentication flows.
+    """
 
     def admin_login(self, email: str, password: str) -> dict:
         response = self.repo.sign_in_with_password(email, password)

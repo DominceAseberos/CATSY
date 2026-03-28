@@ -1,19 +1,37 @@
 """
-OrderService — fixed version.
+OrderService
+============
 
-Changes:
-  1. ProductRepository is now always injected — no silent self-construction.
-     Callers that don't pass one will get a clear TypeError instead of a
-     hidden internal instance that can't be mocked in tests.
-  2. Duplicated stock-restore block extracted to _restore_items_stock().
-  3. Order status strings centralised as module-level constants.
+Purpose:
+    Encapsulates all business logic for order creation, modification, payment, voiding, and refunding.
+    Coordinates between order and product repositories, manages inventory, and logs audit actions.
+
+Usage:
+    Instantiate with OrderRepository and ProductRepository dependencies.
+    Use methods to create, modify, pay, void, refund, and list orders.
+
+Responsibilities:
+    - Enforces correct order and payment status transitions
+    - Handles inventory deduction/restoration for order items
+    - Validates payment methods and amounts
+    - Logs all critical actions to the audit log
+
+Typical usage:
+    service = OrderService(order_repo, product_repo)
+    order = service.create_order(order_data, user_id)
+    service.pay_order(order_id, payment_method, amount, user_id)
+    service.void_order(order_id, user_id)
+    ...
 """
 from typing import Optional
 from app.repositories.orders_repo import OrderRepository
 from app.repositories.products_repo import ProductRepository
 from app.utils.audit_logger import AuditLogger
 
-# ── Status constants — change once, applies everywhere ────────────────────────
+"""
+Status constants:
+Centralized order and payment status strings for consistency across the codebase.
+"""
 STATUS_PENDING = "pending"
 STATUS_COMPLETED = "completed"
 STATUS_CANCELLED = "cancelled"
@@ -32,7 +50,10 @@ class OrderService:
         self.repo = order_repo
         self.product_repo = product_repo
 
-    # ── Private helpers ───────────────────────────────────────────────────────
+    """
+    Private helpers:
+    Internal methods for stock restoration and other non-public logic.
+    """
 
     def _restore_items_stock(self, order: dict) -> None:
         """Restore inventory for every item in an order. Non-fatal."""
@@ -42,9 +63,12 @@ class OrderService:
                     item.get("product_id"), item.get("quantity", 1)
                 )
             except Exception:
-                pass  # log in production; never block void/refund
+                pass  # TODO: Log in production; never block void/refund
 
-    # ── Public methods ────────────────────────────────────────────────────────
+    """
+    Public methods:
+    Exposed service methods for order creation and management.
+    """
 
     def create_order(self, order_data: dict, user_id: Optional[str] = None) -> dict:
         items = order_data.pop("items", [])

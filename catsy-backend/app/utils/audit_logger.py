@@ -1,11 +1,18 @@
 """
-AuditLogger — fixed version.
+AuditLogger
+===========
 
-Changes:
-  1. Parameter order corrected: entity_id now comes before user_id to match
-     every call site in the codebase (categories_repo, products_repo, etc.)
-  2. Uses get_db() factory instead of importing supabase directly — testable.
-  3. Removed manual datetime.utcnow() — let the DB column default handle it.
+Purpose:
+    Provides a static interface for logging security-sensitive actions to the audit_logs table.
+    Used throughout the codebase to record CREATE, UPDATE, DELETE, and other critical events.
+
+Usage:
+    AuditLogger.log_action(action, entity_type, entity_id, user_id, details, ip_address)
+
+Responsibilities:
+    - Ensures all critical actions are recorded for auditing and compliance
+    - Handles DB interaction and error logging for audit events
+    - Keeps audit logic isolated from business logic
 """
 from typing import Optional, Dict, Any
 from app.database import get_db
@@ -20,8 +27,8 @@ class AuditLogger:
     def log_action(
         action: str,
         entity_type: str,
-        entity_id: Optional[str],        # <-- was user_id (swapped)
-        user_id: Optional[str] = None,   # <-- was entity_id (swapped)
+        entity_id: Optional[str],
+        user_id: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         ip_address: Optional[str] = None,
     ):
@@ -45,7 +52,7 @@ class AuditLogger:
                 "user_id": user_id,
                 "details": details or {},
                 "ip_address": ip_address,
-                # created_at intentionally omitted — DB column default handles it
+                # created_at intentionally omitted: handled by DB column default
             }
             db.table("audit_logs").insert(payload).execute()
 

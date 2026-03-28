@@ -90,10 +90,16 @@ def check_material_in_use(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# --- Product Recipes ---
+"""
+Product Recipes:
+Endpoints for managing product recipes (admin only).
+"""
 
 
-# --- Product Recipes: moved to separate router to avoid route conflicts ---
+"""
+Product Recipes (separate router):
+Moved to a separate router to avoid route conflicts with materials endpoints.
+"""
 recipe_router = APIRouter(prefix="/api/admin/recipes", tags=["Product Recipes"])
 
 @recipe_router.get("/products/{product_id}/recipe")

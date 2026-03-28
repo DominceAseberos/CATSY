@@ -1,10 +1,19 @@
 """
-SettingsRepository — fixed version.
+SettingsRepository
+=================
 
-Changes:
-  1. New SingletonRepository abstract base that only exposes get() and update().
-     SettingsRepository implements that — no create()/delete() NotImplementedError traps.
-  2. Settings row PK constant extracted — not hardcoded in the query itself.
+Purpose:
+    Provides a repository interface for the restaurant_settings singleton table.
+    Exposes only get() and update() methods, as the table has exactly one row.
+
+Usage:
+    - Use get() to retrieve current settings
+    - Use update() to modify settings
+
+Responsibilities:
+    - Ensures only valid operations are exposed for singleton tables
+    - Integrates with AuditLogger for update tracking
+    - Hides Supabase details from business logic
 """
 from abc import ABC, abstractmethod
 from typing import Any, Optional
@@ -30,8 +39,13 @@ class SingletonRepository(ABC):
 
 
 # ── Implementation ────────────────────────────────────────────────────────────
+"""
+SettingsRepository implementation:
+Implements SingletonRepository for restaurant_settings table.
+"""
 
 SETTINGS_ROW_ID = 1  # business rule lives here, not buried in a query
+SETTINGS_ROW_ID = 1  # Business rule: singleton row ID is defined here, not buried in a query
 
 
 class SettingsRepository(SingletonRepository):
@@ -42,6 +56,7 @@ class SettingsRepository(SingletonRepository):
         return response.data[0] if response.data else {}
 
     # Keep the old name so existing callers (routers, services) don't break
+        # Legacy: Keep the old name so existing callers (routers, services) don't break
     def get_all(self) -> dict:
         return self.get()
 

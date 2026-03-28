@@ -19,7 +19,10 @@ class CmsRepository:
     consistent with the Repository pattern used in orders_repo, rewards_repo, etc.
     """
 
-    # ── Read ────────────────────────────────────────────────────────────────
+    """
+    Read methods:
+    Methods for retrieving CMS entries from the database.
+    """
 
     def get_all(self) -> List[dict]:
         """Return all CMS entries (admin view), newest first."""
@@ -49,7 +52,10 @@ class CmsRepository:
             .execute()
         return res.data[0] if res.data else None
 
-    # ── Write ───────────────────────────────────────────────────────────────
+    """
+    Write methods:
+    Methods for creating, updating, and deleting CMS entries.
+    """
 
     def create(self, data: Dict[str, Any]) -> dict:
         """Insert a new CMS entry. `data` is the validated Pydantic dict."""

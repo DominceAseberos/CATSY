@@ -1,10 +1,20 @@
 """
-Auth router — fixed version.
+Auth Router
+===========
 
-Changes:
-  1. AuthService injected via Depends() — no more static method calls.
-  2. LoginRequest / SignupRequest moved here temporarily; move to schemas.py
-     once you split that file.
+Purpose:
+    Provides authentication endpoints for admin and customer login/signup.
+    Integrates with AuthService for business logic and user validation.
+
+Usage:
+    - POST /admin/login: Admin login
+    - POST /customer/login: Customer login
+    - POST /customer/signup: Customer signup
+
+Responsibilities:
+    - Validates login/signup requests
+    - Injects AuthService via dependency injection
+    - Returns authentication tokens and user profiles
 """
 from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
@@ -17,6 +27,10 @@ router = APIRouter(tags=["Auth"])
 
 
 # ── Schemas (move to schemas.py when splitting that file) ─────────────────────
+"""
+Schemas (temporary):
+LoginRequest and SignupRequest are defined here for now. Move to schemas.py when splitting that file.
+"""
 
 class LoginRequest(BaseModel):
     username: str = None
@@ -34,12 +48,20 @@ class SignupRequest(BaseModel):
 
 
 # ── Dependency ────────────────────────────────────────────────────────────────
+"""
+Dependency injection:
+Provides get_auth_service() for injecting AuthService via Depends().
+"""
 
 def get_auth_service() -> AuthService:
     return AuthService()
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
+"""
+Routes:
+Authentication endpoints for admin and customer login/signup.
+"""
 
 @router.post("/admin/login")
 @limiter.limit("5/minute")
