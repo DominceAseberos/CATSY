@@ -1,3 +1,22 @@
+    def get_by_user_id(self, user_id: str) -> Optional[dict]:
+        db = get_db()
+        res = db.table("customers").select("*").eq("id", user_id).execute()
+        return res.data[0] if res.data else None
+
+    def create_customer(
+        self, user_id: str, email: str, username: str = "",
+        first_name: str = "", last_name: str = "",
+        phone: str = "", role: str = "customer"
+    ) -> bool:
+        try:
+            get_db().table("customers").insert({
+                "id": user_id, "email": email, "username": username,
+                "first_name": first_name, "last_name": last_name,
+                "phone": phone, "role": role,
+            }).execute()
+            return True
+        except Exception:
+            return False
 """
 Customer Repository.
 

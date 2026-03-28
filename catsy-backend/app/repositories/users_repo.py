@@ -1,3 +1,7 @@
+    def get_profile(self, user_id: str) -> Optional[dict]:
+        db = get_db()
+        res = db.table("user_profiles").select("*").eq("id", user_id).execute()
+        return res.data[0] if res.data else None
 from typing import List, Optional, Any
 from app.repositories.base import IRepository
 from app.database import get_db
